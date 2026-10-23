@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#0f4c75" name="theme-color"/>
-<meta name="saman-build" content="v208"/>
+<meta name="saman-build" content="v210"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; manifest-src 'self'; connect-src 'self' https://eiobajtihwxdlfxufmbg.supabase.co wss://eiobajtihwxdlfxufmbg.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
@@ -523,7 +523,7 @@ textarea{min-height:64px}
 #pageWarehouse .warehouseBatchTools>button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:34px!important;height:auto!important;margin:0!important;padding:5px 3px!important;border-radius:8px!important;font-family:inherit!important;font-size:clamp(9px,2.45vw,11px)!important;font-weight:600!important;line-height:1.3!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;box-sizing:border-box!important}
 @media(max-width:360px){#pageWarehouse .warehouseSection>.listTabs>button{font-size:11px!important;padding:5px 3px!important}#pageWarehouse .warehouseBatchTools{gap:4px!important;padding:4px!important}#pageWarehouse .warehouseBatchTools>button{font-size:9px!important;padding:4px 2px!important;min-height:34px!important}}
 </style>
-<meta name="saman-build" content="v208">
+<meta name="saman-build" content="v210">
 <style id="v205-immersive-status-strip">
 /* v205: در حالت تمام‌صفحه هر دو نوار سیستم اندروید (بالا و پایین) مخفی می‌شوند. چون امکان نمایش فقط نوار
    بالای سیستم وجود ندارد، این نوار باریک جایگزین «نوار ساعت» شده و ساعت و شارژ باتری را نشان می‌دهد،
@@ -672,6 +672,7 @@ html.saman-immersive.sysUiOpen #samanStatusStrip>*{visibility:hidden}
   <div class="fundDailyStats" id="fundDailyStats"></div>
   <div class="fundDailyActions"><button class="outline" type="button" id="toggleFundHistory">مشاهده روزهای گذشته</button><button class="primary" type="button" id="closeFundDay">بستن پرونده امروز</button></div>
   <div id="fundDailyHint" class="fundMeta" style="margin-top:8px"></div>
+  <div class="fundDailyNotify" style="margin-top:10px"><button class="outline hidden" type="button" id="fundNotifyEnableBtn">فعال‌سازی اعلان گوشی</button></div>
   <div id="fundDailyHistory" class="hidden"><div class="fundHistoryPicker"><label for="fundHistoryDate">انتخاب روز</label><div class="datePickWrap"><input id="fundHistoryDate" class="finput jalaliInput" readonly placeholder="انتخاب تاریخ شمسی"><button class="calendarBtn" type="button" id="fundHistoryCalendar">▣</button></div></div><div id="fundHistorySelected"></div></div>
  </div>
  <div class="ctitle" style="font-size:14px;margin-top:14px">واریزی‌ها و مانده قابل استفاده</div>
@@ -1477,9 +1478,122 @@ function fundAvailable(f){if(!f||fundReturnMarked(f)||fundBlockedByAnyRecord(f))
 function fundEligibleForPurchase(f){return !!f&&dateKey(f.date||'')===dateKey(today())&&fundAvailable(f)>0.000001&&!fundReturnMarked(f)&&!fundBlockedByAnyRecord(f)}
 function saveFunds(){save(FUND_K,driverFunds);renderDriverFunds();if(typeof renderDashboardStats==='function')renderDashboardStats();if(typeof renderPurchaseFundOptions==='function')renderPurchaseFundOptions();if(typeof renderAll==='function')renderAll()}
 function fundDayStats(day){const key=dateKey(day),arr=driverFunds.filter(f=>dateKey(f.date||'')===key);return {day,arr,count:arr.length,total:arr.reduce((a,f)=>a+Math.max(0,Number(f.amount)||0),0),used:arr.reduce((a,f)=>a+fundUsed(f),0),returned:arr.reduce((a,f)=>a+fundReturned(f),0),remaining:arr.reduce((a,f)=>a+fundAvailable(f),0),closed:!!driverFundDayClosures[String(day)]||!!driverFundDayClosures[key]}}
-function renderFundDaily(){const date=today(),stats=fundDayStats(date),status=$('fundDailyStatus'),hint=$('fundDailyHint'),closeBtn=$('closeFundDay');$('fundDailyDate').textContent='تاریخ: '+date; $('fundDailyStats').innerHTML=`<div><small>تعداد واریزی</small><b>${fa(stats.count)}</b></div><div><small>جمع واریزی</small><b>${money(stats.total)} ریال</b></div><div><small>تعیین‌تکلیف‌شده</small><b>${money(stats.used+stats.returned)} ریال</b></div><div><small>مانده باز</small><b>${money(stats.remaining)} ریال</b></div>`;status.textContent=stats.closed?'پرونده بسته شده':'در انتظار تعیین تکلیف';status.classList.toggle('done',stats.closed);status.classList.toggle('pending',!stats.closed);closeBtn.disabled=stats.closed||stats.count===0||stats.remaining>0||!canCloseFundDay();closeBtn.textContent=stats.closed?'پرونده بسته شد':'بستن پرونده امروز';hint.textContent=stats.closed?'جمع‌بندی این روز ثبت شده است.':stats.count===0?'برای امروز هنوز واریزی ثبت نشده است.':stats.remaining>0?'برای بستن پرونده، ابتدا ماندهٔ تمام واریزی‌های امروز را با مصرف در خرید، انتقال به تنخواه یا برگشت کامل به صندوق تعیین تکلیف کن.':'همهٔ واریزی‌های امروز تعیین تکلیف شده‌اند؛ می‌توانی پرونده را ببندی.';renderFundHistory()}
+function renderFundDaily(){const date=today(),stats=fundDayStats(date),closure=fundDayClosureOf(date),status=$('fundDailyStatus'),hint=$('fundDailyHint'),closeBtn=$('closeFundDay');$('fundDailyDate').textContent='تاریخ: '+date; $('fundDailyStats').innerHTML=`<div><small>تعداد واریزی</small><b>${fa(stats.count)}</b></div><div><small>جمع واریزی</small><b>${money(stats.total)} ریال</b></div><div><small>تعیین‌تکلیف‌شده</small><b>${money(stats.used+stats.returned)} ریال</b></div><div><small>مانده باز</small><b>${money(stats.remaining)} ریال</b></div>`;status.textContent=stats.closed?(closure?.auto?'بسته‌شده (تعطیلی جمعه)':'پرونده بسته شده'):'در انتظار تعیین تکلیف';status.classList.toggle('done',stats.closed);status.classList.toggle('pending',!stats.closed);closeBtn.disabled=stats.closed||stats.count===0||stats.remaining>0||!canCloseFundDay();closeBtn.textContent=stats.closed?'پرونده بسته شد':'بستن پرونده امروز';hint.textContent=stats.closed?(closure?.auto?'در روزهای جمعه پرونده روز بصورت خودکار بسته می شود':'جمع‌بندی این روز ثبت شده است.'):stats.count===0?'برای امروز هنوز واریزی ثبت نشده است.':stats.remaining>0?'برای بستن پرونده، ابتدا ماندهٔ تمام واریزی‌های امروز را با مصرف در خرید، انتقال به تنخواه یا برگشت کامل به صندوق تعیین تکلیف کن.':'همهٔ واریزی‌های امروز تعیین تکلیف شده‌اند؛ می‌توانی پرونده را ببندی.';renderFundHistory()}
 function renderFundHistory(){const box=$('fundDailyHistory');if(!box||box.classList.contains('hidden'))return;const input=$('fundHistoryDate'),out=$('fundHistorySelected');if(!input||!out)return;const available=[...new Set([...driverFunds.map(f=>String(f.date||'')),...Object.keys(driverFundDayClosures)])].filter(Boolean).sort((a,b)=>b.localeCompare(a));if(!input.value)input.value=available.find(d=>d!==today())||today();const d=input.value,x=fundDayStats(d);out.innerHTML=`<div class="fundHistoryRow"><div class="fundHistoryTop"><b>${esc(d)}</b><span class="statusPill ${x.closed?'done':'pending'}">${x.closed?'بسته‌شده':x.count===0?'بدون واریزی':x.remaining>0?'باز':'آماده بستن'}</span></div><div class="fundHistoryNums"><span>تعداد واریزی: <b>${fa(x.count)}</b></span><span>جمع واریزی: <b>${money(x.total)} ریال</b></span><span>تعیین‌تکلیف‌شده: <b>${money(x.used+x.returned)} ریال</b></span><span>ماندهٔ باز: <b>${money(x.remaining)} ریال</b></span></div><div class="fundMeta">${x.closed?'پرونده این روز بسته شده است.':x.count===0?'برای این تاریخ واریزی ثبت نشده است.':x.remaining>0?'هنوز همه مبالغ تعیین‌تکلیف نشده‌اند.':'همه مبالغ تعیین‌تکلیف شده‌اند.'}</div>${!x.closed&&x.count>0&&x.remaining===0?`<button type="button" class="outline fundHistoryClose" data-close-fund-day="${esc(d)}">بستن پرونده این روز</button>`:''}</div>`}
 async function closeDriverFundDay(day=today()){if(!canCloseFundDay())return;const x=fundDayStats(day);if(x.closed){alert('پرونده امروز قبلاً بسته شده است.');return}if(!x.count){alert('برای امروز واریزی ثبت نشده است.');return}if(x.remaining>0){alert('پرونده قابل بستن نیست؛ هنوز از واریزی‌های امروز '+money(x.remaining)+' '+currencyUnit()+' مانده تعیین‌تکلیف‌نشده وجود دارد.');return}if(!(await window.uiConfirm('پرونده واریزی‌های روز '+day+' با جمع '+money(x.total)+' '+currencyUnit()+' بسته شود؟ پس از بستن، این روز در سابقه روزهای گذشته ثبت می‌شود.')))return;driverFundDayClosures[day]={date:day,closedAt:nowParts().iso,closedBy:current?.name||'',count:x.count,total:x.total,used:x.used,returned:x.returned,remaining:x.remaining};save(FUND_DAY_CLOSE_K,driverFundDayClosures);renderFundDaily();alert('پرونده روزانه بسته شد.')}
+// v210: بستن خودکار پروندهٔ روزهای جمعه + یادآوری ساعت ۱۵ برای مدیر صندوق
+const FUND_REMINDER_HOUR=15;
+function fundDayClosureOf(day){const d=String(day||'');return driverFundDayClosures[d]||driverFundDayClosures[dateKey(d)]||null}
+function isFridayJalali(day){return jalaliWeekday(day||today())==='جمعه'}
+function isFundDayManager(){return isAdmin()||canCloseFundDay()}
+function fundAutoCloseFriday(day){
+ const d=day||today();
+ if(!isFridayJalali(d))return false;
+ const x=fundDayStats(d);
+ if(x.closed)return false;
+ if(x.remaining>0)return false;
+ driverFundDayClosures[String(d)]={date:d,closedAt:nowParts().iso,closedBy:'سیستم (تعطیلی جمعه)',auto:true,count:x.count,total:x.total,used:x.used,returned:x.returned,remaining:x.remaining};
+ save(FUND_DAY_CLOSE_K,driverFundDayClosures);
+ return true;
+}
+let fundFridayCheckedDate='';
+function autoCloseFridayFiles(){
+ let changed=false;
+ const t=today();
+ if(isFridayJalali(t)&&fundAutoCloseFriday(t))changed=true;
+ if(fundFridayCheckedDate!==t){
+  fundFridayCheckedDate=t;
+  let d=t;
+  for(let i=0;i<60;i++){d=addJalaliDays(d,-1);if(!d)break;if(isFridayJalali(d)&&fundAutoCloseFriday(d))changed=true}
+ }
+ return changed;
+}
+function fundDayReminderDue(){
+ if(!current||!isFundDayManager())return false;
+ const t=today();
+ if(isFridayJalali(t))return false;
+ if(new Date().getHours()<FUND_REMINDER_HOUR)return false;
+ const x=fundDayStats(t);
+ return !x.closed&&x.count>0;
+}
+function notifyPhone(title,body,tag){
+ try{
+  if(typeof Notification==='undefined'||Notification.permission!=='granted')return;
+  const opts={body:String(body||''),icon:'./icons/icon-192.png',badge:'./icons/icon-192.png',tag:String(tag||'saman-bazargani'),dir:'rtl',lang:'fa'};
+  const fallback=()=>{try{new Notification(title,opts)}catch(_){}};
+  if(navigator.serviceWorker&&navigator.serviceWorker.ready){navigator.serviceWorker.ready.then(reg=>{try{reg.showNotification(title,opts)}catch(_){fallback()}}).catch(fallback)}
+  else fallback();
+ }catch(_){}
+}
+function maybeNotifyFundDayOpen(){
+ if(!fundDayReminderDue())return;
+ if(typeof Notification==='undefined'||Notification.permission!=='granted')return;
+ const t=today(),key='bazargani_fund_reminder_'+dateKey(t);
+ try{if(localStorage.getItem(key))return}catch(_){}
+ try{localStorage.setItem(key,'1')}catch(_){}
+ notifyPhone('پروندهٔ روزانه بسته نشده','واریزی‌های امروز ('+t+') هنوز بسته نشده است. لطفاً تا پایان وقت پرونده را ببندید.','saman-fund-'+dateKey(t));
+}
+function updateFundNotifyButton(){
+ const btn=$('fundNotifyEnableBtn');if(!btn)return;
+ const supported=typeof Notification!=='undefined';
+ const granted=supported&&Notification.permission==='granted';
+ const show=!!current&&isFundDayManager()&&supported;
+ btn.classList.toggle('hidden',!show||granted);
+ if(show&&!granted)btn.textContent=Notification.permission==='denied'?'اعلان گوشی مسدود است؛ از تنظیمات مرورگر اجازه بده':'فعال‌سازی اعلان گوشی';
+}
+function maybeAskNotifyPermission(){
+ try{
+  if(!current||!isFundDayManager())return;
+  if(typeof Notification==='undefined'||Notification.permission!=='default')return;
+  const key='bazargani_notify_asked_'+String(current.id||current.username||'');
+  if(localStorage.getItem(key))return;
+  localStorage.setItem(key,'1');
+  Notification.requestPermission().then(()=>updateFundNotifyButton()).catch(()=>{});
+ }catch(_){}
+}
+function runFundDayAutomation(){
+ try{
+  if(!current)return;
+  if(isFundDayManager()&&autoCloseFridayFiles()){try{renderDriverFunds()}catch(_){}try{refreshNotificationBadge()}catch(_){}}
+  maybeNotifyFundDayOpen();
+  updateFundNotifyButton();
+  subscribePush();
+ }catch(_){}
+}
+window.__runFundDayAutomation=runFundDayAutomation;
+// v210: Web Push واقعی — اعلان حتی وقتی برنامه بسته است.
+// کلید عمومی VAPID را از تابع exportApplicationServerKey (یا خروجی npx web-push generate-vapid-keys) اینجا بگذار.
+const VAPID_PUBLIC_KEY='BJJ8pF9mEe-mnG0JnRbpYwyrv98T_0FrvQsMfFM25PzZukFOd1DJHq0rYtlryrNgyg3-_Wec9a3_0Yfzk5NMelw';
+function urlBase64ToUint8Array(base64String){
+ const padding='='.repeat((4-base64String.length%4)%4);
+ const base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
+ const raw=atob(base64);const out=new Uint8Array(raw.length);
+ for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);
+ return out;
+}
+let pushSubscribed=false,lastPushAttempt=0;
+async function subscribePush(){
+ if(pushSubscribed)return true;
+ if(!VAPID_PUBLIC_KEY)return false;
+ if(Date.now()-lastPushAttempt<60000)return false;
+ lastPushAttempt=Date.now();
+ try{
+  if(!current||!isFundDayManager())return false;
+  if(typeof Notification==='undefined'||Notification.permission!=='granted')return false;
+  if(!('serviceWorker' in navigator)||!('PushManager' in window))return false;
+  if(!supabase)return false;
+  const reg=await navigator.serviceWorker.ready;
+  let sub=await reg.pushManager.getSubscription();
+  if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlBase64ToUint8Array(VAPID_PUBLIC_KEY)});
+  if(!sub)return false;
+  const j=sub.toJSON(),keys=j.keys||{};
+  if(!j.endpoint||!keys.p256dh||!keys.auth)return false;
+  const payload={username:String(current.username||'').toLowerCase(),endpoint:j.endpoint,p256dh:keys.p256dh,auth:keys.auth,user_agent:String(navigator.userAgent||'').slice(0,300)};
+  const {error}=await supabase.from('push_subscriptions').upsert(payload,{onConflict:'endpoint'});
+  if(error){console.warn('push_subscriptions upsert failed',error);return false}
+  pushSubscribed=true;return true;
+ }catch(e){console.warn('subscribePush failed',e);return false}
+}
 function renderDriverFunds(){const cashboxPanel=$('cashboxRechargePanel');if(cashboxPanel)cashboxPanel.classList.toggle('hidden',mode!=='deposit'||!(canChargeCashbox()));const panel=$('driverFundsPanel');if(!panel)return;panel.classList.toggle('hidden',mode!=='deposit'||!(canManageFunds()||canUseFunds()||can('fundView')));if($('fundDraftList')&&!$('fundDraftList').children.length)renderFundDraft();panel.classList.toggle('hidden',mode!=='deposit'||!(canManageFunds()||canUseFunds()||can('fundView')));$('cashboxFundTools').classList.toggle('hidden',!canManageFunds());const box=$('driverFundsList');if(!box)return;renderFundDaily();const todayKey=dateKey(today());const arr=driverFunds.filter(f=>dateKey(f.date||'')===todayKey).slice().sort((a,b)=>{const aa=fundAvailable(a)>0?1:0,bb=fundAvailable(b)>0?1:0;return bb-aa||String(b.date||'').localeCompare(String(a.date||''))||Number(b.id||0)-Number(a.id||0)});box.innerHTML=arr.length?arr.map(f=>{const used=fundUsed(f),ret=fundReturned(f),avail=fundAvailable(f);return `<div class="fundCard"><div class="fundTop"><div><b>${esc(f.desc||'واریزی کارت رانندگان')}</b><div class="fundMeta">${esc(f.date||'')} · ${esc(f.ref||'بدون شماره پیگیری')}<br>ثبت‌کننده: ${esc(f.createdBy||'')}${f.editedBy?`<br><span class="fundEditMeta">ویرایش‌کننده: ${esc(f.editedBy)}</span>`:''}</div></div><span class="statusPill ${fundReturnMarked(f)?'returned':avail?'pending':'done'}">${fundReturnMarked(f)?'برگشت به صندوق':avail?'قابل استفاده':'تسویه‌شده'}</span></div><div class="fundNums"><div><small>مبلغ اولیه</small><b>${money(f.amount)} ریال</b></div><div><small>مصرف‌شده</small><b>${money(used)} ریال</b></div><div><small>مانده</small><b>${money(avail)} ریال</b></div></div>${(f.allocations||[]).length?`<div class="fundMeta">${f.allocations.map(a=>a.kind==='purchase'?`• مصرف در خرید — ${money(a.amount)} ریال${a.desc?' · '+esc(String(a.desc).replace(/^مصرف در خرید[:：]?\s*/,'')):''}`:`• ${esc(a.date||'')} — ${esc('انتقال به تنخواه')}: ${money(a.amount)} ریال${a.desc?' · '+esc(a.desc):''}`).join('<br>')}</div>`:''}${ret?`<div class="fundMeta fundReturnedNote">برگشت به صندوق: ${money(ret)} ریال</div>`:''}<div class="fundActions fundCardActions">${fundReturnMarked(f)?(canReturnDriverFunds()&&!driverFundDayClosures[String(f.date||'')]&&!driverFundDayClosures[dateKey(f.date||'')]?`<button class="fundIconAction fundUndoReturnAction" type="button" data-fund-undo-return="${esc(f.id)}" aria-label="برگرداندن واریزی به حالت قابل استفاده" title="لغو برگشت به صندوق"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11a9 9 0 1 1 2.6 6.4"/><path d="M3 4v7h7"/></svg></button>`:''):(canManageFunds()&&!(f.allocations||[]).length&&used<=0&&ret<=0?`<button class="fundIconAction fundEditAction" type="button" data-fund-edit="${esc(f.id)}" aria-label="ویرایش واریزی ${esc(f.desc||'')}" title="ویرایش"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg></button><button class="fundIconAction fundDeleteAction" type="button" data-fund-delete="${esc(f.id)}" aria-label="حذف واریزی ${esc(f.desc||'')}" title="حذف"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/><path d="M10 10v6M14 10v6"/></svg></button>`:'')}${canReturnDriverFunds()&&!driverFundDayClosures[String(f.date||'')]&&!driverFundDayClosures[dateKey(f.date||'')]&&avail>0&&!(f.allocations||[]).length&&!ret&&avail===Number(f.amount||0)?`<button class="outline" type="button" data-fund-return="${esc(f.id)}">برگشت مانده به صندوق</button>`:''}</div></div>`}).join(''):'<div class="empty">امروز هنوز واریزی کارت رانندگان ثبت نشده است.</div>'}
 function cashboxDraftHtml(item,i){return `<div class="requestItem" data-cashbox-draft="${i}"><div class="requestItemTop"><span class="requestItemNo">شارژ تنخواه ${i+1}</span></div><div class="twocol"><div><label class="flabel">تاریخ شمسی</label><div class="datePickWrap"><input class="finput jalaliInput" data-cashbox-prop="date" value="${esc(item.date||today())}" readonly><button class="calendarBtn" type="button" data-open-cashbox-date="1">▣</button></div></div><div><label class="flabel">مبلغ (ریال)</label><input class="finput moneyInput" data-cashbox-prop="amount" inputmode="numeric" value="${esc(item.amount||'')}" placeholder="50,000,000"></div></div><label class="flabel">شرح شارژ تنخواه</label><input class="finput" data-cashbox-prop="desc" value="${esc(item.desc||'')}" placeholder="شارژ تنخواه"></div>`}
 let cashboxDraft=[{date:today(),amount:'',desc:'شارژ تنخواه'}];
@@ -1575,6 +1689,13 @@ function buildNotifications(){
   if(mine&&(r.items||[]).some(it=>['bought','unavailable','notPossible','rejected'].includes(String(it.status||''))))add('result-'+r.id+'-'+statusFingerprint,'نتیجه درخواست خرید','نتیجه خرید برای درخواست #'+r.id+' ثبت شده است.');
  });
  (Array.isArray(quotes)?quotes:[]).forEach(q=>{const mine=String(q.requesterId)===String(current.id)||String(q.createdBy||'')===String(current.id);if(admin)add('admin-quote-'+q.id+'-'+q.status+'-'+JSON.stringify(q.responses||q.prices||q.sources||[]),'به‌روزرسانی استعلام قیمت','استعلام «'+(q.name||'کالا')+'» · '+(q.status==='done'?'نهایی شده':'در انتظار پاسخ'),'quote');else if((can('quoteRespond')||can('quoteEdit')||userHasNamedRole(current,'مسئول خرید'))&&!mine&&q.status!=='done')add('quote-pending-'+q.id+'-'+JSON.stringify(q.responses||q.prices||q.sources||[]),'استعلام قیمت جدید','استعلام قیمت «'+(q.name||'کالا')+'» نیاز به پیگیری دارد.','quote');else if(mine&&q.status==='done')add('quote-result-'+q.id+'-'+JSON.stringify(q.responses||q.prices||q.sources||[]),'نتیجه استعلام قیمت','نتیجه استعلام «'+(q.name||'کالا')+'» ثبت شده است.','quote');});
+ if(isFundDayManager()){
+  const _ft=today();
+  if(!isFridayJalali(_ft)&&new Date().getHours()>=FUND_REMINDER_HOUR){
+   const _fs=fundDayStats(_ft);
+   if(!_fs.closed&&_fs.count>0)out.push({id:'fund-day-open-'+dateKey(_ft),title:'پروندهٔ روزانه بسته نشده',body:'واریزی‌های امروز ('+_ft+') هنوز بسته نشده است؛ لطفاً پرونده را ببندید.',kind:'fund'});
+  }
+ }
  return out.reverse();
 }
 let activeMessagePage='unread';
@@ -1585,7 +1706,7 @@ function renderNotifications(){
  const needle=String(search?.value||'').trim().toLocaleLowerCase('fa');const pageItems=items.filter(x=>(activeMessagePage==='read'?read.has(x.id):!read.has(x.id))&&(!needle||[x.title,x.body,x.kind,x.id].some(v=>String(v||'').toLocaleLowerCase('fa').includes(needle))));
  const mark=$('markNotificationsRead');if(mark)mark.classList.toggle('hidden',activeMessagePage!=='unread'||unread.length===0);
  list.replaceChildren();if(!pageItems.length){const empty=document.createElement('div');empty.className='notificationEmpty';empty.innerHTML='<span class="notificationEmptyCheck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.2 4.2L19 7"/></svg></span><b>'+(needle?'پیامی پیدا نشد':(activeMessagePage==='read'?'پیام خوانده‌شده‌ای ندارید':'پیامی وجود ندارد'))+'</b><small>'+(needle?'عبارت دیگری را جست‌وجو کنید.':'در این صفحه فعلاً پیامی ندارید.')+'</small>';list.appendChild(empty);return;}
- pageItems.forEach(item=>{const b=document.createElement('button');b.type='button';b.className='notificationItem '+(read.has(item.id)?'isRead':'isUnread');b.dataset.notificationId=item.id;b.dataset.notificationKind=item.kind;const icon=document.createElement('span');icon.className='notificationItemIcon';icon.textContent=item.kind==='quote'?'$':'↗';const txt=document.createElement('span');txt.className='notificationItemText';const title=document.createElement('b');title.textContent=item.title;const body=document.createElement('small');body.textContent=item.body;txt.append(title,body);b.append(icon,txt);if(!read.has(item.id)){const d=document.createElement('i');d.className='notificationItemDot';b.appendChild(d)}list.appendChild(b)});
+ pageItems.forEach(item=>{const b=document.createElement('button');b.type='button';const _read=read.has(item.id);b.className='notificationItem '+(_read?'isRead':'isUnread')+((!_read&&item.kind==='fund')?' notificationItemImportant':'');b.dataset.notificationId=item.id;b.dataset.notificationKind=item.kind;const icon=document.createElement('span');icon.className='notificationItemIcon';icon.textContent=item.kind==='quote'?'$':'↗';const txt=document.createElement('span');txt.className='notificationItemText';const title=document.createElement('b');title.textContent=item.title;const body=document.createElement('small');body.textContent=item.body;txt.append(title,body);b.append(icon,txt);if(!_read){const d=document.createElement('i');d.className='notificationItemDot';b.appendChild(d)}list.appendChild(b)});
 }
 function openNotifications(){renderNotifications();const modal=$('notificationModal');if(modal){modal.classList.remove('hidden');modal.style.display='flex';modal.setAttribute('aria-hidden','false')}}
 function closeNotifications(){const modal=$('notificationModal');if(modal){modal.classList.add('hidden');modal.style.display='none';modal.setAttribute('aria-hidden','true')}}
@@ -1595,6 +1716,11 @@ $('notificationSearch')?.addEventListener('input',()=>{const c=$('clearNotificat
 $('clearNotificationSearch')?.addEventListener('click',()=>{const q=$('notificationSearch');if(q){q.value='';q.focus()}const c=$('clearNotificationSearch');if(c)c.classList.add('hidden');renderNotifications()});
 $('notificationBellBtn')?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openNotifications()},true);
 $('closeNotifications')?.addEventListener('click',e=>{e.preventDefault();closeNotifications()});
+$('fundNotifyEnableBtn')?.addEventListener('click',async()=>{
+ if(typeof Notification==='undefined'){alert('این مرورگر از اعلان گوشی پشتیبانی نمی‌کند.');return}
+ try{const p=await Notification.requestPermission();if(p==='granted'){notifyPhone('اعلان‌های سامان فعال شد','از این پس یادآوری بستن پروندهٔ روزانه برایت ارسال می‌شود.','saman-fund-test');subscribePush();alert('اعلان گوشی فعال شد.')}else{alert('اجازهٔ اعلان داده نشد؛ از تنظیمات مرورگر اجازهٔ اعلان این سایت را بده.')}}catch(_){alert('فعال‌سازی اعلان ممکن نشد.')}
+ updateFundNotifyButton();
+});
 $('notificationModal')?.addEventListener('click',e=>{
  if(e.target.closest('[data-close-notifications]')){closeNotifications();return;}
  const item=e.target.closest('[data-notification-id]');
@@ -1602,15 +1728,16 @@ $('notificationModal')?.addEventListener('click',e=>{
  const read=notificationReadSet();read.add(item.dataset.notificationId);notificationSaveRead(read);
  activeMessagePage='read';const kind=item.dataset.notificationKind;renderNotifications();closeNotifications();
  try{
-  if(kind==='quote'&&(isAdmin()||can('procurement'))){go('procurement');document.querySelector('[data-proc-section=\"quotes\"],#quoteList')?.scrollIntoView({behavior:'smooth',block:'start'});}
+  if(kind==='fund'){go('add');setTimeout(()=>{try{$('driverFundDailyPanel')?.scrollIntoView({behavior:'smooth',block:'start'})}catch(_){}},80);}
+  else if(kind==='quote'&&(isAdmin()||can('procurement'))){go('procurement');document.querySelector('[data-proc-section=\"quotes\"],#quoteList')?.scrollIntoView({behavior:'smooth',block:'start'});}
   else if(kind!=='quote'&&(isAdmin()||can('procurement'))){go('procurement');$('approvalList')?.scrollIntoView({behavior:'smooth',block:'start'});}
  }catch(_){}
 });
 $('markNotificationsRead')?.addEventListener('click',()=>{const read=notificationReadSet();buildNotifications().forEach(x=>read.add(x.id));notificationSaveRead(read);renderNotifications()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeNotifications()});
-setInterval(()=>{if(!current)return;refreshNotificationBadge();const modal=$('notificationModal');if(modal&&!modal.classList.contains('hidden')&&modal.getAttribute('aria-hidden')!=='true')renderNotifications()},6000);
+setInterval(()=>{if(!current)return;runFundDayAutomation();refreshNotificationBadge();const modal=$('notificationModal');if(modal&&!modal.classList.contains('hidden')&&modal.getAttribute('aria-hidden')!=='true')renderNotifications()},6000);
 
-const _showAppNotifications=showApp;showApp=function(){const r=_showAppNotifications.apply(this,arguments);setTimeout(refreshNotificationBadge,80);return r};
+const _showAppNotifications=showApp;showApp=function(){const r=_showAppNotifications.apply(this,arguments);setTimeout(()=>{refreshNotificationBadge();runFundDayAutomation()},80);return r};
 async function boot(){await hydrateDevice();roles=load(RK,roles||null);if(roles){let changed=false;roles=roles.map(r=>{const np=normalizePerms(r.permissions);if(JSON.stringify(np)!==JSON.stringify(r.permissions||{}))changed=true;return {...r,permissions:np}});if(changed)save(RK,roles)}users=load(UK,users||[]);txs=load(TXK,txs||[]);procurement=load(PROC_K,procurement||[]);quotes=load(QUOTE_K,quotes||[]);driverFunds=load(FUND_K,driverFunds||[]);if(!roles){roles=[{id:'manager',name:'مدیر',desc:'دسترسی کامل مدیریتی',permissions:{home:true,add:true,ledger:true,manage:true,export:true,import:true,deleteAll:true,publish:true,viewerUpdate:true,procurement:false}},{id:'viewer',name:'تماشاگر',desc:'مشاهده اطلاعات و دریافت بروزرسانی',permissions:{...defaultPermissions}}];save(RK,roles)}if(!users.length)users=[{id:'admin',name:'عادل مجیری',username:'admin',role:'admin',roleId:'manager'}];if(!users.some(u=>u.role==='admin'))users.unshift({id:'admin',name:'عادل مجیری',username:'admin',role:'admin',roleId:'manager'});users=users.map(({passwordHash,...u})=>{if(!u.roleId)u.roleId=u.role==='admin'?'manager':'viewer';if(!Array.isArray(u.roleIds))u.roleIds=[u.roleId];return u;});save(UK,users);save(PROC_K,procurement);save(QUOTE_K,quotes);
  // Reuse a valid Supabase session to avoid asking for credentials on every app reopen.
  try{const remembered=sessionStorage.getItem('bazargani_session_v1');if(supabase&&remembered){const {data,error}=await supabase.auth.getSession();const session=data?.session;if(!error&&session?.user&&String(session.user.email||'').toLowerCase()===usernameEmail(remembered)){cloudUser=session.user;const found=users.find(x=>String(x.username).toLowerCase()===String(remembered).toLowerCase());if(found){current=found;showApp();connectCloudRealtime().catch(console.warn);pullCloudState(false).then(()=>{const fresh=users.find(x=>String(x.username).toLowerCase()===String(remembered).toLowerCase());if(fresh){current=fresh;showApp()}}).catch(e=>{console.warn('Background session refresh failed',e);showCloudNotice('برنامه با اطلاعات ذخیره‌شده باز شد؛ دریافت آخرین اطلاعات آنلاین ناموفق بود.')});return}await pullCloudState(false);const cloudFound=users.find(x=>String(x.username).toLowerCase()===String(remembered).toLowerCase());if(cloudFound){current=cloudFound;showApp();connectCloudRealtime().catch(console.warn);return}}}}catch(e){console.warn('Session restore skipped',e)}
@@ -1641,7 +1768,7 @@ async function changeOwnPassword(){
  alert('رمز عبور با موفقیت تغییر کرد.');
 }
 $('changeOwnPassword')?.addEventListener('click',changeOwnPassword);
-document.addEventListener('click',()=>setTimeout(refreshNotificationBadge,150));window.addEventListener('focus',refreshNotificationBadge);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshNotificationBadge()});
+document.addEventListener('click',()=>{setTimeout(refreshNotificationBadge,150);maybeAskNotifyPermission()});window.addEventListener('focus',()=>{refreshNotificationBadge();runFundDayAutomation()});document.addEventListener('visibilitychange',()=>{if(!document.hidden){refreshNotificationBadge();runFundDayAutomation()}});
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-reset-password]');if(!b||!isAdmin())return;const u=users.find(x=>String(x.id)===String(b.dataset.resetPassword));if(!u||u.role==='admin'){alert('رمز حساب مدیر اصلی از این قسمت قابل تنظیم نیست.');return}const p=await window.uiPrompt('رمز عبور جدید برای «'+u.name+'» را وارد کن (حداقل ۱۰ نویسه، شامل حرف بزرگ و کوچک و عدد):');if(p===null)return;if(!isStrongPassword(p)){alert('رمز باید حداقل ۱۰ نویسه و شامل حرف بزرگ، حرف کوچک و عدد باشد.');return}if(!(await window.uiConfirm('رمز ورود آنلاین حساب «'+u.username+'» هم تغییر کند؟')))return;try{if(!supabase||!cloudUser)throw new Error('ابتدا با حساب مدیر آنلاین وارد شو.');const {data,error}=await supabase.functions.invoke('manage-saman-user',{body:{action:'reset',username:u.username,password:p}});if(error)throw error;if(!data?.ok)throw new Error(data?.error||'تغییر رمز آنلاین ناموفق بود.');save(UK,users);await pushCloudState();alert('رمز ورود آنلاین کاربر تغییر کرد. رمز جدید را به کاربر بده.');}catch(err){console.error('Reset online password failed',err);alert('رمز تغییر نکرد: '+(err.message||'خطای اتصال')+'\nاگر نسخه جدید سرویس هنوز منتشر نشده، ابتدا کد جدید سرویس مدیریت کاربران را منتشر کن.')}});
 // Keep cross-device data fresh: refresh as soon as the tab becomes visible or regains focus.
 window.refreshCloudIfChanged=refreshCloudIfChanged;
@@ -1755,6 +1882,9 @@ boot();
 .notificationBellBtn{position:relative}.notificationUnreadDot{position:absolute;right:4px;bottom:4px;width:8px;height:8px;border-radius:50%;background:#e53945;box-shadow:0 0 0 2px #fff}.notificationUnreadDot.hidden{display:none}
 .notificationModal{position:fixed;inset:0;z-index:10020;display:flex;align-items:flex-start;justify-content:center;padding:76px 12px 16px;box-sizing:border-box}.notificationModal.hidden{display:none}.notificationShade{position:absolute;inset:0;background:#0b172333;backdrop-filter:blur(2px)}.notificationDialog{position:relative;width:min(480px,100%);max-height:min(74vh,650px);display:flex;flex-direction:column;background:#fff;color:#21313c;border:1px solid #e0e8ed;border-radius:18px;box-shadow:0 18px 55px #102b3a25;overflow:hidden}.notificationHead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:15px 16px 12px;border-bottom:1px solid #edf1f4}.notificationHead>div{display:grid;gap:3px}.notificationHead b{font-size:15px}.notificationHead small{font-size:11px;color:#71808a}.notificationClose{width:29px;height:29px;display:grid;place-items:center;border:0;border-radius:9px;background:#f4f6f8;color:#74818b;font-size:21px;line-height:1}.notificationToolbar{display:flex;justify-content:flex-start;padding:7px 13px 0}.notificationToolbar button{border:0;background:transparent;color:#176087;font:inherit;font-size:11px;font-weight:800;padding:5px 4px}.notificationList{overflow:auto;padding:8px 10px 12px}.notificationItem{width:100%;display:flex;align-items:center;gap:10px;text-align:right;padding:11px 9px;border:0;border-radius:12px;background:#fff;color:inherit;box-shadow:none;margin:2px 0;cursor:pointer}.notificationItem.isUnread{background:#f1f7fa}.notificationItem.isRead{opacity:.78}.notificationItemIcon{width:32px;height:32px;flex:0 0 32px;display:grid;place-items:center;border-radius:10px;background:#e5f0f5;color:#215d7a;font-size:17px;font-weight:900}.notificationItemText{display:grid;gap:4px;flex:1;min-width:0}.notificationItemText b{font-size:12px;line-height:1.4}.notificationItemText small{font-size:11px;line-height:1.7;color:#62727d}.notificationItemDot{width:7px;height:7px;flex:0 0 7px;border-radius:50%;background:#e53945}.notificationEmpty{display:grid;justify-items:center;gap:8px;text-align:center;padding:30px 18px;color:#667681}.notificationEmpty span{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:#edf7f1;color:#2b8a58;font-size:22px}.notificationEmpty b{font-size:13px;color:#344651}.notificationEmpty small{font-size:11px;line-height:1.8}
 .calDay.disabled{opacity:.25;background:#f0f2f4;color:#9aa4ab;cursor:not-allowed;text-decoration:line-through}.calNav:disabled{opacity:.25;cursor:not-allowed}
+/* v210: پیام مهم (بستن پروندهٔ روزانه) — پس‌زمینهٔ قرمز بسیار ملایم و پاستلی؛ پس از خوانده‌شدن دقیقاً مثل بقیه پیام‌ها می‌شود */
+.notificationItem.notificationItemImportant{background:#fdeeee}
+.notificationItem.notificationItemImportant.isRead{background:#fff}
 </style>
 
 
@@ -1786,7 +1916,7 @@ boot();
 (function(){
   if(!('serviceWorker' in navigator) || !window.isSecureContext || location.protocol==='file:') return;
   navigator.serviceWorker.register('./service-worker.js').catch(e=>console.warn('Service worker registration skipped',e));
-  const currentBuild=document.querySelector('meta[name="saman-build"]')?.content || 'v208';
+  const currentBuild=document.querySelector('meta[name="saman-build"]')?.content || 'v210';
   let checking=false, updatePending=false, lastActivity=Date.now();
   const note=document.createElement('div');
   note.id='samanUpdateNotice';
@@ -2156,7 +2286,7 @@ boot();
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initPasswordUi,{once:true});else initPasswordUi();
 
  /* ---------- keep permission-driven UI fresh when the cloud state changes ---------- */
- document.addEventListener('saman:cloud-state-applied',function(){schedulePasswordUi();try{if(typeof window.__refreshPermissionAccordions==='function')window.__refreshPermissionAccordions()}catch(e){}try{if(typeof window.__syncBioSetting==='function')window.__syncBioSetting()}catch(e){}});
+ document.addEventListener('saman:cloud-state-applied',function(){schedulePasswordUi();try{if(typeof window.__refreshPermissionAccordions==='function')window.__refreshPermissionAccordions()}catch(e){}try{if(typeof window.__syncBioSetting==='function')window.__syncBioSetting()}catch(e){}try{if(typeof window.__runFundDayAutomation==='function')window.__runFundDayAutomation()}catch(e){}});
 
  /* ---------- PWA helpers (items 10 and 11) ---------- */
  try{
