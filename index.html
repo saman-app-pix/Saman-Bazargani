@@ -1001,6 +1001,7 @@ function bioErrorFa(e,stage){
  const deep=diag.pick,deepName=String(deep.name||'').toLowerCase(),deepMsg=String(deep.message||'').toLowerCase();
  const outerMsg=String(diag.outer.message||'').toLowerCase();
  const hay=[code,raw,deepName,deepMsg,outerMsg].join(' ').toLowerCase();
+ const hayCore=[code,deepName,deepMsg].join(' ').toLowerCase();
  const action=stage==='register'?'ثبت اثر انگشت':'ورود با اثر انگشت';
  const detail='\n\n— تشخیص فنی —\n'+diag.text;
  const W=function(m){return m+detail};
@@ -1009,12 +1010,13 @@ function bioErrorFa(e,stage){
  if(deepName==='invalidstateerror'||/previous|already|excluded|exclude credential|credential_exist/.test(hay))return W('برای همین حساب از قبل یک «کلید عبور» ثبت شده و همان باعث خطا می‌شود؛ کلید قبلی باید حذف و از نو ثبت شود.');
  if(deepName==='securityerror'||/invalid_rp|invalid domain|rp id|relying party/.test(hay))return W('دامنهٔ سایت با تنظیمات «کلید عبور» سرور هم‌خوان نیست؛ دامنهٔ برنامه باید در تنظیمات Passkeys سرویس آنلاین (Relying Party ID و Origins) ثبت شده باشد.');
  if(deepName==='notsupportederror'||/no available authenticator|discoverable|pubkeycredparams|not supported/.test(hay))return W('این گوشی یا مرورگر در این حالت از «کلید عبور» پشتیبانی نمی‌کند؛ فعال بودن اثر انگشت/قفل صفحه و باز بودن برنامه در مرورگر اصلی را بررسی کن.');
+ if(deepName==='typeerror')return W('گزینه‌هایی که سرور برای «کلید عبور» فرستاده با این مرورگر هم‌خوان نیست (خطای TypeError). این حالت معمولاً یعنی تنظیمات Passkeys در سرویس آنلاین (دامنه/Relying Party) کامل نیست، یا نسخهٔ مرورگر قدیمی است.');
  if(deepName==='constrainterror')return W('گوشی نتوانست «کلید عبور» را با تنظیمات درخواستی بسازد (معمولاً ذخیره‌سازی کلید عبور روی این دستگاه ممکن نیست).');
  if(deepName==='notallowederror'||deepName==='aborterror'||/ceremony_aborted|user_verification|timeout|not allowed/.test(hay))return W('گوشی/مرورگر درخواست اثر انگشت را نپذیرفت یا لغو کرد. مهم‌ترین علت ممکن: روی این گوشی امکان ذخیرهٔ «کلید عبور» (سرویس گوگل/Google Play یا قفل صفحه) فراهم نیست. دسترسی به سرویس گوگل و فعال بودن قفل صفحه را بررسی کن و پنجرهٔ اثر انگشت را کامل تأیید کن.');
  if(/empty credential|unexpected credential/.test(hay))return W('مرورگر پاسخ «کلید عبور» را خالی برگرداند؛ ذخیرهٔ کلید عبور روی این گوشی انجام نشد. دسترسی به سرویس گوگل/Google Play و فعال بودن قفل صفحه را بررسی کن.');
  if(hay.indexOf('empty_passkey_registration')>=0)return W('سرور «کلید عبور» را ناقص برگرداند؛ یک‌بار دیگر تلاش کن.');
  if(bioIsSessionError(e))return W('نشست آنلاین این حساب معتبر نیست؛ یک‌بار از برنامه خارج شو و دوباره وارد شو و سپس اثر انگشت را فعال کن.');
- if(/webauthn|passkey|challenge/.test(hay))return W('سرور درخواست «کلید عبور» را تأیید نکرد؛ تنظیمات Passkeys سرور را بررسی کن.');
+ if(/webauthn|passkey|challenge|attestation|registration/.test(hayCore))return W('سرور درخواست «کلید عبور» را تأیید نکرد؛ تنظیمات Passkeys سرور را بررسی کن.');
  return W(action+' انجام نشد. علت دقیقی که گوشی/مرورگر برگرداند در بخش «تشخیص فنی» بالا آمده است.');
 }
 async function enrollBiometricFor(user){
@@ -1784,7 +1786,7 @@ boot();
 (function(){
   if(!('serviceWorker' in navigator) || !window.isSecureContext || location.protocol==='file:') return;
   navigator.serviceWorker.register('./service-worker.js').catch(e=>console.warn('Service worker registration skipped',e));
-  const currentBuild=document.querySelector('meta[name="saman-build"]')?.content || 'v206';
+  const currentBuild=document.querySelector('meta[name="saman-build"]')?.content || 'v207';
   let checking=false, updatePending=false, lastActivity=Date.now();
   const note=document.createElement('div');
   note.id='samanUpdateNotice';
