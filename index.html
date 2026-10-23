@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#0f4c75" name="theme-color"/>
-<meta name="saman-build" content="v205"/>
+<meta name="saman-build" content="v207"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; manifest-src 'self'; connect-src 'self' https://eiobajtihwxdlfxufmbg.supabase.co wss://eiobajtihwxdlfxufmbg.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
@@ -523,16 +523,17 @@ textarea{min-height:64px}
 #pageWarehouse .warehouseBatchTools>button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:34px!important;height:auto!important;margin:0!important;padding:5px 3px!important;border-radius:8px!important;font-family:inherit!important;font-size:clamp(9px,2.45vw,11px)!important;font-weight:600!important;line-height:1.3!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;box-sizing:border-box!important}
 @media(max-width:360px){#pageWarehouse .warehouseSection>.listTabs>button{font-size:11px!important;padding:5px 3px!important}#pageWarehouse .warehouseBatchTools{gap:4px!important;padding:4px!important}#pageWarehouse .warehouseBatchTools>button{font-size:9px!important;padding:4px 2px!important;min-height:34px!important}}
 </style>
-<meta name="saman-build" content="v205">
+<meta name="saman-build" content="v207">
 <style id="v205-immersive-status-strip">
 /* v205: در حالت تمام‌صفحه هر دو نوار سیستم اندروید (بالا و پایین) مخفی می‌شوند. چون امکان نمایش فقط نوار
    بالای سیستم وجود ندارد، این نوار باریک جایگزین «نوار ساعت» شده و ساعت و شارژ باتری را نشان می‌دهد،
    در حالی که دکمه‌های پایین (بازگشت/خانه) همچنان مخفی می‌مانند. فقط وقتی اپ واقعاً fullscreen باشد دیده می‌شود. */
 #samanStatusStrip{display:none}
-html.saman-immersive #samanStatusStrip{display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;height:27px;padding:0 12px;background:var(--blue);color:#fff;font-size:12px;font-weight:700;line-height:1;direction:ltr;box-sizing:border-box}
+html.saman-immersive #samanStatusStrip{display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;height:27px;padding:0 20px;background:var(--blue);color:#fff;font-size:12px;font-weight:700;line-height:1;direction:ltr;box-sizing:border-box}
 html.saman-immersive .topbar{top:27px!important}
 html.saman-immersive .login{min-height:calc(100vh - 27px)!important}
 html.saman-immersive .app{min-height:calc(100vh - 27px)!important}
+html.saman-immersive.sysUiOpen #samanStatusStrip>*{visibility:hidden}
 #samanStatusStrip .samanStripClock{font-variant-numeric:tabular-nums;letter-spacing:.4px}
 #samanStatusStrip .samanStripBattery{display:inline-flex;align-items:center;gap:5px;font-variant-numeric:tabular-nums}
 #samanStatusStrip .samanStripBattIcon{position:relative;display:inline-block;width:20px;height:10px;border:1.5px solid #fff;border-radius:2.5px;padding:1px;box-sizing:border-box}
@@ -931,16 +932,36 @@ let lastBiometricError='';
 // v202: خطای واقعی و «علت اصلی» (cause) هم استخراج و نشان داده می‌شود تا علت دقیق مشخص شود.
 function bioRawError(e){return String(e?.message||'').replace(/\s+/g,' ').trim()}
 // زنجیرهٔ cause/originalError را باز می‌کند؛ در WebAuthn خطای واقعی مرورگر داخل cause پنهان است.
-function bioUnderlying(e){
- let cur=e,seen=0,name='',message='';
- while(cur&&seen++<8){
-  const n=String(cur.name||'');const m=String(cur.message||'').replace(/\s+/g,' ').trim();
-  if(n&&!name)name=n;
-  if(m&&!message)message=m;
-  cur=cur.cause||cur.originalError||null;
+function bioChain(e){
+ const out=[];let cur=e,seen=0;
+ while(cur&&seen++<10){
+  const name=String(cur.name||'').trim();
+  const message=String(cur.message||'').replace(/\s+/g,' ').trim();
+  const code=cur.code==null?'':String(cur.code);
+  const status=cur.status==null?'':String(cur.status);
+  if(name||message||code)out.push({name:name,message:message,code:code,status:status});
+  const next=cur.cause||cur.originalError||cur.error||null;
+  if(!next||next===cur)break;
+  cur=next;
  }
- return {name:name,message:message};
+ return out;
 }
+function bioDiagnostic(e,stage){
+ const chain=bioChain(e);
+ let pick=null;
+ for(let i=chain.length-1;i>=0;i--){const m=chain[i].message;if(m&&!/^a\s+Non-Webauthn related error has occurred$/i.test(m)){pick=chain[i];break}}
+ if(!pick)for(let i=chain.length-1;i>=0;i--){if(chain[i].message){pick=chain[i];break}}
+ if(!pick)pick={name:'',message:'',code:'',status:''};
+ const outer=chain[0]||{name:'',message:'',code:'',status:''};
+ const lines=['مرحله: '+(stage==='register'?'ثبت کلید عبور':'ورود با کلید عبور')];
+ if(pick.name||pick.message)lines.push('خطای اصلی: '+[pick.name,pick.message].filter(Boolean).join(' — '));
+ if(outer.name||outer.code)lines.push('خطای بیرونی: '+[outer.name,outer.code].filter(Boolean).join(' / '));
+ if(outer.status)lines.push('کد وضعیت: '+outer.status);
+ if(outer.message&&outer.message!==pick.message)lines.push('پیام سرور: '+outer.message);
+ lines.push('دامنه: '+String(location.hostname||''));
+ return {chain:chain,pick:pick,outer:outer,text:lines.join('\n')};
+}
+function bioUnderlying(e){const d=bioDiagnostic(e,'register');return {name:d.pick.name||d.outer.name,message:d.pick.message||d.outer.message}}
 function bioIsSessionError(e){const u=bioUnderlying(e);const s=String(e?.code||e?.name||'')+' '+bioRawError(e)+' '+u.name+' '+u.message;return /session|jwt|refresh|expired|unauthor|not_authenticated|invalid_token|401|403/i.test(s)}
 // مرورگرهای داخلی پیام‌رسان‌ها و WebView‌ها WebAuthn/کلید عبور را اجرا نمی‌کنند.
 function bioEmbeddedBrowser(){
@@ -957,28 +978,44 @@ function bioEmbeddedHint(){return 'این صفحه داخل مرورگر داخ�
 let bioPlatformSupport=null,bioPlatformProbed=false;
 async function probeBioPlatform(){if(bioPlatformProbed)return bioPlatformSupport;bioPlatformProbed=true;try{if(typeof PublicKeyCredential?.isUserVerifyingPlatformAuthenticatorAvailable!=='function'){bioPlatformSupport=null;return null}bioPlatformSupport=!!(await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable());return bioPlatformSupport}catch(_){bioPlatformSupport=null;return null}}
 function bioMismatchError(){return Object.assign(new Error('bio_account_mismatch'),{code:'bio_account_mismatch'})}
+async function bioListPasskeys(){
+ try{
+  const {data,error}=await supabase.auth.passkey.list();
+  if(error)return null;
+  const arr=Array.isArray(data)?data:(data&&(data.passkeys||data.data)||null);
+  return Array.isArray(arr)?arr:null;
+ }catch(_){return null}
+}
+function bioPasskeyId(p){return (p&&(p.passkeyId||p.passkey_id||p.id))||''}
+async function bioDeleteAllPasskeys(){
+ const list=await bioListPasskeys();
+ if(!list||!list.length)return 0;
+ let n=0;
+ for(const p of list){const id=bioPasskeyId(p);if(!id)continue;try{const r=await supabase.auth.passkey.delete({passkeyId:id});if(!r.error)n++}catch(_){}}
+ return n;
+}
 function bioErrorFa(e,stage){
  const code=String(e?.code||e?.name||'');
  const raw=bioRawError(e);
- const under=bioUnderlying(e);
- const generic=/^a Non-Webauthn related error has occurred$/i.test(raw);
- const cause=under.message&&under.message!==raw&&!/^a Non-Webauthn/i.test(under.message)?under.message:'';
- const causeDetail=cause?'\nعلت اصلی: '+cause:'';
- const detail=raw&&raw!==code&&!generic?'\nجزئیات: '+raw:'';
+ const diag=bioDiagnostic(e,stage);
+ const deep=diag.pick,deepName=String(deep.name||'').toLowerCase(),deepMsg=String(deep.message||'').toLowerCase();
+ const outerMsg=String(diag.outer.message||'').toLowerCase();
+ const hay=[code,raw,deepName,deepMsg,outerMsg].join(' ').toLowerCase();
  const action=stage==='register'?'ثبت اثر انگشت':'ورود با اثر انگشت';
- if(code==='bio_account_mismatch')return 'حساب آنلاینی که وارد شده با این کاربر یکی نیست؛ یک‌بار از برنامه خارج شو و دوباره با همین کاربر وارد شو، بعد اثر انگشت را فعال کن.';
- if(code.includes('passkey_disabled'))return 'ورود با اثر انگشت هنوز در تنظیمات احراز هویت آنلاین فعال نشده است.';
- if(code==='ERROR_AUTHENTICATOR_PREVIOUSLY_REGISTERED')return 'قبلاً روی همین دستگاه اثر انگشت برای این حساب ثبت شده است؛ گزینه را خاموش و دوباره روشن کن یا کلید عبور قبلی را حذف کن.';
- if(code==='ERROR_INVALID_RP_ID'||code==='ERROR_INVALID_DOMAIN'||code==='SecurityError')return 'دامنهٔ این سایت با تنظیمات کلید عبور سرور هم‌خوان نیست؛ دامنهٔ برنامه باید در تنظیمات Passkeys سرویس آنلاین (Relying Party ID و Origins) ثبت شده باشد.'+causeDetail;
- if(code==='NotSupportedError'||code==='ERROR_AUTHENTICATOR_MISSING_DISCOVERABLE_CREDENTIAL_SUPPORT'||code==='ERROR_AUTHENTICATOR_NO_SUPPORTED_PUBKEYCREDPARAMS_ALG'||code==='ERROR_AUTHENTICATOR_MISSING_USER_VERIFICATION_SUPPORT')return 'این مرورگر یا گوشی در این حالت از «کلید عبور» پشتیبانی نمی‌کند؛ مطمئن شو اثر انگشت یا قفل صفحه روی گوشی فعال است و برنامه را در مرورگر اصلی باز کن.'+causeDetail;
- if(code==='NotAllowedError'||code==='ERROR_CEREMONY_ABORTED'||code==='ERROR_AUTO_REGISTER_USER_VERIFICATION_FAILURE')return 'درخواست اثر انگشت لغو شد یا مرورگر اجازه نداد. اگر پنجرهٔ گوشی نیامد، مطمئن شو اثر انگشت/قفل صفحه فعال است و برنامه را در مرورگر اصلی باز کن.'+causeDetail;
- if(code==='ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY'||generic){
-  if(bioEmbeddedBrowser())return bioEmbeddedHint()+causeDetail;
-  return action+' انجام نشد؛ مرورگر/گوشی درخواست کلید عبور را نپذیرفت. مطمئن شو اثر انگشت یا رمز قفل صفحه روی گوشی فعال است و صفحه را در مرورگر اصلی (نه مرورگر داخلی پیام‌رسان‌ها) باز کن.'+causeDetail;
- }
- if(bioIsSessionError(e))return 'نشست آنلاین این حساب معتبر نیست؛ یک‌بار از برنامه خارج شو و دوباره وارد شو و سپس اثر انگشت را فعال کن.'+causeDetail+detail;
- if(code.includes('webauthn')||code.includes('passkey')||code.includes('challenge'))return 'تنظیمات کلید عبور در سرور کامل نیست یا درخواست تأیید نشد.'+detail+causeDetail;
- return action+' انجام نشد؛ تنظیمات دامنه و کلید عبور را بررسی کن.'+causeDetail+detail;
+ const detail='\n\n— تشخیص فنی —\n'+diag.text;
+ const W=function(m){return m+detail};
+ if(code==='bio_account_mismatch'||hay.indexOf('bio_account_mismatch')>=0)return W('حساب آنلاینی که وارد شده‌ای با این کاربر یکی نیست؛ یک‌بار از برنامه خارج شو و با همین کاربر وارد شو و بعد دوباره فعال کن.');
+ if(hay.indexOf('passkey_disabled')>=0)return W('ورود با «کلید عبور» هنوز در تنظیمات احراز هویت آنلاین (Supabase) روشن نشده است.');
+ if(deepName==='invalidstateerror'||/previous|already|excluded|exclude credential|credential_exist/.test(hay))return W('برای همین حساب از قبل یک «کلید عبور» ثبت شده و همان باعث خطا می‌شود؛ کلید قبلی باید حذف و از نو ثبت شود.');
+ if(deepName==='securityerror'||/invalid_rp|invalid domain|rp id|relying party/.test(hay))return W('دامنهٔ سایت با تنظیمات «کلید عبور» سرور هم‌خوان نیست؛ دامنهٔ برنامه باید در تنظیمات Passkeys سرویس آنلاین (Relying Party ID و Origins) ثبت شده باشد.');
+ if(deepName==='notsupportederror'||/no available authenticator|discoverable|pubkeycredparams|not supported/.test(hay))return W('این گوشی یا مرورگر در این حالت از «کلید عبور» پشتیبانی نمی‌کند؛ فعال بودن اثر انگشت/قفل صفحه و باز بودن برنامه در مرورگر اصلی را بررسی کن.');
+ if(deepName==='constrainterror')return W('گوشی نتوانست «کلید عبور» را با تنظیمات درخواستی بسازد (معمولاً ذخیره‌سازی کلید عبور روی این دستگاه ممکن نیست).');
+ if(deepName==='notallowederror'||deepName==='aborterror'||/ceremony_aborted|user_verification|timeout|not allowed/.test(hay))return W('گوشی/مرورگر درخواست اثر انگشت را نپذیرفت یا لغو کرد. مهم‌ترین علت ممکن: روی این گوشی امکان ذخیرهٔ «کلید عبور» (سرویس گوگل/Google Play یا قفل صفحه) فراهم نیست. دسترسی به سرویس گوگل و فعال بودن قفل صفحه را بررسی کن و پنجرهٔ اثر انگشت را کامل تأیید کن.');
+ if(/empty credential|unexpected credential/.test(hay))return W('مرورگر پاسخ «کلید عبور» را خالی برگرداند؛ ذخیرهٔ کلید عبور روی این گوشی انجام نشد. دسترسی به سرویس گوگل/Google Play و فعال بودن قفل صفحه را بررسی کن.');
+ if(hay.indexOf('empty_passkey_registration')>=0)return W('سرور «کلید عبور» را ناقص برگرداند؛ یک‌بار دیگر تلاش کن.');
+ if(bioIsSessionError(e))return W('نشست آنلاین این حساب معتبر نیست؛ یک‌بار از برنامه خارج شو و دوباره وارد شو و سپس اثر انگشت را فعال کن.');
+ if(/webauthn|passkey|challenge/.test(hay))return W('سرور درخواست «کلید عبور» را تأیید نکرد؛ تنظیمات Passkeys سرور را بررسی کن.');
+ return W(action+' انجام نشد. علت دقیقی که گوشی/مرورگر برگرداند در بخش «تشخیص فنی» بالا آمده است.');
 }
 async function enrollBiometricFor(user){
  lastBiometricError='';
@@ -1007,7 +1044,36 @@ async function enrollBiometricFor(user){
   if(!data)throw new Error('empty_passkey_registration');
   localStorage.setItem(bioKey(user.username),JSON.stringify({registered:true,username:user.username,host:location.hostname,createdAt:new Date().toISOString()}));
   return true;
- }catch(e){console.warn('Supabase passkey registration failed',e);lastBiometricError=bioErrorFa(e,'register');return false}
+ }catch(e){
+  console.warn('Supabase passkey registration failed',e);
+  try{
+   const d=bioDiagnostic(e,'register');
+   const hay=(String(e?.code||'')+' '+bioRawError(e)+' '+d.pick.name+' '+d.pick.message).toLowerCase();
+   // v207: خطای «قبلاً ثبت شده» → کلید قدیمی همین حساب حذف و یک‌بار دیگر ثبت می‌شود.
+   if(/previous|already|invalidstateerror|excluded|exclude credential|credential_exist/.test(hay)){
+    const existing=await bioListPasskeys();
+    if(existing&&existing.length){
+     const ok=(typeof confirm!=='function')||confirm('برای این حساب از قبل یک «کلید عبور» ثبت شده و همین باعث خطا می‌شود.\nکلید قبلی حذف شود و از نو ثبت شود؟');
+     if(ok){
+      await bioDeleteAllPasskeys();
+      try{
+       const retry=await supabase.auth.registerPasskey();
+       if(!retry.error&&retry.data){localStorage.setItem(bioKey(user.username),JSON.stringify({registered:true,username:user.username,host:location.hostname,createdAt:new Date().toISOString()}));return true}
+       if(retry.error)e=retry.error;
+      }catch(e2){e=e2}
+     }
+    }
+   }else if(/empty credential|unexpected credential/.test(hay)){
+    // v207: پاسخ خالی مرورگر معمولاً گذرا است؛ یک‌بار دیگر تلاش می‌کنیم.
+    try{
+     const retry=await supabase.auth.registerPasskey();
+     if(!retry.error&&retry.data){localStorage.setItem(bioKey(user.username),JSON.stringify({registered:true,username:user.username,host:location.hostname,createdAt:new Date().toISOString()}));return true}
+     if(retry.error)e=retry.error;
+    }catch(e2){e=e2}
+   }
+  }catch(_){}
+  lastBiometricError=bioErrorFa(e,'register');return false
+ }
 }
 async function biometricLogin(){
  const requestedUsername=$('loginUser')?.value.trim()||'';
@@ -1718,7 +1784,7 @@ boot();
 (function(){
   if(!('serviceWorker' in navigator) || !window.isSecureContext || location.protocol==='file:') return;
   navigator.serviceWorker.register('./service-worker.js').catch(e=>console.warn('Service worker registration skipped',e));
-  const currentBuild=document.querySelector('meta[name="saman-build"]')?.content || 'v205';
+  const currentBuild=document.querySelector('meta[name="saman-build"]')?.content || 'v206';
   let checking=false, updatePending=false, lastActivity=Date.now();
   const note=document.createElement('div');
   note.id='samanUpdateNotice';
@@ -2106,6 +2172,13 @@ var mq=window.matchMedia('(display-mode: fullscreen)');
 function applyMode(){document.documentElement.classList.toggle('saman-immersive',!!mq.matches);}
 applyMode();
 try{mq.addEventListener('change',applyMode);}catch(e){try{mq.addListener(applyMode);}catch(_){}}
+var maxH=window.innerHeight;
+function onVP(){var h=window.innerHeight;if(h>maxH)maxH=h;var d=maxH-h;document.documentElement.classList.toggle('sysUiOpen',d>=10&&d<=90);}
+window.addEventListener('resize',onVP);
+try{if(window.visualViewport)window.visualViewport.addEventListener('resize',onVP);}catch(_){}
+window.addEventListener('orientationchange',function(){maxH=window.innerHeight;document.documentElement.classList.remove('sysUiOpen');});
+document.addEventListener('touchstart',function(e){var y=e.touches&&e.touches[0]?e.touches[0].clientY:999;if(y<32)document.documentElement.classList.add('sysUiOpen');},{passive:true});
+onVP();
 var clock=document.getElementById('samanStripClock');
 function tick(){if(!clock)return;var d=new Date(),h=('0'+d.getHours()).slice(-2),m=('0'+d.getMinutes()).slice(-2);clock.textContent=h+':'+m;}
 tick();setInterval(tick,15000);
