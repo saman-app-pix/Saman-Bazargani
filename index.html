@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#0f4c75" name="theme-color"/>
-<meta name="saman-build" content="v202"/>
+<meta name="saman-build" content="v204"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; manifest-src 'self'; connect-src 'self' https://eiobajtihwxdlfxufmbg.supabase.co wss://eiobajtihwxdlfxufmbg.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
@@ -31,6 +31,8 @@ button,input,select{font:inherit}button{cursor:pointer}.hidden{display:none!impo
 .field{margin:12px 0}.field label,.flabel{display:block;font-size:14px;color:#53616c;margin:0 0 6px}
 .field input,.finput,.select{width:100%;height:48px;border:1px solid #d5dee5;border-radius:12px;padding:0 12px;outline:0;background:#fff}
 .primary{height:48px;border:0;border-radius:12px;background:var(--blue2);color:#fff;font-weight:bold;width:100%}
+/* v203: کلید «ورود به برنامه» در صفحهٔ ورود همیشه رنگ اصلی خودش (آبی پیش‌فرض) را نگه می‌دارد و با تغییر رنگ‌بندی برنامه عوض نمی‌شود. */
+#loginBtn{background:#1976b9}
 .demo{text-align:center;color:#929da6;font-size:10px;margin-top:12px}
 .error{color:var(--red);font-size:11px;text-align:center;margin-top:10px;min-height:15px}
 .app{min-height:100vh;padding-bottom:78px}.topbar{height:65px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 15px;position:sticky;top:0;z-index:10;box-shadow:0 3px 14px #052f4a30}
@@ -521,7 +523,7 @@ textarea{min-height:64px}
 #pageWarehouse .warehouseBatchTools>button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:34px!important;height:auto!important;margin:0!important;padding:5px 3px!important;border-radius:8px!important;font-family:inherit!important;font-size:clamp(9px,2.45vw,11px)!important;font-weight:600!important;line-height:1.3!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;box-sizing:border-box!important}
 @media(max-width:360px){#pageWarehouse .warehouseSection>.listTabs>button{font-size:11px!important;padding:5px 3px!important}#pageWarehouse .warehouseBatchTools{gap:4px!important;padding:4px!important}#pageWarehouse .warehouseBatchTools>button{font-size:9px!important;padding:4px 2px!important;min-height:34px!important}}
 </style>
-<meta name="saman-build" content="v200">
+<meta name="saman-build" content="v204">
 </head>
 <body>
 <div class="login" id="loginScreen">
@@ -1118,6 +1120,11 @@ function loadCardView(){try{return localStorage.getItem('bazargani_card_view_v1'
 const themeChoices={default:['#0f4c75','#1976b9'],forest:['#24594b','#2e7863'],plum:['#543c68','#75538e'],wine:['#713c49','#984f60'],slate:['#3b4d63','#526a85'],brown:['#65503d','#8b6a4b']};
 // v202: رنگ نوار وضعیت/نوبار گوشی (نوار اعلان و کلیدهای پایین) و مانیفست PWA را هم‌رنگ تم می‌کند.
 // برای هر تم یک فایل مانیفست واقعی و هم‌مبدأ ساخته شده است؛ مانیفست Blob در نصب PWA پایدار نیست، پس از فایل ثابت استفاده می‌کنیم.
+// v203: توجه — نوار «بالای» گوشی (نوار اعلان/وضعیت) با theme-color تغییر می‌کند، ولی نوار «پایین» سیستم اندروید
+// (کلیدهای بازگشت/خانه/برنامه‌ها یا نوار ژست) متعلق به خود اندروید است و هیچ وب‌اپ/PWA نمی‌تواند رنگش را تعیین کند
+// (chromium issue 40759522). این محدودیت مرورگر است، نه ایراد اپ.
+// v204: طبق تصمیم کاربر، حالت نمایش اپ روی «تمام‌صفحه» (display: fullscreen) تنظیم شد تا نوار پایین اندروید
+// اصلاً نمایش داده نشود و کاربر در صورت نیاز با کشیدن از لبهٔ بالا/پایین آن را موقتاً ببیند.
 const themeManifestFiles={default:'./manifest.webmanifest',forest:'./manifest-forest.webmanifest',plum:'./manifest-plum.webmanifest',wine:'./manifest-wine.webmanifest',slate:'./manifest-slate.webmanifest',brown:'./manifest-brown.webmanifest'};
 function syncThemeColor(primary,name){
  try{
@@ -1694,7 +1701,7 @@ boot();
 (function(){
   if(!('serviceWorker' in navigator) || !window.isSecureContext || location.protocol==='file:') return;
   navigator.serviceWorker.register('./service-worker.js').catch(e=>console.warn('Service worker registration skipped',e));
-  const currentBuild=document.querySelector('meta[name="saman-build"]')?.content || 'v202';
+  const currentBuild=document.querySelector('meta[name="saman-build"]')?.content || 'v204';
   let checking=false, updatePending=false, lastActivity=Date.now();
   const note=document.createElement('div');
   note.id='samanUpdateNotice';
