@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#ffffff" name="theme-color"/>
-<meta name="saman-build" content="v218"/>
+<meta name="saman-build" content="v219"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; manifest-src 'self'; connect-src 'self' https://eiobajtihwxdlfxufmbg.supabase.co wss://eiobajtihwxdlfxufmbg.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
@@ -523,7 +523,7 @@ textarea{min-height:64px}
 #pageWarehouse .warehouseBatchTools>button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:34px!important;height:auto!important;margin:0!important;padding:5px 3px!important;border-radius:8px!important;font-family:inherit!important;font-size:clamp(9px,2.45vw,11px)!important;font-weight:600!important;line-height:1.3!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;box-sizing:border-box!important}
 @media(max-width:360px){#pageWarehouse .warehouseSection>.listTabs>button{font-size:11px!important;padding:5px 3px!important}#pageWarehouse .warehouseBatchTools{gap:4px!important;padding:4px!important}#pageWarehouse .warehouseBatchTools>button{font-size:9px!important;padding:4px 2px!important;min-height:34px!important}}
 </style>
-<meta name="saman-build" content="v218">
+<meta name="saman-build" content="v219">
 
 <style id="v213-fund-transfer-split">
 .fundActOverlay,.fundPickerOverlay{position:fixed;inset:0;z-index:100520;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;background:rgba(15,28,45,.48);backdrop-filter:blur(2px)}
@@ -2133,6 +2133,256 @@ function closeFundActModal(id){const el=document.getElementById(id);if(el)el.rem
 function openFundTransferModal(fundId){const f=driverFunds.find(x=>String(x.id)===String(fundId));if(!f)return;if(!canUseFunds()){alert('دسترسی انتقال واریزی به تنخواه برای این نقش فعال نیست.');return}const avail=fundAvailable(f);if(avail<=0){alert('ماندهٔ قابل استفاده‌ای برای انتقال به تنخواه وجود ندارد.');return}closeFundActModal('fundTransferModal');const overlay=document.createElement('div');overlay.id='fundTransferModal';overlay.className='fundActOverlay';overlay.innerHTML=`<form class="fundActCard" role="dialog" aria-modal="true" aria-labelledby="fundTransferTitle"><div class="fundActHead"><b id="fundTransferTitle">انتقال به تنخواه</b><button type="button" class="fundActClose" aria-label="بستن">×</button></div><div class="fundActMeta"><span>${esc(f.desc||'واریزی کارت رانندگان')}</span><small>مانده قابل استفاده: ${money(avail)} ${currencyUnit()}</small></div><label for="fundTransferAmount">مبلغ انتقال (${currencyUnit()})</label><input id="fundTransferAmount" class="finput moneyInput" inputmode="numeric" value="${fa(moneyInputValue(avail))}" autocomplete="off"><div class="fundActError" role="alert"></div><div class="fundActActions"><button type="button" class="fundActCancel">انصراف</button><button type="submit" class="primary">ثبت انتقال</button></div></form>`;document.body.appendChild(overlay);document.body.style.overflow='hidden';overlay.querySelector('.fundActClose').onclick=()=>closeFundActModal('fundTransferModal');overlay.querySelector('.fundActCancel').onclick=()=>closeFundActModal('fundTransferModal');overlay.addEventListener('click',e=>{if(e.target===overlay)closeFundActModal('fundTransferModal')});const input=overlay.querySelector('#fundTransferAmount'),err=overlay.querySelector('.fundActError');input.addEventListener('input',()=>{input.value=input.value?fa(num(input.value)):''});overlay.querySelector('form').onsubmit=e=>{e.preventDefault();const val=toRial(input.value);if(val<=0){err.textContent='مبلغ انتقال را وارد کن.';return}if(val>fundAvailable(f)+0.000001){err.textContent='مبلغ بیشتر از ماندهٔ قابل استفادهٔ این واریزی است.';return}if(!driverFundTransferToCashbox(f.id,val,'انتقال به تنخواه')){err.textContent='انتقال انجام نشد؛ دوباره تلاش کن.';return}closeFundActModal('fundTransferModal');try{renderAll()}catch(_e){}try{renderDriverFunds()}catch(_e2){}alert('انتقال به تنخواه ثبت شد و در گردش حساب آمد.')}}
 function openFundSplitModal(fundId){const f=driverFunds.find(x=>String(x.id)===String(fundId));if(!f)return;if(!can('fundSplit')){alert('دسترسی تفکیک واریزی برای این سمت فعال نیست.');return}const orig=Math.max(0,Number(f.amount)||0);const avail=fundAvailable(f);if(fundReturnMarked(f)||orig<=0||avail<=0){alert('ماندهٔ قابل استفاده‌ای برای تفکیک این واریزی وجود ندارد.');return}closeFundActModal('fundSplitModal');const overlay=document.createElement('div');overlay.id='fundSplitModal';overlay.className='fundActOverlay';overlay.innerHTML=`<form class="fundActCard" role="dialog" aria-modal="true" aria-labelledby="fundSplitTitle"><div class="fundActHead"><b id="fundSplitTitle">تفکیک واریزی</b><button type="button" class="fundActClose" aria-label="بستن">×</button></div><div class="fundActMeta"><span>${esc(f.desc||'واریزی کارت رانندگان')}</span><small>مبلغ کل: ${money(orig)} ${currencyUnit()} • مانده قابل استفاده: ${money(avail)} ${currencyUnit()}</small></div><label for="fundSplitAmount">مبلغی که تفکیک می‌شود (${currencyUnit()})</label><input id="fundSplitAmount" class="finput moneyInput" inputmode="numeric" placeholder="مثلاً ${fa(moneyInputValue(Math.floor(avail/2)))}" autocomplete="off"><div class="fundActNote">این مبلغ به‌عنوان یک واریزی جداگانه با همان نام راننده ثبت می‌شود و از مبلغ اصلی کم می‌گردد.</div><div class="fundActError" role="alert"></div><div class="fundActActions"><button type="button" class="fundActCancel">انصراف</button><button type="submit" class="primary">ثبت تفکیک</button></div></form>`;document.body.appendChild(overlay);document.body.style.overflow='hidden';overlay.querySelector('.fundActClose').onclick=()=>closeFundActModal('fundSplitModal');overlay.querySelector('.fundActCancel').onclick=()=>closeFundActModal('fundSplitModal');overlay.addEventListener('click',e=>{if(e.target===overlay)closeFundActModal('fundSplitModal')});const input=overlay.querySelector('#fundSplitAmount'),err=overlay.querySelector('.fundActError');input.addEventListener('input',()=>{input.value=input.value?fa(num(input.value)):''});overlay.querySelector('form').onsubmit=e=>{e.preventDefault();const val=toRial(input.value);if(val<=0){err.textContent='مبلغ تفکیک را وارد کن.';return}if(val>=orig){err.textContent='مبلغ تفکیک باید کمتر از مبلغ کل واریزی باشد.';return}if(val>avail){err.textContent='مبلغ تفکیک نمی‌تواند از ماندهٔ قابل استفاده بیشتر باشد.';return}if(!splitDriverFund(f.id,val)){err.textContent='تفکیک انجام نشد؛ دوباره تلاش کن.';return}closeFundActModal('fundSplitModal');try{renderAll()}catch(_e){}try{renderDriverFunds()}catch(_e2){}alert('واریزی تفکیک شد؛ دو واریزی جداگانه با همان نام راننده ساخته شد.')}}
 function openFundPicker(initialUses,onConfirm){closeFundActModal('fundPickerModal');const funds=eligibleFundsToday();const init={};[...(Array.isArray(initialUses)?initialUses:[])].forEach(u=>{init[String(u.fundId)]=Number(u.amount)||0});const overlay=document.createElement('div');overlay.id='fundPickerModal';overlay.className='fundPickerOverlay';overlay.innerHTML=`<div class="fundPickerCard" role="dialog" aria-modal="true" aria-labelledby="fundPickerTitle"><div class="fundPickerHead"><b id="fundPickerTitle">انتخاب از واریزی‌های کارت رانندگان</b><button type="button" class="fundPickerClose" aria-label="بستن">×</button></div><p class="fundPickerHint">مبلغی که از هر واریزی برداشت می‌شود را وارد کن. فقط واریزی‌های امروز که ماندهٔ قابل استفاده دارند نمایش داده می‌شوند.</p><div class="fundPickerList">${funds.length?funds.map(f=>`<label class="fundPickRow"><span class="fundPickInfo"><b>${esc(f.desc||'واریزی کارت رانندگان')}</b><small>مانده: ${money(fundAvailable(f))} ${currencyUnit()}</small></span><input class="finput moneyInput" inputmode="numeric" data-pick-fund="${esc(f.id)}" data-pick-max="${fundAvailable(f)}" value="${init[String(f.id)]?fa(moneyInputValue(init[String(f.id)])):''}" placeholder="مبلغ"></label>`).join(''):'<div class="fundPickerEmpty">واریزی قابل استفاده‌ای برای امروز وجود ندارد.</div>'}</div><div class="fundPickerTotal">جمع انتخاب: <b data-pick-total>۰ ${currencyUnit()}</b></div><div class="fundPickerActions"><button type="button" class="outline fundPickCancel">انصراف</button><button type="button" class="primary fundPickConfirm"${funds.length?'':' disabled'}>تأیید انتخاب</button></div></div>`;document.body.appendChild(overlay);document.body.style.overflow='hidden';const close=()=>closeFundActModal('fundPickerModal');overlay.querySelector('.fundPickerClose').onclick=close;overlay.querySelector('.fundPickCancel').onclick=close;overlay.addEventListener('click',e=>{if(e.target===overlay)close()});const totalEl=overlay.querySelector('[data-pick-total]');const recalc=()=>{let t=0;overlay.querySelectorAll('[data-pick-fund]').forEach(inp=>{const mx=Number(inp.dataset.pickMax)||0;let v=toRial(inp.value);if(v>mx){v=mx;inp.value=fa(moneyInputValue(mx))}t+=Math.max(0,v)});totalEl.textContent=money(t)+' '+currencyUnit()};overlay.querySelectorAll('[data-pick-fund]').forEach(inp=>{inp.addEventListener('input',()=>{inp.value=inp.value?fa(num(inp.value)):'';recalc()})});recalc();overlay.querySelector('.fundPickConfirm').onclick=()=>{const uses=[];let bad=false;overlay.querySelectorAll('[data-pick-fund]').forEach(inp=>{const v=Math.round(toRial(inp.value)||0);if(v>0){const mx=Number(inp.dataset.pickMax)||0;if(v>mx+0.000001){bad=true;return}uses.push({fundId:String(inp.dataset.pickFund),amount:v})}});if(bad){alert('مبلغ یکی از واریزی‌ها بیشتر از ماندهٔ قابل استفادهٔ آن است.');return}close();onConfirm(uses)}}
+/* ================= v219: ورود فقط با اتصال واقعی + قفل همهٔ تراکنش‌های کارت رانندگان + دریافت جزئی انبار ================= */
+
+/* ---------- ۱) گیت اتصال: بدون سرور، ورود انجام نمی‌شود ---------- */
+let __serverOnline=false,__entryGateActive=false,__connWatchTimer=null,__connWatchTick=null;
+function serverReachable(timeoutMs){
+ return new Promise(resolve=>{
+  let settled=false;
+  const done=v=>{if(!settled){settled=true;resolve(v)}};
+  try{
+   const ctl=new AbortController();
+   const timer=setTimeout(()=>{try{ctl.abort()}catch(_){}done(false)},Math.max(1500,Number(timeoutMs)||5000));
+   fetch(SUPABASE_URL+'/auth/v1/health',{method:'GET',cache:'no-store',headers:{apikey:SUPABASE_PUBLISHABLE_KEY},signal:ctl.signal})
+    .then(res=>{clearTimeout(timer);done(!!res&&res.ok)})
+    .catch(()=>{clearTimeout(timer);done(false)});
+  }catch(_){done(false)}
+ });
+}
+function showLoginConnectionError(ok){
+ const err=$('loginError');if(!err)return;
+ if(ok){err.style.color='#1d7a3f';err.textContent='اتصال به سرور برقرار شد؛ حالا می‌توانی وارد شوی.';return}
+ err.style.color='#b3261e';
+ err.textContent='اتصال به سرور ممکن نیست؛ بدون اتصال امکان ورود نیست. اگر اینترنت داری، Wi‑Fi یا دادهٔ موبایل را عوض کن یا استفاده از VPN را امتحان کن. تا وقتی اتصال برقرار نشود، ورود انجام نمی‌شود.';
+}
+function stopOnlineEntryWatch(){
+ if(__connWatchTimer){clearInterval(__connWatchTimer);__connWatchTimer=null}
+ if(__connWatchTick){try{window.removeEventListener('online',__connWatchTick)}catch(_){}__connWatchTick=null}
+}
+function startOnlineEntryWatch(){
+ if(__connWatchTimer)return;
+ __connWatchTick=async()=>{
+  if(current)return stopOnlineEntryWatch();
+  if(document.hidden)return;
+  const online=await serverReachable(5000);
+  if(!online)return;
+  __serverOnline=true;stopOnlineEntryWatch();
+  try{await boot()}catch(e){console.warn('Online entry retry failed',e)}
+ };
+ __connWatchTimer=setInterval(__connWatchTick,7000);
+ try{window.addEventListener('online',__connWatchTick)}catch(_){}
+}
+// v219: نشست ذخیره‌شده فقط وقتی بازیابی می‌شود که اتصال واقعی به سرور باشد.
+const _origGetSessionSafe=getSessionSafe;
+getSessionSafe=async function(timeoutMs){
+ let got=null;
+ try{got=await _origGetSessionSafe(timeoutMs)}catch(_){got=null}
+ if(!got||got.offline)return null;
+ return got;
+};
+const _origShowApp=showApp;
+showApp=function(){
+ if(__entryGateActive&&!__serverOnline)return;
+ return _origShowApp.apply(this,arguments);
+};
+const _origBoot=boot;
+boot=async function(){
+ const online=await serverReachable(6000);
+ __serverOnline=online;__entryGateActive=!online;
+ try{await _origBoot()}
+ finally{
+  __entryGateActive=false;
+  if(!online&&!current){
+   try{if($('loginScreen'))$('loginScreen').classList.remove('hidden');if($('app'))$('app').classList.add('hidden')}catch(_){}
+   showLoginConnectionError();
+   startOnlineEntryWatch();
+  }else{stopOnlineEntryWatch();if(!current)showLoginConnectionError(true)}
+ }
+};
+const _origLogin=login;
+login=async function(){
+ const u=$('loginUser').value.trim(),p=$('loginPass').value;
+ const err=$('loginError'),btn=$('loginBtn');
+ if(!u||!p){if(err){err.style.color='#b3261e';err.textContent='نام کاربری و رمز عبور را وارد کن.'}return}
+ if(!supabase){if(err){err.style.color='#b3261e';err.textContent='اتصال آنلاین بارگذاری نشد؛ اینترنت و نشانی امن سایت را بررسی کن.'}return}
+ if(btn){btn.disabled=true;btn.textContent='در حال بررسی اتصال…'}
+ const online=await serverReachable(8000);
+ if(!online){
+  if(btn){btn.disabled=false;btn.textContent='ورود به برنامه'}
+  showLoginConnectionError();startOnlineEntryWatch();return;
+ }
+ __serverOnline=true;stopOnlineEntryWatch();
+ if(btn)btn.textContent='در حال ورود…';
+ const localFound=users.find(x=>String(x.username).toLowerCase()===u.toLowerCase());
+ try{
+  const {data}=await authSignIn(u,p);
+  cloudUser=data.user;cloudReady=true;
+  if(localFound){
+   current=localFound;showApp();if(err){err.textContent='';err.style.color=''};
+   connectCloudRealtime().catch(console.warn);
+   pullCloudState(false).then(()=>{const fresh=users.find(x=>String(x.username).toLowerCase()===u.toLowerCase());if(!fresh)throw new Error('این نام کاربری در فهرست برنامه ثبت نشده است.');current=fresh;showApp()}).catch(e=>{console.warn('Background cloud sync failed',e);showCloudNotice('ورود انجام شد، اما دریافت آخرین اطلاعات آنلاین ناموفق بود.')});
+  }else{
+   await pullCloudState(true);
+   const found=users.find(x=>String(x.username).toLowerCase()===u.toLowerCase());
+   if(!found)throw new Error('این نام کاربری در فهرست برنامه ثبت نشده است.');
+   current=found;showApp();if(err){err.textContent='';err.style.color=''};
+   connectCloudRealtime().catch(console.warn);
+  }
+ }catch(e){
+  console.error('Cloud login failed',e);
+  if(isTransientLoginError(e)){showLoginConnectionError();startOnlineEntryWatch()}
+  else if(err){err.style.color='#b3261e';err.textContent=loginErrorFa(e)}
+ }finally{if(btn){btn.disabled=false;btn.textContent='ورود به برنامه'}}
+};
+
+/* ---------- ۲) قفل کارت رانندگان برای همهٔ تراکنش‌ها (شامل روزهای گذشته) ---------- */
+const _origTxDriverDayClosed=txDriverDayClosed;
+txDriverDayClosed=function(x){
+ if(!x)return false;
+ try{
+  const ids=txDriverFundIds(x);
+  if(ids.some(id=>{const f=driverFunds.find(g=>String(g.id)===id);return !!f&&!!fundDayClosureOf(String(f.date||''))}))return true;
+  if(fundDayClosureOf(String(x.date||'')))return true;
+  // v219: چون پروندهٔ هر روز پس از پایان همان روز بسته می‌شود، تراکنش‌های
+  // کارت رانندگانِ روزهای گذشته هم قفل می‌شوند (مستقل از وجود رکورد بسته‌شدن).
+  const dk=String(dateKey(x.date)||''),tk=String(dateKey(today())||'');
+  if(dk&&tk&&dk<tk)return true;
+ }catch(_){return _origTxDriverDayClosed(x)}
+ return false;
+};
+// v219: نگه‌داشتن سابقهٔ «بسته‌شدن پرونده روز» تا نسخهٔ کهنهٔ یک دستگاه آن را پاک نکند.
+const _origApplyCloudStateToLocal=applyCloudStateToLocal;
+applyCloudStateToLocal=function(cloudState){
+ try{
+  if(cloudState&&typeof cloudState==='object'&&cloudState[FUND_DAY_CLOSE_K]&&typeof cloudState[FUND_DAY_CLOSE_K]==='object'){
+   const local=load(FUND_DAY_CLOSE_K,{})||{};
+   const merged=Object.assign({},cloudState[FUND_DAY_CLOSE_K]);
+   let added=false;
+   Object.keys(local).forEach(k=>{if(!Object.prototype.hasOwnProperty.call(merged,k)){merged[k]=local[k];added=true}});
+   cloudState=Object.assign({},cloudState);cloudState[FUND_DAY_CLOSE_K]=merged;
+   if(added&&typeof scheduleCloudSync==='function')scheduleCloudSync();
+  }
+ }catch(_){}
+ return _origApplyCloudStateToLocal(cloudState);
+};
+
+/* ---------- ۳) دریافت جزئی کالای انبار: تیکه‌کردن ردیف به دریافت‌شده + در راه ---------- */
+function warehousePurchasedQty(it){
+ if(!it)return 0;
+ const b=Number(it.boughtQty);
+ if(Number.isFinite(b)&&b>0)return b;
+ const q=Number(it.qty);
+ return Number.isFinite(q)&&q>0?q:0;
+}
+function splitWarehouseItemRow(r,i,recvQty,ctx){
+ const it=r&&r.items&&r.items[i];
+ const total=warehousePurchasedQty(it);
+ if(!it||!(total>0))return null;
+ let recv=Number(recvQty);
+ if(!Number.isFinite(recv)||recv<=0)recv=total;
+ if(recv>total)recv=total;
+ it.warehouseReceived=true;
+ it.warehouseReceivedDate=ctx.date;
+ it.warehouseReceivedTime=ctx.time;
+ it.warehouseBatchId=ctx.batchId;
+ it.warehouseReceivedQty=recv;
+ if(recv>=total-0.000001){
+  it.warehouseReceivedQty=total;it.qty=total;if(it.boughtQty!=null)it.boughtQty=total;
+  return {index:i,recv:total,split:false};
+ }
+ const remain=total-recv;
+ const remaining={};
+ Object.keys(it).forEach(k=>{
+  if(k==='warehouseReceivedDate'||k==='warehouseReceivedTime'||k==='warehouseBatchId'||k==='warehouseFreight'||k==='warehouseBonusSameQty'||k==='warehouseBonusItems'||k==='warehouseReceivedQty')return;
+  remaining[k]=it[k];
+ });
+ remaining.qty=remain;remaining.boughtQty=remain;
+ remaining.warehouseReceived=false;remaining.warehouseReceivedDate='';remaining.warehouseReceivedTime='';remaining.warehouseBatchId='';
+ remaining.status='bought';remaining.splitFromIndex=i;
+ const j=r.items.length;
+ r.items.push(remaining);
+ it.qty=recv;if(it.boughtQty!=null)it.boughtQty=recv;
+ return {index:i,newIndex:j,recv,remain,split:true};
+}
+function adjustSupplyLineForSplit(requestId,fromIndex,toIndex,recvQty,remainQty){
+ let changed=false;
+ (Array.isArray(txs)?txs:[]).forEach(tx=>{
+  const link=tx&&tx.supplyLink;
+  if(!link||String(link.requestId)!==String(requestId))return;
+  const arr=Array.isArray(link.items)?link.items:[];
+  const line=arr.find(li=>Number(li.index)===Number(fromIndex));
+  if(!line)return;
+  const newLine={};
+  Object.keys(line).forEach(k=>{if(k==='purchaseBonusSameQty'||k==='purchaseBonusItems')return;newLine[k]=line[k]});
+  newLine.index=toIndex;newLine.qty=remainQty;newLine.purchaseBonusSameQty=0;newLine.purchaseBonusItems=[];
+  line.qty=recvQty;
+  arr.push(newLine);
+  changed=true;
+ });
+ if(changed)save(TXK,txs);
+}
+async function receiveWarehouseItemsPartial(r,entries){
+ const dt=new Date(),tm=dt.toLocaleTimeString('fa-IR',{hour:'2-digit',minute:'2-digit',hour12:false});
+ const ctx={date:today(),time:tm,batchId:'wb_'+Date.now()+'_'+Math.floor(Math.random()*10000)};
+ const results=[];
+ entries.forEach(({i,recv})=>{
+  const it=r&&r.items&&r.items[i];
+  if(!it||it.status!=='bought'||!it.deliveryDate||it.warehouseReceived)return;
+  const res=splitWarehouseItemRow(r,i,recv,ctx);
+  if(res)results.push(res);
+ });
+ if(!results.length)return;
+ if(r.noFreight){
+  results.forEach(res=>{const it=r.items[res.index];if(it)it.warehouseFreight={amount:0,saved:true,noFreight:true,by:'سیستم',byId:'system',date:ctx.date+' · '+ctx.time}});
+ }
+ results.filter(x=>x.split).forEach(res=>adjustSupplyLineForSplit(r.id,res.index,res.newIndex,res.recv,res.remain));
+ save(PROC_K,procurement);
+ renderWarehouse();
+ if(isAdmin())renderProcurement();
+}
+function openWarehouseReceiveQtyDialog(r,indices){
+ const old=document.getElementById('warehouseReceiveQtyModal');if(old)old.remove();
+ const rows=indices.map(i=>{const it=r&&r.items&&r.items[i];return it?{i,it,total:warehousePurchasedQty(it)}:null}).filter(Boolean);
+ if(!rows.length)return;
+ const overlay=document.createElement('div');
+ overlay.id='warehouseReceiveQtyModal';
+ overlay.className='purchaseQtyModal';
+ overlay.innerHTML=`<div class="purchaseQtyCard" role="dialog" aria-modal="true" aria-labelledby="whRecvQtyTitle"><h3 class="purchaseQtyTitle" id="whRecvQtyTitle">تعداد دریافتی هر کالا</h3><p class="purchaseQtySub">برای هر قلم مشخص کن چند عدد رسیده است؛ مابقی در لیست «در راه» می‌ماند تا بارش برسد.</p>${rows.map(({i,it,total})=>`<div class="purchaseQtyRow" data-whq-row="${i}"><div class="purchaseQtyName">${esc(it.name||'کالا')}</div><div class="purchaseQtyMeta">تعداد خرید: ${fa(total)} ${esc(it.unit||'')}</div><div class="purchaseQtyChoices"><label><input type="radio" name="whQtyMode${i}" value="full" checked> دریافت کامل (${fa(total)})</label><label><input type="radio" name="whQtyMode${i}" value="partial"> دریافت بخشی از تعداد</label></div><div class="purchaseQtyInput" data-whq-input="${i}" hidden><input type="number" min="0.001" max="${total}" step="any" inputmode="decimal" data-whq-final="${i}" value="${total}" aria-label="تعداد دریافتی ${esc(it.name||'')}"><span style="font-size:10px;white-space:nowrap">${esc(it.unit||'واحد')}</span></div></div>`).join('')}<div class="purchaseQtyActions"><button type="button" class="purchaseQtyCancel" data-whq-cancel>انصراف</button><button type="button" class="purchaseQtyConfirm" data-whq-confirm>ثبت دریافت</button></div></div>`;
+ document.body.appendChild(overlay);
+ overlay.querySelectorAll('input[type="radio"]').forEach(el=>{
+  el.addEventListener('change',()=>{
+   const i=el.name.replace('whQtyMode','');
+   const box=overlay.querySelector(`[data-whq-input="${i}"]`);
+   if(box)box.hidden=el.value!=='partial';
+  });
+ });
+ overlay.querySelector('[data-whq-cancel]').onclick=()=>overlay.remove();
+ overlay.onclick=e=>{if(e.target===overlay)overlay.remove()};
+ overlay.querySelector('[data-whq-confirm]').onclick=async()=>{
+  const entries=[];
+  for(const {i,it,total} of rows){
+   const mode=overlay.querySelector(`input[name="whQtyMode${i}"]:checked`)?.value||'full';
+   let recv=total;
+   if(mode==='partial')recv=Number(overlay.querySelector(`[data-whq-final="${i}"]`)?.value);
+   if(!Number.isFinite(recv)||recv<=0){alert(`تعداد دریافتی «${it.name||'کالا'}» باید بیشتر از صفر باشد.`);return}
+   if(recv>total+0.000001){alert(`تعداد دریافتی «${it.name||'کالا'}» نمی‌تواند بیشتر از تعداد خرید (${fa(total)}) باشد.`);return}
+   entries.push({i,recv:Math.min(recv,total)});
+  }
+  overlay.remove();
+  await receiveWarehouseItemsPartial(r,entries);
+ };
+}
+const _origUpdateWarehouseSelectedReceipt=updateWarehouseSelectedReceipt;
+updateWarehouseSelectedReceipt=function(rid){
+ if(!(isAdmin()||can('warehouseReceive')))return;
+ const r=procurement.find(x=>String(x.id)===String(rid));
+ if(!r)return;
+ const selected=[...document.querySelectorAll(`[data-warehouse-pick="${CSS.escape(String(rid))}"]:checked`)].map(x=>Number(x.dataset.warehouseI));
+ if(!selected.length){alert('ابتدا اقلام موردنظر را انتخاب کن.');return}
+ openWarehouseReceiveQtyDialog(r,selected);
+};
+
 boot();
 })();
 </script>
@@ -2274,7 +2524,7 @@ boot();
 (function(){
   if(!('serviceWorker' in navigator) || !window.isSecureContext || location.protocol==='file:') return;
   navigator.serviceWorker.register('./service-worker.js').catch(e=>console.warn('Service worker registration skipped',e));
-  const currentBuild=document.querySelector('meta[name="saman-build"]')?.content || 'v218';
+  const currentBuild=document.querySelector('meta[name="saman-build"]')?.content || 'v219';
   let checking=false, updatePending=false, lastActivity=Date.now();
   const note=document.createElement('div');
   note.id='samanUpdateNotice';
