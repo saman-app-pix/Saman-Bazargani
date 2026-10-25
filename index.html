@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#ffffff" name="theme-color"/>
-<meta name="saman-build" content="v219"/>
+<meta name="saman-build" content="v220"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; manifest-src 'self'; connect-src 'self' https://eiobajtihwxdlfxufmbg.supabase.co wss://eiobajtihwxdlfxufmbg.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
@@ -523,7 +523,7 @@ textarea{min-height:64px}
 #pageWarehouse .warehouseBatchTools>button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:34px!important;height:auto!important;margin:0!important;padding:5px 3px!important;border-radius:8px!important;font-family:inherit!important;font-size:clamp(9px,2.45vw,11px)!important;font-weight:600!important;line-height:1.3!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;box-sizing:border-box!important}
 @media(max-width:360px){#pageWarehouse .warehouseSection>.listTabs>button{font-size:11px!important;padding:5px 3px!important}#pageWarehouse .warehouseBatchTools{gap:4px!important;padding:4px!important}#pageWarehouse .warehouseBatchTools>button{font-size:9px!important;padding:4px 2px!important;min-height:34px!important}}
 </style>
-<meta name="saman-build" content="v219">
+<meta name="saman-build" content="v220">
 
 <style id="v213-fund-transfer-split">
 .fundActOverlay,.fundPickerOverlay{position:fixed;inset:0;z-index:100520;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;background:rgba(15,28,45,.48);backdrop-filter:blur(2px)}
@@ -569,6 +569,28 @@ textarea{min-height:64px}
 .cashboxPickTotal{font-size:11px;display:flex;align-items:center;justify-content:space-between}
 .cashboxPickTotal b{color:#1f7a4d}
 </style>
+<style id="v220-conn-status">
+.connStatusCard{direction:rtl;width:100%;box-sizing:border-box;height:64px;margin-top:10px;border-radius:12px;border:1px solid #eceef1;background:#f5f6f8;color:#1f2937;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;overflow:hidden;transition:background .35s ease,border-color .35s ease,color .35s ease}
+.connStatusText{display:flex;flex-direction:column;align-items:flex-start;text-align:right;gap:2px;min-width:0}
+.connStatusTitle{font-size:12.5px;font-weight:800;line-height:1.4}
+.connStatusHint{font-size:9.5px;line-height:1.5;color:#6b7280;max-width:210px}
+.connStatusIcon{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.connStatusIcon svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.connStatusIcon svg circle{fill:currentColor;stroke:none}
+.connStatusDots{display:inline-flex;align-items:center;gap:4px}
+.connStatusDots i{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.22;animation:connDot 1.25s infinite ease-in-out}
+.connStatusDots i:nth-child(2){animation-delay:.18s}
+.connStatusDots i:nth-child(3){animation-delay:.36s}
+.connStatusDots i:nth-child(4){animation-delay:.54s}
+.connStatusDots i:nth-child(5){animation-delay:.72s}
+@keyframes connDot{0%,100%{opacity:.22;transform:translateY(0)}45%{opacity:1;transform:translateY(-2.5px)}}
+.connStatusCard.is-ok{background:#e8f6ee;border-color:#c9e8d7;color:#1c6c3d}
+.connStatusCard.is-ok .connStatusHint{color:#418a5f}
+.connStatusCard.is-fail{background:#fdecec;border-color:#f4cccc;color:#c0392b}
+.connStatusCard.is-fail .connStatusHint{color:#c56a60}
+.connStatusCard.is-ok .connStatusDots i,.connStatusCard.is-fail .connStatusDots i{animation:none;opacity:.85;transform:none}
+@media(prefers-reduced-motion:reduce){.connStatusDots i{animation:none}}
+</style>
 </head>
 <body>
 
@@ -578,9 +600,10 @@ textarea{min-height:64px}
 <div class="field"><label>نام کاربری</label><input autocomplete="username" id="loginUser"/></div>
 <div class="field loginPasswordField"><label>رمز عبور</label><div class="loginPasswordWrap"><input autocomplete="current-password" id="loginPass" type="password"/><div id="fingerprintLoading" class="fingerprintLoading hidden" aria-live="polite">در حال تأیید…</div><button type="button" id="fingerprintLoginBtn" class="fingerprintLoginBtn" aria-label="ورود با اثر انگشت" title="ورود با اثر انگشت"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 11.2c-1.5 0-2.5 1-2.5 2.6 0 2.1-.3 4.2-1.3 6"/><path d="M12 7.5a6 6 0 0 0-6 6c0 2.2-.3 4.2-1.1 6"/><path d="M12 4.5a9 9 0 0 0-9 9c0 1.3-.1 2.5-.4 3.6"/><path d="M12 11.2c1.5 0 2.5 1 2.5 2.6 0 3.2-.5 5.2-1.6 7"/><path d="M12 7.5a6 6 0 0 1 6 6c0 2.8-.4 5.3-1.5 7.5"/><path d="M12 4.5a9 9 0 0 1 9 9c0 1.6-.1 3-.4 4.2"/><path d="M12 14.5c0 2.3-.2 4.1-.8 5.8"/></svg></button></div><small id="fingerprintHint" class="fingerprintHint">ورود با اثر انگشت از طریق تأیید امن انجام می‌شود.</small></div>
 <button class="primary" id="loginBtn">ورود به برنامه</button>
-<div style="margin-top:8px;text-align:center;font-size:11px;color:#6b7c88">ورود آنلاین سامان</div>
-<div style="margin-top:4px;text-align:center"><button type="button" id="connTestBtn" style="border:0;background:none;color:#2c6fa8;font:inherit;font-size:11px;text-decoration:underline;cursor:pointer;padding:4px">بررسی اتصال به سرور</button></div>
-<div id="connTestResult" style="margin-top:4px;text-align:center;font-size:11px;line-height:1.9;color:#4a5963"></div>
+<div id="connStatusCard" class="connStatusCard is-checking" role="status" aria-live="polite">
+<div class="connStatusText"><strong class="connStatusTitle">در حال بررسی اتصال</strong><small class="connStatusHint">لطفاً چند لحظه صبر کن…</small></div>
+<div class="connStatusIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="6" rx="2"/><rect x="3.5" y="13.5" width="17" height="6" rx="2"/><circle cx="7.2" cy="7.5" r="1"/><circle cx="7.2" cy="16.5" r="1"/><path d="M11 7.5h6M11 16.5h6"/></svg><span class="connStatusDots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div>
+</div>
 <div class="error" id="loginError"></div>
 </div>
 </div>
@@ -2150,12 +2173,16 @@ function serverReachable(timeoutMs){
   }catch(_){done(false)}
  });
 }
-function showLoginConnectionError(ok){
- const err=$('loginError');if(!err)return;
- if(ok){err.style.color='#1d7a3f';err.textContent='اتصال به سرور برقرار شد؛ حالا می‌توانی وارد شوی.';return}
- err.style.color='#b3261e';
- err.textContent='اتصال به سرور ممکن نیست؛ بدون اتصال امکان ورود نیست. اگر اینترنت داری، Wi‑Fi یا دادهٔ موبایل را عوض کن یا استفاده از VPN را امتحان کن. تا وقتی اتصال برقرار نشود، ورود انجام نمی‌شود.';
+function setConnStatus(state){
+ const card=$('connStatusCard');if(!card)return;
+ card.classList.remove('is-checking','is-ok','is-fail');
+ card.classList.add(state==='ok'?'is-ok':state==='fail'?'is-fail':'is-checking');
+ const title=card.querySelector('.connStatusTitle'),hint=card.querySelector('.connStatusHint');
+ if(state==='ok'){if(title)title.textContent='اتصال برقرار شد';if(hint)hint.textContent='حالا می‌توانی با نام کاربری و رمز وارد شوی.'}
+ else if(state==='fail'){if(title)title.textContent='اتصال ناموفق بود';if(hint)hint.textContent='شبکهٔ اینترنت را عوض کن یا از VPN استفاده کن.'}
+ else{if(title)title.textContent='در حال بررسی اتصال';if(hint)hint.textContent='لطفاً چند لحظه صبر کن…'}
 }
+function showLoginConnectionError(ok){setConnStatus(ok?'ok':'fail')}
 function stopOnlineEntryWatch(){
  if(__connWatchTimer){clearInterval(__connWatchTimer);__connWatchTimer=null}
  if(__connWatchTick){try{window.removeEventListener('online',__connWatchTick)}catch(_){}__connWatchTick=null}
@@ -2176,6 +2203,7 @@ function startOnlineEntryWatch(){
 // v219: نشست ذخیره‌شده فقط وقتی بازیابی می‌شود که اتصال واقعی به سرور باشد.
 const _origGetSessionSafe=getSessionSafe;
 getSessionSafe=async function(timeoutMs){
+ if(__serverOnline===false)return null;
  let got=null;
  try{got=await _origGetSessionSafe(timeoutMs)}catch(_){got=null}
  if(!got||got.offline)return null;
@@ -2188,16 +2216,18 @@ showApp=function(){
 };
 const _origBoot=boot;
 boot=async function(){
+ setConnStatus('checking');
  const online=await serverReachable(6000);
  __serverOnline=online;__entryGateActive=!online;
+ if(!online){
+  showLoginConnectionError(false);
+  try{if($('loginScreen'))$('loginScreen').classList.remove('hidden');if($('app'))$('app').classList.add('hidden')}catch(_){}
+ }
  try{await _origBoot()}
  finally{
   __entryGateActive=false;
-  if(!online&&!current){
-   try{if($('loginScreen'))$('loginScreen').classList.remove('hidden');if($('app'))$('app').classList.add('hidden')}catch(_){}
-   showLoginConnectionError();
-   startOnlineEntryWatch();
-  }else{stopOnlineEntryWatch();if(!current)showLoginConnectionError(true)}
+  if(!online){startOnlineEntryWatch()}
+  else{stopOnlineEntryWatch();if(!current)showLoginConnectionError(true)}
  }
 };
 const _origLogin=login;
@@ -2206,14 +2236,8 @@ login=async function(){
  const err=$('loginError'),btn=$('loginBtn');
  if(!u||!p){if(err){err.style.color='#b3261e';err.textContent='نام کاربری و رمز عبور را وارد کن.'}return}
  if(!supabase){if(err){err.style.color='#b3261e';err.textContent='اتصال آنلاین بارگذاری نشد؛ اینترنت و نشانی امن سایت را بررسی کن.'}return}
- if(btn){btn.disabled=true;btn.textContent='در حال بررسی اتصال…'}
- const online=await serverReachable(8000);
- if(!online){
-  if(btn){btn.disabled=false;btn.textContent='ورود به برنامه'}
-  showLoginConnectionError();startOnlineEntryWatch();return;
- }
+ if(btn){btn.disabled=true;btn.textContent='در حال ورود…'}
  __serverOnline=true;stopOnlineEntryWatch();
- if(btn)btn.textContent='در حال ورود…';
  const localFound=users.find(x=>String(x.username).toLowerCase()===u.toLowerCase());
  try{
   const {data}=await authSignIn(u,p);
@@ -2524,7 +2548,7 @@ boot();
 (function(){
   if(!('serviceWorker' in navigator) || !window.isSecureContext || location.protocol==='file:') return;
   navigator.serviceWorker.register('./service-worker.js').catch(e=>console.warn('Service worker registration skipped',e));
-  const currentBuild=document.querySelector('meta[name="saman-build"]')?.content || 'v219';
+  const currentBuild=document.querySelector('meta[name="saman-build"]')?.content || 'v220';
   let checking=false, updatePending=false, lastActivity=Date.now();
   const note=document.createElement('div');
   note.id='samanUpdateNotice';
