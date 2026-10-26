@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#ffffff" name="theme-color"/>
-<meta name="saman-build" content="v224"/>
+<meta name="saman-build" content="v225"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; manifest-src 'self'; connect-src 'self' https://eiobajtihwxdlfxufmbg.supabase.co wss://eiobajtihwxdlfxufmbg.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
@@ -523,7 +523,7 @@ textarea{min-height:64px}
 #pageWarehouse .warehouseBatchTools>button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:34px!important;height:auto!important;margin:0!important;padding:5px 3px!important;border-radius:8px!important;font-family:inherit!important;font-size:clamp(9px,2.45vw,11px)!important;font-weight:600!important;line-height:1.3!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;box-sizing:border-box!important}
 @media(max-width:360px){#pageWarehouse .warehouseSection>.listTabs>button{font-size:11px!important;padding:5px 3px!important}#pageWarehouse .warehouseBatchTools{gap:4px!important;padding:4px!important}#pageWarehouse .warehouseBatchTools>button{font-size:9px!important;padding:4px 2px!important;min-height:34px!important}}
 </style>
-<meta name="saman-build" content="v224">
+<meta name="saman-build" content="v225">
 
 <style id="v213-fund-transfer-split">
 .fundActOverlay,.fundPickerOverlay{position:fixed;inset:0;z-index:100520;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;background:rgba(15,28,45,.48);backdrop-filter:blur(2px)}
@@ -591,7 +591,7 @@ textarea{min-height:64px}
 .connStatusCard.is-ok .connStatusDots i,.connStatusCard.is-fail .connStatusDots i{animation:none;opacity:.85;transform:none}
 @media(prefers-reduced-motion:reduce){.connStatusDots i{animation:none}}
 /* v224: بازگشت پارت به انبار + سبد «تعهد روزهای بعد» */
-.pricingReturn{flex:1 1 100%!important;width:100%!important;min-width:0!important;height:34px!important;border:1px solid #e3d3b6!important;background:#fff8ec!important;color:#8a6320!important;font-weight:800!important;border-radius:9px!important;font-size:10px!important;padding:0 10px!important}
+.pricingReturn{flex:1 1 100%!important;width:100%!important;min-width:0!important;padding:0 12px!important;height:30px!important;font-size:9px!important;border-radius:8px!important;white-space:nowrap;border:1px solid #e3d3b6!important;background:#fff8ec!important;color:#8a6320!important;font-weight:800!important}
 .pricingReturn:hover{background:#fdf1dc!important}
 .basketFields{margin-top:8px;padding:9px 10px;border:1px dashed #d7c7a5;border-radius:11px;background:#fffdf6}
 .basketToggle{display:flex;align-items:flex-start;gap:8px;font-size:11px;line-height:1.7;color:var(--text);cursor:pointer}
@@ -2612,7 +2612,7 @@ boot();
 (function(){
   if(!('serviceWorker' in navigator) || !window.isSecureContext || location.protocol==='file:') return;
   navigator.serviceWorker.register('./service-worker.js').catch(e=>console.warn('Service worker registration skipped',e));
-  const currentBuild=document.querySelector('meta[name="saman-build"]')?.content || 'v224';
+  const currentBuild=document.querySelector('meta[name="saman-build"]')?.content || 'v225';
   let checking=false, updatePending=false, lastActivity=Date.now();
   const note=document.createElement('div');
   note.id='samanUpdateNotice';
