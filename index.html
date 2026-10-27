@@ -1039,8 +1039,11 @@ function pickNewerRecord(a,b,prefer){
 function mergeCoreArray(localArr,cloudArr,tomb,prefer){
  const l=Array.isArray(localArr)?localArr:[],c=Array.isArray(cloudArr)?cloudArr:[];
  const lm=new Map(),cm=new Map();
- l.forEach(r=>{if(r&&r.id!=null)lm.set(String(r.id),r)});
- c.forEach(r=>{if(r&&r.id!=null)cm.set(String(r.id),r)});
+ // v232: عناصر بدون id (اگر وجود داشته باشند) هرگز حذف نمی‌شوند؛ جداگانه نگه داشته می‌شوند.
+ const orphans=[],orphanSeen=new Set();
+ const addOrphan=r=>{let s;try{s=JSON.stringify(r)}catch(_){s=String(r)}if(!orphanSeen.has(s)){orphanSeen.add(s);orphans.push(r)}};
+ l.forEach(r=>{if(r&&r.id!=null)lm.set(String(r.id),r);else if(r!=null)addOrphan(r)});
+ c.forEach(r=>{if(r&&r.id!=null)cm.set(String(r.id),r);else if(r!=null)addOrphan(r)});
  const ids=[...new Set([...lm.keys(),...cm.keys()])];
  const out=[];let localOnly=false;
  ids.forEach(id=>{
@@ -1050,7 +1053,7 @@ function mergeCoreArray(localArr,cloudArr,tomb,prefer){
   const pick=pickNewerRecord(a,b,prefer);
   if(pick)out.push(pick);
  });
- return {arr:out,localOnly};
+ return {arr:out.concat(orphans),localOnly};
 }
 // v217/v232: هرگز کلید محلی‌ای که در ابر نیست حذف نمی‌شود؛ و اگر ردیف ابری ناقص
 // (آسیب‌دیده) باشد، مقدار ابری روی دادهٔ محلیِ موجود بازنویسی نمی‌شود. فهرست‌های اصلی
