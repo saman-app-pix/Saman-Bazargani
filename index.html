@@ -2933,7 +2933,7 @@ async function connLockProbe(){
  window.addEventListener('online',()=>{connLockProbe()});
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)connLockProbe()});
  window.addEventListener('focus',()=>{connLockProbe()});
- document.addEventListener('keydown',e=>{if(__connLockActive){try{e.stopPropagation();e.preventDefault()}catch(_){}}},true);
+ document.addEventListener('keydown',e=>{if(__connLockActive){try{e.stopPropagation()}catch(_){}}},true);
  setTimeout(connLockProbe,1200);
 })();
 
