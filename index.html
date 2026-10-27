@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#ffffff" name="theme-color"/>
-<meta name="saman-build" content="v231"/>
+<meta name="saman-build" content="v232"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; manifest-src 'self'; connect-src 'self' https://eiobajtihwxdlfxufmbg.supabase.co wss://eiobajtihwxdlfxufmbg.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
@@ -530,7 +530,7 @@ textarea{min-height:64px}
 #pageWarehouse .warehouseBatchTools>button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:34px!important;height:auto!important;margin:0!important;padding:5px 3px!important;border-radius:8px!important;font-family:inherit!important;font-size:clamp(9px,2.45vw,11px)!important;font-weight:600!important;line-height:1.3!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;box-sizing:border-box!important}
 @media(max-width:360px){#pageWarehouse .warehouseSection>.listTabs>button{font-size:11px!important;padding:5px 3px!important}#pageWarehouse .warehouseBatchTools{gap:4px!important;padding:4px!important}#pageWarehouse .warehouseBatchTools>button{font-size:9px!important;padding:4px 2px!important;min-height:34px!important}}
 </style>
-<meta name="saman-build" content="v231">
+<meta name="saman-build" content="v232">
 
 <style id="v213-fund-transfer-split">
 .fundActOverlay,.fundPickerOverlay{position:fixed;inset:0;z-index:100520;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;background:rgba(15,28,45,.48);backdrop-filter:blur(2px)}
@@ -880,12 +880,14 @@ textarea{min-height:64px}
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const APP='bazargani_saman_v1', TXK=APP+'_tx', UK=APP+'_users', UPK=APP+'_lastUpdate', FUND_K=APP+'_driver_funds', FUND_DAY_CLOSE_K=APP+'_driver_fund_day_closures', CLEAR_K=APP+'_clear_v1';
+const APP='bazargani_saman_v1', TXK=APP+'_tx', UK=APP+'_users', UPK=APP+'_lastUpdate', FUND_K=APP+'_driver_funds', FUND_DAY_CLOSE_K=APP+'_driver_fund_day_closures', CLEAR_K=APP+'_clear_v1', DEL_K=APP+'_deleted_v1';
 // Supabase cloud connection (publishable key; safe to include in browser code).
 const SUPABASE_URL='https://eiobajtihwxdlfxufmbg.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_Jw-XUnzexgGbJO011YDdIw_MJsMitbi';
 const supabase=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,experimental:{passkey:true}}});
-const CLOUD_KEYS=[TXK,UK,UPK,FUND_K,FUND_DAY_CLOSE_K,APP+'_roles',APP+'_procurement',APP+'_quotes','bazargani_last_publish_v1',CLEAR_K];
+const CLOUD_KEYS=[TXK,UK,UPK,FUND_K,FUND_DAY_CLOSE_K,APP+'_roles',APP+'_procurement',APP+'_quotes','bazargani_last_publish_v1',CLEAR_K,DEL_K];
+// v232: فهرست‌های اصلی که هرگز نباید با نسخهٔ ناقص/کهنه بازنویسی شوند و همیشه «اجتماعی» ادغام می‌شوند.
+const CORE_ARRAY_KEYS=[TXK,FUND_K,APP+'_procurement',APP+'_quotes'];
 let cloudUser=null,cloudSyncTimer=null,cloudSyncBusy=false,cloudSyncAgain=false,cloudRealtimeChannel=null,cloudPollTimer=null,lastCloudUpdatedAt='';
 let cloudClearKeys=new Set();
 // v223: کلیدهای تغییرکردهٔ محلی که هنوز به سرور نرفته‌اند (پایدار در localStorage).
@@ -916,7 +918,19 @@ const nowParts=()=>{const d=new Date();return {date:persianDate(d),time:new Intl
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 const sourceText=s=>s==='cashbox'?'تنخواه':s==='driver'?'کارت رانندگان':s==='official'?'واریز مستقیم از حساب شرکت':'ترکیبی';
 function load(k,f){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(f))}catch(e){return f}}
+// v232: به هر رکوردِ «تغییرکرده» یک مهر زمان (_m) می‌زند تا ادغام چنددستگاهی بتواند
+// تازه‌ترین نسخه را تشخیص دهد و هیچ رکوردی با نسخهٔ کهنه‌تر بازنویسی/پاک نشود.
+function stampChangedRecords(k,v){
+ if(!Array.isArray(v))return v;
+ let prev=[];try{prev=JSON.parse(localStorage.getItem(k)||'[]')}catch(_){prev=[]}
+ const strip=o=>{if(!o||typeof o!=='object')return '';const c={...o};delete c._m;return JSON.stringify(c)};
+ const prevMap=new Map((Array.isArray(prev)?prev:[]).filter(r=>r&&r.id!=null).map(r=>[String(r.id),r]));
+ const now=Date.now();
+ v.forEach(r=>{if(!r||r.id==null)return;const p=prevMap.get(String(r.id));if(!p||strip(p)!==strip(r))r._m=now});
+ return v;
+}
 function save(k,v,opts){
+ if(CORE_ARRAY_KEYS.includes(k)){try{stampChangedRecords(k,v)}catch(_){}}
  try{localStorage.setItem(k,JSON.stringify(v))}catch(e){console.warn('Local save failed',k,e)}
  try{deviceSet(k,v)}catch(e){console.warn('Device mirror unavailable; local save succeeded for',k,e)}
  if(CLOUD_KEYS.includes(k)){
@@ -978,7 +992,7 @@ function rebuildProcurementFromTxs(){
      items.push({name:'—',qty:0,pack:0,unit:'',date:(g.dates.slice().sort()[0]||today()),status:'bought',warehouseReceived:false,recovered:true,placeholder:true});
     }
    }
-   created.push({id:g.id,title:g.label||('درخواست خرید #'+g.id),requesterId:'',requesterName:'',approvalStatus:'approved',approvedBy:'بازیابی خودکار',createdDate:(g.dates.slice().sort()[0]||today()),items,recoveredFromTxs:true});
+   created.push({id:g.id,title:g.label||('درخواست خرید #'+g.id),requesterId:'',requesterName:'',approvalStatus:'approved',approvedBy:'بازیابی خودکار',createdDate:(g.dates.slice().sort()[0]||today()),items,recoveredFromTxs:true,recovered:true});
   });
   if(!created.length)return false;
   procurement=created.concat(Array.isArray(procurement)?procurement:[]);
@@ -995,25 +1009,91 @@ function sameCloudTime(a,b){if(!a||!b)return false;const ta=Date.parse(a),tb=Dat
 function localArrayLen(k){try{const v=JSON.parse(localStorage.getItem(k)||'null');return Array.isArray(v)?v.length:0}catch(_){return 0}}
 function isCloudDamaged(cloudState){if(!cloudState||typeof cloudState!=='object')return false;return CLOUD_CORE_KEYS.some(k=>localHasValue(k)&&!cloudHasKey(cloudState,k))}
 function reloadFromLocal(){txs=load(TXK,[]);users=load(UK,[]);driverFunds=load(FUND_K,[]);driverFundDayClosures=load(FUND_DAY_CLOSE_K,{});roles=load(RK,null);if(roles)roles=roles.map(r=>({...r,permissions:normalizePerms(r.permissions)}));procurement=load(PROC_K,[]);quotes=load(QUOTE_K,[])}
-// v217: هرگز کلید محلی‌ای که در ابر نیست حذف نمی‌شود؛ و اگر ردیف ابری ناقص
-// (آسیب‌دیده) باشد، مقدار ابری روی دادهٔ محلیِ موجود بازنویسی نمی‌شود.
+// v232: کمکی‌های ادغام بی‌زیان بین نسخهٔ محلی و ابری.
+function readLocalArray(k){try{const v=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(v)?v:[]}catch(_){return []}}
+function loadDeletions(){try{const d=JSON.parse(localStorage.getItem(DEL_K)||'{}');return (d&&typeof d==='object')?d:{}}catch(_){return {}}}
+function tombFor(deletions,key){const t=deletions&&deletions[key];return (t&&typeof t==='object')?t:{}}
+function addDeletion(key,id){try{const d=loadDeletions();d[key]=d[key]||{};d[key][String(id)]=Date.now();save(DEL_K,d)}catch(_){}}
+function mergeDeletionMaps(a,b){
+ const out=Object.assign({},a||{});
+ Object.keys(b||{}).forEach(k=>{
+  const src=b[k]||{},dst=Object.assign({},out[k]||{});
+  Object.keys(src).forEach(id=>{const ts=Number(src[id])||0;if(!dst[id]||Number(dst[id])<ts)dst[id]=ts});
+  out[k]=dst;
+ });
+ return out;
+}
+// v232: انتخاب بین دو رکورد با شناسهٔ یکسان. رکورد «بازیابی‌شده» هرگز بر رکورد واقعی
+// غلبه نمی‌کند؛ در غیر این صورت رکورد با مهر زمان (_m) تازه‌تر برنده است و در تساوی،
+// طرفِ مرجّح (prefer: 'cloud' هنگام خواندن، 'local' هنگام نوشتن) انتخاب می‌شود.
+function pickNewerRecord(a,b,prefer){
+ if(!a)return b;if(!b)return a;
+ const ar=a.recovered===true,br=b.recovered===true;
+ if(ar!==br)return ar?b:a;
+ const am=Number(a._m)||0,bm=Number(b._m)||0;
+ if(am!==bm)return am>bm?a:b;
+ return prefer==='cloud'?b:a;
+}
+// v232: اجتماع رکوردهای دو آرایه بر اساس id بدون حذف هیچ رکوردی؛ حذف‌های عمدی (tombstone)
+// اعمال می‌شوند. localOnly یعنی محلی رکوردهایی دارد که ابر ندارد و باید به ابر برگردند.
+function mergeCoreArray(localArr,cloudArr,tomb,prefer){
+ const l=Array.isArray(localArr)?localArr:[],c=Array.isArray(cloudArr)?cloudArr:[];
+ const lm=new Map(),cm=new Map();
+ l.forEach(r=>{if(r&&r.id!=null)lm.set(String(r.id),r)});
+ c.forEach(r=>{if(r&&r.id!=null)cm.set(String(r.id),r)});
+ const ids=[...new Set([...lm.keys(),...cm.keys()])];
+ const out=[];let localOnly=false;
+ ids.forEach(id=>{
+  if(tomb&&tomb[id]!=null)return;
+  const a=lm.get(id),b=cm.get(id);
+  if(a&&!b)localOnly=true;
+  const pick=pickNewerRecord(a,b,prefer);
+  if(pick)out.push(pick);
+ });
+ return {arr:out,localOnly};
+}
+// v217/v232: هرگز کلید محلی‌ای که در ابر نیست حذف نمی‌شود؛ و اگر ردیف ابری ناقص
+// (آسیب‌دیده) باشد، مقدار ابری روی دادهٔ محلیِ موجود بازنویسی نمی‌شود. فهرست‌های اصلی
+// (تراکنش‌ها، درخواست‌های خرید، استعلام‌ها، واریزی‌ها) همیشه «اجتماعی» ادغام می‌شوند تا
+// هیچ دستگاهی با نسخهٔ ناقص/کهنه، رکوردهای موجود در سرور را پاک نکند.
 function applyCloudStateToLocal(cloudState){
  if(!cloudState||typeof cloudState!=='object')return;
  const damaged=isCloudDamaged(cloudState);cloudDamaged=damaged;
+ const cloudClear=clearMarkerAt(cloudState[CLEAR_K]);
+ let localClear=0;try{localClear=clearMarkerAt(localStorage.getItem(CLEAR_K))}catch(_){}
+ const cloudWantsClear=cloudClear>localClear;
+ // ابتدا حذف‌های عمدی را با هم یکی کن (اجتماعی، با تازه‌ترین زمان).
+ try{
+  const merged=mergeDeletionMaps(loadDeletions(),(cloudState[DEL_K]&&typeof cloudState[DEL_K]==='object')?cloudState[DEL_K]:{});
+  localStorage.setItem(DEL_K,JSON.stringify(merged));deviceSet(DEL_K,merged);
+ }catch(_){}
+ const deletions=loadDeletions();
  for(const k of CLOUD_KEYS){
-  if(!cloudHasKey(cloudState,k))continue;
-  const v=cloudState[k];
-  if(v===null)continue;
+  if(k===DEL_K)continue;
   if(cloudDirtyKeys.has(k))continue;
-  if(damaged&&localHasValue(k))continue;
-  // v231: هرگز مقدار خالی/تهیِ ابری روی دادهٔ محلیِ موجود نوشته نشود؛ در عوض پرچم خرابی را
-  // روشن می‌کنیم تا بازیابی خودکار، دادهٔ محلی را دوباره به ابر بفرستد. تنها استثنا زمانی است که
-  // مدیر با «حذف کل اطلاعات» عمداً پاک‌سازی کرده باشد (نشانگر زمانی تازه‌تر).
-  if(isEmptyCloudValue(v)&&localHasValue(k)){
-   const cloudClear=clearMarkerAt(cloudState[CLEAR_K]);
-   let localClear=0;try{localClear=clearMarkerAt(localStorage.getItem(CLEAR_K))}catch(_){}
-   if(!(cloudClear>localClear)){cloudDamaged=true;continue}
+  const hasCloud=cloudHasKey(cloudState,k);
+  const v=hasCloud?cloudState[k]:undefined;
+  if(CORE_ARRAY_KEYS.includes(k)){
+   const localArr=readLocalArray(k);
+   const hasLocal=localArr.length>0;
+   if(!hasCloud){
+    if(hasLocal){cloudDamaged=true;cloudDirtyKeys.add(k);persistDirtyKeys();try{scheduleCloudSync(k)}catch(_){}}
+    continue;
+   }
+   if(cloudWantsClear){
+    try{localStorage.setItem(k,'[]');deviceSet(k,[])}catch(_){}
+    continue;
+   }
+   if(isEmptyCloudValue(v)&&hasLocal){cloudDamaged=true;cloudDirtyKeys.add(k);persistDirtyKeys();try{scheduleCloudSync(k)}catch(_){};continue}
+   const merged=mergeCoreArray(localArr,Array.isArray(v)?v:[],tombFor(deletions,k),'cloud');
+   try{localStorage.setItem(k,JSON.stringify(merged.arr));deviceSet(k,merged.arr)}catch(e){console.warn('Apply cloud key failed',k,e)}
+   if(merged.localOnly){cloudDamaged=true;cloudDirtyKeys.add(k);persistDirtyKeys();try{scheduleCloudSync(k)}catch(_){}}
+   continue;
   }
+  if(!hasCloud)continue;
+  if(v===null)continue;
+  if(damaged&&localHasValue(k))continue;
+  if(isEmptyCloudValue(v)&&localHasValue(k)&&!cloudWantsClear){cloudDamaged=true;continue}
   if((k===UK||k===RK)&&Array.isArray(v)&&localArrayLen(k)>v.length)continue;
   try{localStorage.setItem(k,JSON.stringify(v));deviceSet(k,v)}catch(e){console.warn('Apply cloud key failed',k,e)}
  }
@@ -1069,6 +1149,29 @@ async function pushCloudState(mode='auto',onlyKeys=null){
   const state=cloudSnapshot(Array.isArray(pushKeys)&&pushKeys.length?pushKeys:CLOUD_KEYS);
   // v231: مقادیر خالی هرگز به ابر فرستاده نمی‌شوند مگر با درخواست صریح پاک‌سازی (cloudClearKeys).
   for(const k of Object.keys(state)){if(isEmptyCloudValue(state[k])&&!cloudClearKeys.has(k)){delete state[k];if(cloudDirtyKeys.delete(k))persistDirtyKeys()}}
+  // v232: پیش از نوشتن، فهرست‌های اصلی را با نسخهٔ تازهٔ ابری «اجتماعی» کن تا یک دستگاه
+  // کهنه/ناقص هرگز نتواند رکوردهای موجود در سرور را پاک کند. حذف‌های عمدی هم‌زمان منتقل می‌شوند.
+  try{
+   const coreInState=Object.keys(state).filter(k=>CORE_ARRAY_KEYS.includes(k)&&!cloudClearKeys.has(k));
+   if(coreInState.length){
+    const {data:cur}=await supabase.from('saman_app_state').select('state').eq('id','main').maybeSingle();
+    const cloudNow=(cur&&cur.state&&typeof cur.state==='object')?cur.state:{};
+    const cloudClearAt=clearMarkerAt(cloudNow[CLEAR_K]);
+    let localClearAt=0;try{localClearAt=clearMarkerAt(localStorage.getItem(CLEAR_K))}catch(_){}
+    if(cloudClearAt>localClearAt){
+     // سرور عمداً پاک شده و این دستگاه هنوز خبر ندارد: رکوردهای قدیمی را دوباره نساز.
+     coreInState.forEach(k=>{delete state[k]});
+    }else{
+     const mergedDel=mergeDeletionMaps(loadDeletions(),(cloudNow[DEL_K]&&typeof cloudNow[DEL_K]==='object')?cloudNow[DEL_K]:{});
+     try{localStorage.setItem(DEL_K,JSON.stringify(mergedDel));deviceSet(DEL_K,mergedDel)}catch(_){}
+     coreInState.forEach(k=>{
+      const merged=mergeCoreArray(state[k],Array.isArray(cloudNow[k])?cloudNow[k]:[],tombFor(mergedDel,k),'local');
+      state[k]=merged.arr;
+     });
+     state[DEL_K]=mergedDel;
+    }
+   }
+  }catch(e){console.warn('v232 pre-push cloud union failed; sending local copy',e)}
   if(!Object.keys(state).length)return;
   for(const k of Object.keys(state))sentKeys.push(k);
   const updatedAt=new Date().toISOString();
@@ -1091,7 +1194,7 @@ async function pushCloudState(mode='auto',onlyKeys=null){
   }
   lastCloudUpdatedAt=saved.updated_at||updatedAt;
   if(sentKeys.length){for(const k of sentKeys){cloudDirtyKeys.delete(k);cloudClearKeys.delete(k)}persistDirtyKeys()}
- }catch(e){console.error('Cloud save failed',e);showCloudNotice('ذخیره آنلاین انجام نشد؛ اتصال اینترنت را بررسی کن.')}
+ }catch(e){console.error('Cloud save failed',e);showCloudNotice('ذخیره آنلاین انجام نشد؛ اتصال اینترنت را بررسی کن.');try{if(typeof showConnLock==='function')showConnLock()}catch(_){}}
  finally{cloudSyncBusy=false;if(cloudSyncAgain){cloudSyncAgain=false;scheduleCloudSync()}}
 }
 async function pullCloudState(seedIfEmpty=true){
@@ -1121,7 +1224,7 @@ async function pullCloudState(seedIfEmpty=true){
 function showCloudNotice(message){let n=document.getElementById('cloudStatusNotice');if(!n){n=document.createElement('div');n.id='cloudStatusNotice';n.style.cssText='position:fixed;z-index:20000;bottom:12px;left:12px;right:12px;padding:10px 14px;background:#7b3428;color:#fff;border-radius:10px;font-size:13px;text-align:center';document.body.appendChild(n)}n.textContent=message;n.style.display='block';setTimeout(()=>{if(n)n.style.display='none'},5000)}
 function usernameEmail(username){return String(username||'').trim().toLowerCase()+'@saman.app'}
 function applyIncomingCloudState(state, updatedAt=''){if(!state||typeof state!=='object')return;applyCloudStateToLocal(state);lastCloudUpdatedAt=updatedAt||lastCloudUpdatedAt;reloadFromLocal();if(cloudDamaged&&!cloudRecoveryDone){cloudRecoveryDone=true;recoverCloudState(state).catch(()=>{})}if(!((Array.isArray(procurement)?procurement:[]).length)&&rebuildProcurementFromTxs()){try{showCloudNotice('درخواست‌های خرید از روی تراکنش‌ها بازیابی شد.')}catch(_){}}current=users.find(x=>String(x.username).toLowerCase()===String(cloudUser?.email||'').split('@')[0])||current;if(current){try{renderAll();applyPermissions();try{if(typeof window.__refreshPermissionAccordions==='function')window.__refreshPermissionAccordions()}catch(_e){}try{document.dispatchEvent(new CustomEvent('saman:cloud-state-applied'))}catch(_e){}if(typeof renderDriverFunds==='function')renderDriverFunds();if(typeof renderNotifications==='function')renderNotifications();if(typeof refreshNotificationBadge==='function')refreshNotificationBadge();if(typeof renderProcurement==='function')renderProcurement();if(typeof renderWarehouse==='function')renderWarehouse();if(typeof renderPricing==='function')renderPricing();if(typeof renderUsers==='function'&&(isAdmin()||can('manageUsers')))renderUsers();if(typeof renderRoles==='function'&&(isAdmin()||can('manageRoles')))renderRoles()}catch(e){console.warn('Cloud refresh display failed',e)}}}
-async function refreshCloudIfChanged(){if(!supabase||!cloudUser||cloudSyncBusy||document.hidden||!cloudReady)return;try{const {data,error}=await supabase.from('saman_app_state').select('updated_at,updated_by').eq('id','main').maybeSingle();if(error)throw error;if(!data?.updated_at)return;if(sameCloudTime(data.updated_at,lastCloudUpdatedAt))return;if(String(data.updated_by||'')===String(cloudUser.id)){lastCloudUpdatedAt=data.updated_at;return}const {data:full,error:fullError}=await supabase.from('saman_app_state').select('state,updated_at').eq('id','main').maybeSingle();if(fullError)throw fullError;if(!full?.state)return;applyIncomingCloudState(full.state,full.updated_at)}catch(e){console.warn('Cloud polling failed',e)}}
+async function refreshCloudIfChanged(){if(!supabase||!cloudUser||cloudSyncBusy||document.hidden||!cloudReady)return;try{const {data,error}=await supabase.from('saman_app_state').select('updated_at,updated_by').eq('id','main').maybeSingle();if(error)throw error;if(!data?.updated_at)return;if(sameCloudTime(data.updated_at,lastCloudUpdatedAt))return;if(String(data.updated_by||'')===String(cloudUser.id)){lastCloudUpdatedAt=data.updated_at;return}const {data:full,error:fullError}=await supabase.from('saman_app_state').select('state,updated_at').eq('id','main').maybeSingle();if(fullError)throw fullError;if(!full?.state)return;applyIncomingCloudState(full.state,full.updated_at)}catch(e){console.warn('Cloud polling failed',e);try{if(typeof showConnLock==='function')showConnLock()}catch(_){}}}
 async function connectCloudRealtime(){if(!supabase||!cloudUser)return;if(cloudRealtimeChannel){try{await supabase.removeChannel(cloudRealtimeChannel)}catch(_){}}cloudRealtimeChannel=supabase.channel('saman-app-state-live-'+cloudUser.id).on('postgres_changes',{event:'*',schema:'public',table:'saman_app_state',filter:'id=eq.main'},payload=>{if(!cloudUser||!payload.new?.state||!payload.new?.updated_at)return;const isOwn=String(payload.new.updated_by||'')===String(cloudUser.id);if(isOwn){lastCloudUpdatedAt=payload.new.updated_at;return}if(!sameCloudTime(payload.new.updated_at,lastCloudUpdatedAt))applyIncomingCloudState(payload.new.state,payload.new.updated_at)}).subscribe((status)=>{if(status==='SUBSCRIBED')refreshCloudIfChanged()});if(cloudPollTimer)clearInterval(cloudPollTimer);cloudPollTimer=setInterval(refreshCloudIfChanged,3000);setTimeout(refreshCloudIfChanged,300)}
 function flushPendingSync(){if(!supabase||!cloudUser||!cloudReady||!cloudDirtyKeys.size)return;if(cloudSyncTimer){clearTimeout(cloudSyncTimer);cloudSyncTimer=null}pushCloudState()}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshCloudIfChanged();else flushPendingSync()});window.addEventListener('focus',()=>refreshCloudIfChanged());window.addEventListener('pagehide',flushPendingSync);window.addEventListener('beforeunload',flushPendingSync);
@@ -1131,7 +1234,7 @@ function openDeviceDB(){return new Promise((resolve,reject)=>{if(!window.indexed
 function deviceGet(k){return new Promise((resolve,reject)=>{if(!deviceDb)return resolve(null);const req=deviceDb.transaction('kv','readonly').objectStore('kv').get(k);req.onsuccess=()=>resolve(req.result===undefined?null:req.result);req.onerror=()=>reject(req.error)})}
 function deviceSet(k,v){if(!deviceDb)return;try{const tx=deviceDb.transaction('kv','readwrite');tx.objectStore('kv').put(v,k)}catch(e){}}
 async function hydrateDevice(){try{await openDeviceDB()}catch(e){return false}
- const keys=[TXK,UK,UPK,RK,PROC_K,QUOTE_K,FUND_K,'bazargani_last_publish_v1','bazargani_session_v1'];
+ const keys=[TXK,UK,UPK,RK,PROC_K,QUOTE_K,FUND_K,DEL_K,'bazargani_last_publish_v1','bazargani_session_v1'];
  const values=await Promise.all(keys.map(k=>deviceGet(k)));
  keys.forEach((k,i)=>{const v=values[i];if(v!==null){localStorage.setItem(k,typeof v==='string'?v:JSON.stringify(v))}else{const raw=localStorage.getItem(k);if(raw!==null){try{deviceSet(k,JSON.parse(raw))}catch(e){deviceSet(k,raw)}}}});
  txs=load(TXK,[]);users=load(UK,[]);return true}
@@ -1839,8 +1942,8 @@ $('togglePricingSearch')?.addEventListener('click',()=>{$('pricingFilters').clas
 
 async function confirmTransactionDocument(id){if(!(isAdmin()||userHasNamedRole(current,'اپراتور قیمت گذاری')||userHasNamedRole(current,'اپراتور قیمت‌گذاری')))return;const x=txs.find(t=>String(t.id)===String(id));if(!x||x.deposit||x.documentApproved)return;if(!(await window.uiConfirm('ثبت سند این تراکنش نهایی شود؟ پس از تأیید، هیچ بخشی از تراکنش قابل ویرایش یا حذف نخواهد بود.')))return;x.documentApproved=true;x.documentApprovedAt=new Date().toISOString();x.documentApprovedBy=current?.name||'';save(TXK,txs);renderAll();}
 function editTx(id){const x=txs.find(t=>t.id===id);if(!x)return;if(!canEditLedgerRow(x))return;if(x.documentApproved){alert('این سند نهایی شده و دیگر قابل ویرایش نیست.');return;}if(txDriverFullyLocked(x)){alert('این تراکنش کاملاً از واریزی کارت رانندگان تأمین شده و پرونده روز آن بسته شده است؛ امکان ویرایش یا حذف ندارد.');return}driverEditLock=txDriverLocked(x);driverEditLockDriverAmount=driverEditLock?(Number(x.purchaseDriver)||0):0;driverEditLockFreightAmount=driverEditLock?(Number(x.freightDriver)||0):0;if(driverEditLock&&driverEditLockDriverAmount<=0.000001){const _ut=(Array.isArray(x.driverFundUses)?x.driverFundUses:[]).reduce((a,u)=>a+Math.max(0,Number(u.amount)||0),0);driverEditLockDriverAmount=_ut}editingId=id;dateEditLock=!x.deposit;purchaseInvoicePhoto=x.invoicePhoto||'';purchaseInvoiceChanged=false;setPurchaseInvoicePreview(purchaseInvoicePhoto);$('formTitle').textContent='ویرایش تراکنش';$('cancelEdit').classList.remove('hidden');$('txDate').value=x.date;$('txDesc').value=x.desc;$('txDeposit').value=x.deposit?money(x.deposit):'';$('txPurchase').value=x.purchase?money(x.purchase):'';$('txFreight').value=x.freight?money(x.freight):'';$('depositType').value=x.depositType||'cashbox';$('purchaseSource').value=x.officialInvoice?'cashbox':(x.purchaseSource||'cashbox');$('freightSource').value=x.officialInvoice?'cashbox':(x.freightSource||'cashbox');$('purchaseCash').value=x.purchaseCash?money(x.purchaseCash):'';$('purchaseDriver').value=x.purchaseDriver?money(x.purchaseDriver):'';if($('purchasePart1Source'))$('purchasePart1Source').value=(Number(x.purchaseCash)||0)>0?'cashbox':'driver';if($('purchasePart2Source'))$('purchasePart2Source').value=(Number(x.purchaseDriver)||0)>0?'driver':'cashbox';$('freightCash').value=x.freightCash?money(x.freightCash):'';$('freightDriver').value=x.freightDriver?money(x.freightDriver):'';if($('txNoFreight'))$('txNoFreight').checked=!!x.noFreight;if($('txOfficialInvoice'))$('txOfficialInvoice').checked=!!x.officialInvoice;if($('purchaseBasketToggle')){$('purchaseBasketToggle').checked=!!(x.purchaseBasket&&Number(x.purchaseBasket.amount||0)>0);const _ba=$('purchaseBasketAmount');if(_ba){if(x.purchaseBasket&&Number(x.purchaseBasket.remaining||0)>0){_ba.value=money(Number(x.purchaseBasket.remaining)||0);_ba.dataset.userEdited='1'}else{_ba.value='';delete _ba.dataset.userEdited}}}setMixed('purchase');setMixed('freight');setMode(x.deposit?'deposit':'purchase');if(!x.deposit&&x.supplyLink){renderSupplyLinkOptions();$('supplyLinkRequest').value=String(x.supplyLink.requestId);renderSupplyLinkItems();const modeRadio=document.querySelector(`input[name="supplyLinkMode"][value="${x.supplyLink.mode==='whole'?'whole':'items'}"]`);if(modeRadio)modeRadio.checked=true;const itemBox=$('supplyLinkItemChecks');if(itemBox)itemBox.hidden=x.supplyLink.mode==='whole';(x.supplyLink.items||[]).forEach(it=>{const cb=document.querySelector(`[data-supply-link-item="${Number(it.index)}"]`);if(cb)cb.checked=true})}go('add');applyDriverEditLock();applyOfficialInvoiceUI()}
-async function deleteTx(id){const old=txs.find(x=>x.id===id);if(!old)return;if(!canDeleteLedgerRow(old))return;if(txDriverLocked(old)){alert('این تراکنش از واریزی کارت رانندگان استفاده کرده و پرونده روز آن بسته شده است؛ امکان حذف ندارد.');return}if(old?.documentApproved){alert('این سند نهایی شده و دیگر قابل حذف یا ویرایش نیست.');return;}if(!(await window.uiConfirm('این تراکنش حذف شود؟')))return;if(old?.driverFundUses?.length){for(const f of driverFunds){f.allocations=(f.allocations||[]).filter(a=>String(a.txId)!==String(id))}save(FUND_K,driverFunds)}txs=txs.filter(x=>x.id!==id);save(TXK,txs);renderAll()}
-function clearAll(){if(!(isAdmin()||can('deleteAll')))return;const hasAny=txs.length||driverFunds.length||Object.keys(driverFundDayClosures||{}).length||(procurement||[]).length||(quotes||[]).length;if(!hasAny){alert('اطلاعاتی برای حذف وجود ندارد.');return}let modal=$('deleteRangeModal');if(!modal){modal=document.createElement('div');modal.id='deleteRangeModal';modal.className='fundEditOverlay';modal.innerHTML='<div class="fundEditCard" role="dialog" aria-modal="true"><div class="fundEditHead"><b>حذف اطلاعات ثبت‌شده</b><button type="button" class="fundEditClose" data-delete-cancel>×</button></div><p class="fundMeta">بازه حذف را انتخاب کن. حذف اطلاعات مالی قابل بازگشت نیست.</p><label>نوع حذف</label><select class="finput" id="deleteRangeMode"><option value="all">تمام اطلاعات از ابتدا تا امروز</option><option value="range">فقط تراکنش‌های بازه تاریخ</option></select><div id="deleteRangeFields" class="hidden"><label>از تاریخ شمسی</label><input class="finput" id="deleteRangeFrom" placeholder="1405/01/01"><label>تا تاریخ شمسی</label><input class="finput" id="deleteRangeTo" placeholder="1405/12/29"></div><div class="fundEditActions"><button type="button" class="fundEditCancel" data-delete-cancel>انصراف</button><button type="button" class="fundEditSave" id="confirmDeleteRange">حذف</button></div></div>';document.body.appendChild(modal);modal.querySelectorAll('[data-delete-cancel]').forEach(b=>b.onclick=()=>modal.remove());modal.querySelector('#deleteRangeMode').onchange=e=>modal.querySelector('#deleteRangeFields').classList.toggle('hidden',e.target.value!=='range');modal.querySelector('#confirmDeleteRange').onclick=async()=>{const mode=modal.querySelector('#deleteRangeMode').value,from=dateKey(modal.querySelector('#deleteRangeFrom').value),to=dateKey(modal.querySelector('#deleteRangeTo').value);if(mode==='range'&&(!from||!to||from>to)){alert('بازه تاریخ معتبر وارد کن.');return}if(!(await window.uiConfirm(mode==='all'?'تمام تراکنش‌ها، واریزی‌ها، درخواست‌های خرید، اطلاعات انبار و سوابق روزانه حذف شوند؟':'تراکنش‌های بازه انتخاب‌شده حذف شوند؟ واریزی‌های مرتبط با مصرف این تراکنش‌ها نیز به‌روزرسانی می‌شوند.')))return;if(mode==='all'){txs=[];driverFunds=[];driverFundDayClosures={};procurement=[];quotes=[];try{const __clearMarker={at:Date.now(),by:(current&&current.id)||''};localStorage.setItem(CLEAR_K,JSON.stringify(__clearMarker));save(CLEAR_K,__clearMarker)}catch(_){}}else{const removed=new Set(txs.filter(t=>dateKey(t.date)>=from&&dateKey(t.date)<=to).map(t=>String(t.id)));txs=txs.filter(t=>!removed.has(String(t.id)));driverFunds=driverFunds.filter(f=>dateKey(f.date)<from||dateKey(f.date)>to);driverFunds.forEach(f=>f.allocations=(f.allocations||[]).filter(a=>!removed.has(String(a.txId))));}save(TXK,txs,{force:true});save(FUND_K,driverFunds,{force:true});save(FUND_DAY_CLOSE_K,driverFundDayClosures,{force:true});save(PROC_K,procurement,{force:true});save(QUOTE_K,quotes,{force:true});renderAll();if(typeof renderWarehouse==='function')renderWarehouse();if(typeof renderNotifications==='function')renderNotifications();if(typeof refreshNotificationBadge==='function')refreshNotificationBadge();modal.remove();alert('حذف اطلاعات انجام شد.')}}}
+async function deleteTx(id){const old=txs.find(x=>x.id===id);if(!old)return;if(!canDeleteLedgerRow(old))return;if(txDriverLocked(old)){alert('این تراکنش از واریزی کارت رانندگان استفاده کرده و پرونده روز آن بسته شده است؛ امکان حذف ندارد.');return}if(old?.documentApproved){alert('این سند نهایی شده و دیگر قابل حذف یا ویرایش نیست.');return;}if(!(await window.uiConfirm('این تراکنش حذف شود؟')))return;if(old?.driverFundUses?.length){for(const f of driverFunds){f.allocations=(f.allocations||[]).filter(a=>String(a.txId)!==String(id))}save(FUND_K,driverFunds)}txs=txs.filter(x=>x.id!==id);save(TXK,txs);addDeletion(TXK,id);renderAll()}
+function clearAll(){if(!(isAdmin()||can('deleteAll')))return;const hasAny=txs.length||driverFunds.length||Object.keys(driverFundDayClosures||{}).length||(procurement||[]).length||(quotes||[]).length;if(!hasAny){alert('اطلاعاتی برای حذف وجود ندارد.');return}let modal=$('deleteRangeModal');if(!modal){modal=document.createElement('div');modal.id='deleteRangeModal';modal.className='fundEditOverlay';modal.innerHTML='<div class="fundEditCard" role="dialog" aria-modal="true"><div class="fundEditHead"><b>حذف اطلاعات ثبت‌شده</b><button type="button" class="fundEditClose" data-delete-cancel>×</button></div><p class="fundMeta">بازه حذف را انتخاب کن. حذف اطلاعات مالی قابل بازگشت نیست.</p><label>نوع حذف</label><select class="finput" id="deleteRangeMode"><option value="all">تمام اطلاعات از ابتدا تا امروز</option><option value="range">فقط تراکنش‌های بازه تاریخ</option></select><div id="deleteRangeFields" class="hidden"><label>از تاریخ شمسی</label><input class="finput" id="deleteRangeFrom" placeholder="1405/01/01"><label>تا تاریخ شمسی</label><input class="finput" id="deleteRangeTo" placeholder="1405/12/29"></div><div class="fundEditActions"><button type="button" class="fundEditCancel" data-delete-cancel>انصراف</button><button type="button" class="fundEditSave" id="confirmDeleteRange">حذف</button></div></div>';document.body.appendChild(modal);modal.querySelectorAll('[data-delete-cancel]').forEach(b=>b.onclick=()=>modal.remove());modal.querySelector('#deleteRangeMode').onchange=e=>modal.querySelector('#deleteRangeFields').classList.toggle('hidden',e.target.value!=='range');modal.querySelector('#confirmDeleteRange').onclick=async()=>{const mode=modal.querySelector('#deleteRangeMode').value,from=dateKey(modal.querySelector('#deleteRangeFrom').value),to=dateKey(modal.querySelector('#deleteRangeTo').value);if(mode==='range'&&(!from||!to||from>to)){alert('بازه تاریخ معتبر وارد کن.');return}if(!(await window.uiConfirm(mode==='all'?'تمام تراکنش‌ها، واریزی‌ها، درخواست‌های خرید، اطلاعات انبار و سوابق روزانه حذف شوند؟':'تراکنش‌های بازه انتخاب‌شده حذف شوند؟ واریزی‌های مرتبط با مصرف این تراکنش‌ها نیز به‌روزرسانی می‌شوند.')))return;if(mode==='all'){try{(Array.isArray(txs)?txs:[]).forEach(t=>t&&t.id!=null&&addDeletion(TXK,t.id))}catch(_){}txs=[];driverFunds=[];driverFundDayClosures={};procurement=[];quotes=[];try{const __clearMarker={at:Date.now(),by:(current&&current.id)||''};localStorage.setItem(CLEAR_K,JSON.stringify(__clearMarker));save(CLEAR_K,__clearMarker)}catch(_){}}else{const removed=new Set(txs.filter(t=>dateKey(t.date)>=from&&dateKey(t.date)<=to).map(t=>String(t.id)));try{removed.forEach(rid=>addDeletion(TXK,rid))}catch(_){}txs=txs.filter(t=>!removed.has(String(t.id)));driverFunds=driverFunds.filter(f=>dateKey(f.date)<from||dateKey(f.date)>to);driverFunds.forEach(f=>f.allocations=(f.allocations||[]).filter(a=>!removed.has(String(a.txId))));}save(TXK,txs,{force:true});save(FUND_K,driverFunds,{force:true});save(FUND_DAY_CLOSE_K,driverFundDayClosures,{force:true});save(PROC_K,procurement,{force:true});save(QUOTE_K,quotes,{force:true});renderAll();if(typeof renderWarehouse==='function')renderWarehouse();if(typeof renderNotifications==='function')renderNotifications();if(typeof refreshNotificationBadge==='function')refreshNotificationBadge();modal.remove();alert('حذف اطلاعات انجام شد.')}}}
 async function addViewer(){
 if(!isAdmin())return;
 const name=$('newName').value.trim(),username=$('newUsername').value.trim(),password=$('newPassword').value,roleIds=[...document.querySelectorAll('input[name="newRoleChoice"]:checked')].map(x=>x.value);
@@ -2230,7 +2333,7 @@ async function undoReturnDriverFund(id){
 }
 function editDriverFund(id){if(!canManageFunds())return;const f=driverFunds.find(x=>String(x.id)===String(id));if(!f)return;if(fundReturnMarked(f)){showFundEditMessage('این واریزی به صندوق برگشته است؛ ابتدا با کلید فلش دایره‌ای برگشت را لغو کن.');return}if(driverFundDayClosures[String(f.date||'')]||driverFundDayClosures[dateKey(f.date||'')]){showFundEditMessage('پرونده روز این واریزی بسته شده و امکان ویرایش آن وجود ندارد.');return}document.getElementById('fundEditModal')?.remove();const overlay=document.createElement('div');overlay.id='fundEditModal';overlay.className='fundEditOverlay';overlay.innerHTML=`<form class="fundEditCard" role="dialog" aria-modal="true" aria-labelledby="fundEditTitle"><div class="fundEditHead"><b id="fundEditTitle">ویرایش واریزی راننده</b><button type="button" class="fundEditClose" aria-label="بستن">×</button></div><label for="fundEditName">نام راننده / شرح</label><input id="fundEditName" class="finput" maxlength="120" value="${esc(f.desc||'')}" autocomplete="off"><label for="fundEditAmount">مبلغ واریزی (ریال)</label><input id="fundEditAmount" class="finput moneyInput" inputmode="numeric" value="${String(Number(f.amount)||0)}" autocomplete="off"><div id="fundEditError" class="fundEditError" role="alert"></div><div class="fundEditActions"><button type="button" class="fundEditCancel">انصراف</button><button type="submit" class="fundEditSave">ذخیره تغییرات</button></div></form>`;document.body.appendChild(overlay);document.body.style.overflow='hidden';const close=()=>{overlay.remove();document.body.style.overflow=''};overlay.querySelector('.fundEditClose').onclick=close;overlay.querySelector('.fundEditCancel').onclick=close;overlay.addEventListener('click',e=>{if(e.target===overlay)close()});const amountInput=overlay.querySelector('#fundEditAmount');amountInput.addEventListener('input',()=>{const n=num(amountInput.value);amountInput.value=n?fa(n):''});overlay.querySelector('form').onsubmit=e=>{e.preventDefault();const name=overlay.querySelector('#fundEditName').value.trim(),amount=num(amountInput.value),err=overlay.querySelector('#fundEditError'),used=fundUsed(f)+fundReturned(f);if(!name||amount<=0){err.textContent='نام راننده و مبلغ معتبر را وارد کن.';return}if(amount<used){err.textContent='مبلغ جدید نمی‌تواند از مجموع مصرف‌شده و برگشت‌داده‌شده کمتر باشد.';return}f.desc=name;f.amount=amount;f.editedBy=current?.name||'';f.editedAt=new Date().toISOString();saveFunds();renderFundDaily();renderDriverFunds();renderDashboardStats();renderAll();refreshNotificationBadge();if(supabase&&cloudUser)pushCloudState().catch(e=>console.warn('Edited fund cloud sync failed',e));close()};setTimeout(()=>overlay.querySelector('#fundEditName').focus(),50)}
 function showFundEditMessage(message){const old=document.getElementById('fundEditMessage');old?.remove();const el=document.createElement('div');el.id='fundEditMessage';el.className='fundEditOverlay';el.innerHTML=`<div class="fundEditCard" role="dialog" aria-modal="true"><div class="fundEditHead"><b>امکان ویرایش نیست</b><button type="button" class="fundEditClose" aria-label="بستن">×</button></div><p class="fundEditError">${esc(message)}</p><div class="fundEditActions"><button type="button" class="fundEditSave">متوجه شدم</button></div></div>`;document.body.appendChild(el);const close=()=>{el.remove()};el.querySelectorAll('button').forEach(b=>b.onclick=close);el.onclick=e=>{if(e.target===el)close()}}
-async function deleteDriverFund(id){if(!canManageFunds())return;const f=driverFunds.find(x=>String(x.id)===String(id));if(!f)return;if(fundReturnMarked(f)){alert('این واریزی به صندوق برگشته است؛ ابتدا برگشت به صندوق را لغو کن.');return}if(driverFundDayClosures[String(f.date||'')]){alert('پرونده روز این واریزی بسته شده و امکان حذف آن وجود ندارد.');return}if((f.allocations||[]).length||fundReturned(f)>0){alert('این واریزی مصرف یا برگشت داده شده و برای حفظ سابقه مالی قابل حذف نیست.');return}if(!(await window.uiConfirm('واریزی «'+String(f.desc||'')+'» حذف شود؟')))return;driverFunds=driverFunds.filter(x=>String(x.id)!==String(id));saveFunds();alert('واریزی حذف شد.')}
+async function deleteDriverFund(id){if(!canManageFunds())return;const f=driverFunds.find(x=>String(x.id)===String(id));if(!f)return;if(fundReturnMarked(f)){alert('این واریزی به صندوق برگشته است؛ ابتدا برگشت به صندوق را لغو کن.');return}if(driverFundDayClosures[String(f.date||'')]){alert('پرونده روز این واریزی بسته شده و امکان حذف آن وجود ندارد.');return}if((f.allocations||[]).length||fundReturned(f)>0){alert('این واریزی مصرف یا برگشت داده شده و برای حفظ سابقه مالی قابل حذف نیست.');return}if(!(await window.uiConfirm('واریزی «'+String(f.desc||'')+'» حذف شود؟')))return;driverFunds=driverFunds.filter(x=>String(x.id)!==String(id));saveFunds();addDeletion(FUND_K,id);alert('واریزی حذف شد.')}
 function handleFundClick(e){const undo=e.target.closest('[data-fund-undo-return]');if(undo){undoReturnDriverFund(undo.dataset.fundUndoReturn);return}const edit=e.target.closest('[data-fund-edit]');if(edit){editDriverFund(edit.dataset.fundEdit);return}const del=e.target.closest('[data-fund-delete]');if(del){deleteDriverFund(del.dataset.fundDelete);return}const ret=e.target.closest('[data-fund-return]');if(ret)returnDriverFund(ret.dataset.fundReturn);const tr=e.target.closest('[data-fund-transfer]');if(tr){openFundTransferModal(tr.dataset.fundTransfer);return}const sp=e.target.closest('[data-fund-split]');if(sp){openFundSplitModal(sp.dataset.fundSplit);return}}
 // Minimal offline XLSX reader: reads standard .xlsx ZIP entries via browser DecompressionStream.
 async function unzipXlsx(file){const buf=await file.arrayBuffer(),dv=new DataView(buf),u8=new Uint8Array(buf),entries={};let eocd=-1;for(let i=u8.length-22;i>=Math.max(0,u8.length-65557);i--){if(dv.getUint32(i,true)===0x06054b50){eocd=i;break}}if(eocd<0)throw Error('ساختار فایل اکسل معتبر نیست.');const count=dv.getUint16(eocd+10,true),cdSize=dv.getUint32(eocd+12,true),cdOff=dv.getUint32(eocd+16,true);let p=cdOff;for(let n=0;n<count;n++){if(dv.getUint32(p,true)!==0x02014b50)throw Error('فهرست فایل اکسل قابل خواندن نیست.');const method=dv.getUint16(p+10,true),csize=dv.getUint32(p+20,true),nlen=dv.getUint16(p+28,true),elen=dv.getUint16(p+30,true),clen=dv.getUint16(p+32,true),lo=dv.getUint32(p+42,true),name=new TextDecoder().decode(u8.slice(p+46,p+46+nlen));const lp=lo+30+dv.getUint16(lo+26,true)+dv.getUint16(lo+28,true);let raw=u8.slice(lp,lp+csize);if(method===8){if(!('DecompressionStream'in window))throw Error('مرورگر این دستگاه بازکردن فایل اکسل را پشتیبانی نمی‌کند؛ مرورگر را به‌روز کنید.');const ds=new DecompressionStream('deflate-raw');raw=new Uint8Array(await new Response(new Blob([raw]).stream().pipeThrough(ds)).arrayBuffer())}else if(method!==0)throw Error('روش فشرده‌سازی فایل اکسل پشتیبانی نمی‌شود.');entries[name]=new TextDecoder().decode(raw);p+=46+nlen+elen+clen}return entries}
@@ -2770,6 +2873,70 @@ $('ledgerInvoiceInput')?.addEventListener('change',async e=>{
   }catch(err){console.error(err);alert('خواندن تصویر انجام نشد.')}
 });
 
+/* ===== v232: قفل تمام‌صفحهٔ «قطع اتصال» — بدون دکمه؛ خودکار می‌آید و خودکار می‌رود ===== */
+let __connLockEl=null,__connLockTimer=null,__connLockActive=false,__connLockBusy=false;
+function connLockElement(){
+ if(__connLockEl&&document.body.contains(__connLockEl))return __connLockEl;
+ const el=document.createElement('div');
+ el.id='connLockOverlay';
+ el.setAttribute('role','alertdialog');
+ el.setAttribute('aria-live','assertive');
+ el.setAttribute('aria-label','قطع اتصال');
+ el.innerHTML='<div class="connLockCard">'
+  +'<div class="connLockArt"><span class="connLockRing"></span><span class="connLockWave"></span>'
+  +'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"/><path d="M8.6 16.4a4.9 4.9 0 0 1 6.8 0"/><path d="M5.1 12.9A10 10 0 0 1 7.6 11.2"/><path d="M16.4 11.2a10 10 0 0 1 2.5 1.7"/><path d="M2.2 8.9A15 15 0 0 1 6 6.6"/><path d="M18 6.6a15 15 0 0 1 3.8 2.3"/><circle cx="12" cy="20" r="1.1"/></svg>'
+  +'</div>'
+  +'<b class="connLockTitle">اتصال قطع شد</b>'
+  +'<span class="connLockHint">ارتباط اینترنت یا سرور برقرار نیست. به‌محض وصل‌شدن، برنامه خودکار ادامه می‌دهد و به‌روز می‌شود.</span>'
+  +'<span class="connLockDots"><i></i><i></i><i></i></span>'
+  +'</div>';
+ __connLockEl=el;return el;
+}
+function showConnLock(){
+ if(__connLockActive)return;
+ if(typeof current==='undefined'||!current)return;
+ __connLockActive=true;
+ const el=connLockElement();
+ try{document.body.appendChild(el)}catch(_){}
+ try{document.body.classList.add('connLocked')}catch(_){}
+ requestAnimationFrame(()=>{try{el.classList.add('show')}catch(_){}});
+}
+function hideConnLock(){
+ if(!__connLockActive)return;
+ __connLockActive=false;
+ try{document.body.classList.remove('connLocked')}catch(_){}
+ const el=__connLockEl;
+ if(el){el.classList.remove('show');setTimeout(()=>{try{el.remove()}catch(_){}},260)}
+}
+async function connLockProbe(){
+ if(__connLockBusy)return true;
+ __connLockBusy=true;
+ let ok=false;
+ try{ ok = (navigator.onLine===false) ? false : await serverReachable(4500); }catch(_){ok=false}
+ __connLockBusy=false;
+ if(!(typeof current!=='undefined'&&current)){hideConnLock();return ok}
+ if(ok){
+  if(__connLockActive){
+   hideConnLock();
+   try{if(typeof refreshCloudIfChanged==='function')refreshCloudIfChanged()}catch(_){}
+   try{if(typeof flushPendingSync==='function')flushPendingSync()}catch(_){}
+   try{if(typeof pullCloudState==='function')await pullCloudState(false)}catch(_){}
+   try{showCloudNotice('اتصال برقرار شد؛ برنامه به‌روزرسانی شد.')}catch(_){}
+  }
+ }else{showConnLock()}
+ return ok;
+}
+(function startConnLock(){
+ if(__connLockTimer)clearInterval(__connLockTimer);
+ __connLockTimer=setInterval(()=>{if(document.hidden)return;connLockProbe()},6000);
+ window.addEventListener('offline',()=>{if(typeof current!=='undefined'&&current)showConnLock()});
+ window.addEventListener('online',()=>{connLockProbe()});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)connLockProbe()});
+ window.addEventListener('focus',()=>{connLockProbe()});
+ document.addEventListener('keydown',e=>{if(__connLockActive){try{e.stopPropagation();e.preventDefault()}catch(_){}}},true);
+ setTimeout(connLockProbe,1200);
+})();
+
 boot();
 })();
 </script>
@@ -2911,7 +3078,7 @@ boot();
 (function(){
   if(!('serviceWorker' in navigator) || !window.isSecureContext || location.protocol==='file:') return;
   navigator.serviceWorker.register('./service-worker.js').catch(e=>console.warn('Service worker registration skipped',e));
-  const currentBuild=document.querySelector('meta[name="saman-build"]')?.content || 'v231';
+  const currentBuild=document.querySelector('meta[name="saman-build"]')?.content || 'v232';
   let checking=false, updatePending=false, lastActivity=Date.now();
   const note=document.createElement('div');
   note.id='samanUpdateNotice';
@@ -3481,6 +3648,29 @@ boot();
 .bottom{bottom:env(safe-area-inset-bottom,0px)!important;z-index:20}
 .bottom:after{content:"";position:fixed;left:0;right:0;bottom:0;height:env(safe-area-inset-bottom,0px);background:#fff;pointer-events:none;z-index:21}
 .app{padding-bottom:calc(78px + env(safe-area-inset-bottom,0px))}
+</style>
+
+<style id="v232-connection-lock">
+/* v232: قفل تمام‌صفحهٔ قطع اتصال — تاری/تار + پیام مینیمال گرافیکی، بدون دکمهٔ تأیید */
+#connLockOverlay{position:fixed;inset:0;z-index:2147483600;display:flex;align-items:center;justify-content:center;padding:22px;box-sizing:border-box;background:rgba(9,19,31,.56);-webkit-backdrop-filter:blur(8px) saturate(125%);backdrop-filter:blur(8px) saturate(125%);opacity:0;transition:opacity .28s ease;direction:rtl;font-family:inherit;pointer-events:auto;touch-action:none}
+#connLockOverlay.show{opacity:1}
+body.connLocked{overflow:hidden!important}
+.connLockCard{width:min(340px,100%);background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.24);border-radius:24px;padding:26px 22px 24px;text-align:center;color:#fff;box-shadow:0 26px 74px rgba(0,0,0,.40),inset 0 1px 0 rgba(255,255,255,.22);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);transform:translateY(10px) scale(.975);transition:transform .34s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column;align-items:center;gap:11px}
+#connLockOverlay.show .connLockCard{transform:none}
+.connLockArt{position:relative;width:82px;height:82px;display:grid;place-items:center;margin-bottom:3px}
+.connLockArt svg{position:relative;z-index:2;width:40px;height:40px;fill:none;stroke:#ffd7cf;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.connLockRing{position:absolute;inset:6px;border-radius:50%;border:2px solid rgba(255,255,255,.28);border-top-color:#ff927c;animation:connLockSpin 1.1s linear infinite}
+.connLockWave{position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(255,146,124,.42);animation:connLockPulse 1.9s ease-out infinite}
+@keyframes connLockSpin{to{transform:rotate(360deg)}}
+@keyframes connLockPulse{0%{transform:scale(.82);opacity:.85}100%{transform:scale(1.28);opacity:0}}
+.connLockTitle{font-size:15px;font-weight:800;letter-spacing:.2px;color:#fff}
+.connLockHint{font-size:11.5px;line-height:2;color:rgba(255,255,255,.84);max-width:272px}
+.connLockDots{display:inline-flex;gap:6px;margin-top:3px}
+.connLockDots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.8);animation:connLockDot 1.2s ease-in-out infinite}
+.connLockDots i:nth-child(2){animation-delay:.15s}
+.connLockDots i:nth-child(3){animation-delay:.3s}
+@keyframes connLockDot{0%,100%{opacity:.32;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+@media (prefers-reduced-motion:reduce){.connLockRing,.connLockWave,.connLockDots i{animation:none}}
 </style>
 
 <style id="v216-driver-day-lock">
