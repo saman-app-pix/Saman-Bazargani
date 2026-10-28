@@ -1,4 +1,4 @@
-const CACHE_NAME = 'saman-bazargani-v234';
+const CACHE_NAME = 'saman-bazargani-v235';
 const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './manifest-default.webmanifest', './manifest-forest.webmanifest', './manifest-plum.webmanifest', './manifest-wine.webmanifest', './manifest-slate.webmanifest', './manifest-brown.webmanifest', './vendor/supabase-js-2.105.4.js', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-192.png', './icons/icon-maskable-512.png', './icons/icon-180.png'];
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))).then(() => self.clients.claim())); });
