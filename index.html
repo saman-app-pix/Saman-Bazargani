@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#ffffff" name="theme-color"/>
-<meta name="saman-build" content="v239"/>
+<meta name="saman-build" content="v240"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; manifest-src 'self'; connect-src 'self' https://eiobajtihwxdlfxufmbg.supabase.co wss://eiobajtihwxdlfxufmbg.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
@@ -530,7 +530,7 @@ textarea{min-height:64px}
 #pageWarehouse .warehouseBatchTools>button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:34px!important;height:auto!important;margin:0!important;padding:5px 3px!important;border-radius:8px!important;font-family:inherit!important;font-size:clamp(9px,2.45vw,11px)!important;font-weight:600!important;line-height:1.3!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;box-sizing:border-box!important}
 @media(max-width:360px){#pageWarehouse .warehouseSection>.listTabs>button{font-size:11px!important;padding:5px 3px!important}#pageWarehouse .warehouseBatchTools{gap:4px!important;padding:4px!important}#pageWarehouse .warehouseBatchTools>button{font-size:9px!important;padding:4px 2px!important;min-height:34px!important}}
 </style>
-<meta name="saman-build" content="v239">
+<meta name="saman-build" content="v240">
 
 <style id="v213-fund-transfer-split">
 .fundActOverlay,.fundPickerOverlay{position:fixed;inset:0;z-index:100520;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;background:rgba(15,28,45,.48);backdrop-filter:blur(2px)}
@@ -2663,7 +2663,7 @@ $('invoiceViewerClose')?.addEventListener('click',closeInvoiceViewer);$('invoice
 // Smooth pinch zoom and one-finger panning while zoomed.
 (()=>{const wrap=$('invoiceViewerImageWrap');if(!wrap)return;let startDistance=0,startZoom=1,lastMidX=0,lastMidY=0,lastX=0,lastY=0,gesture='';const dist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY);const mid=t=>({x:(t[0].clientX+t[1].clientX)/2,y:(t[0].clientY+t[1].clientY)/2});wrap.addEventListener('touchstart',e=>{if(e.touches.length===2){gesture='pinch';startDistance=Math.max(1,dist(e.touches));startZoom=invoiceViewerZoom;const m=mid(e.touches);lastMidX=m.x;lastMidY=m.y;e.preventDefault()}else if(e.touches.length===1&&invoiceViewerZoom>1.01){gesture='pan';lastX=e.touches[0].clientX;lastY=e.touches[0].clientY;e.preventDefault()}else gesture='';},{passive:false});wrap.addEventListener('touchmove',e=>{if(gesture==='pinch'&&e.touches.length===2){e.preventDefault();const d=dist(e.touches),m=mid(e.touches);setInvoiceViewerZoom(startZoom*d/startDistance);invoicePanX+=m.x-lastMidX;invoicePanY+=m.y-lastMidY;lastMidX=m.x;lastMidY=m.y;renderInvoiceTransform()}else if(gesture==='pan'&&e.touches.length===1&&invoiceViewerZoom>1.01){e.preventDefault();const t=e.touches[0];invoicePanX+=t.clientX-lastX;invoicePanY+=t.clientY-lastY;lastX=t.clientX;lastY=t.clientY;renderInvoiceTransform()}},{passive:false});const end=e=>{if(e.touches.length===0){gesture='';startDistance=0}else if(e.touches.length===1&&invoiceViewerZoom>1.01){gesture='pan';lastX=e.touches[0].clientX;lastY=e.touches[0].clientY}};wrap.addEventListener('touchend',end,{passive:false});wrap.addEventListener('touchcancel',()=>{gesture='';startDistance=0},{passive:true})})();
 document.querySelectorAll('.themeDot').forEach(b=>b.onclick=()=>chooseTheme(b.dataset.theme));loadThemeChoice();document.querySelectorAll('[data-card-view]').forEach(b=>b.onclick=()=>setCardView(b.dataset.cardView));setCardView(loadCardView());const driverLedgerToggle=$('driverLedgerToggle'),driverLedgerModal=$('driverLedgerModal'),driverLedgerScrim=$('driverLedgerScrim'),driverLedgerClose=$('driverLedgerClose');const closeDriverLedger=()=>{driverLedgerModal?.classList.add('hidden');driverLedgerScrim?.classList.add('hidden')};if(driverLedgerToggle)driverLedgerToggle.addEventListener('click',()=>{renderDriverCardSafely();driverLedgerModal?.classList.remove('hidden');driverLedgerScrim?.classList.remove('hidden')});const driverLedgerIcon=$('driverLedgerIcon');if(driverLedgerIcon)driverLedgerIcon.addEventListener('click',()=>{renderDriverCardSafely();driverLedgerModal?.classList.remove('hidden');driverLedgerScrim?.classList.remove('hidden')});if(driverLedgerClose)driverLedgerClose.addEventListener('click',closeDriverLedger);if(driverLedgerScrim)driverLedgerScrim.addEventListener('click',closeDriverLedger);
-// v239: بررسی و مغایرت‌گیری حساب
+// v240: بررسی و مغایرت‌گیری حساب
 function canReconcile(){return isAdmin()||can('financeReconcile')||/مالی/.test(String(getRole(current)?.name||''))}
 function sortRecons(){return (Array.isArray(recons)?recons:[]).slice().sort((a,b)=>(Number(b.ts)||Date.parse(b.iso)||0)-(Number(a.ts)||Date.parse(a.iso)||0))}
 function renderLastReconcile(){const el=$('lastReconcile');if(!el)return;const last=sortRecons()[0];el.textContent=last?`آخرین مغایرتگیری انجامشده: ${last.date||''} ${last.time||''} توسط ${last.by||''}`:'آخرین مغایرتگیری انجامشده: —';el.title=el.textContent}
@@ -3383,7 +3383,7 @@ boot();
 (function(){
   if(!('serviceWorker' in navigator) || !window.isSecureContext || location.protocol==='file:') return;
   navigator.serviceWorker.register('./service-worker.js').catch(e=>console.warn('Service worker registration skipped',e));
-  const currentBuild=document.querySelector('meta[name="saman-build"]')?.content || 'v239';
+  const currentBuild=document.querySelector('meta[name="saman-build"]')?.content || 'v240';
   let checking=false, updatePending=false, lastActivity=Date.now();
   const note=document.createElement('div');
   note.id='samanUpdateNotice';
@@ -3786,16 +3786,16 @@ boot();
 </html>
 <style id="buyWholeRequestStyle">.buyWholeRequestBtn{width:100%;box-sizing:border-box;margin:7px 0 3px;padding:6px 10px;border:1px solid #d3e2ea;border-radius:9px;background:#f3f8fb;color:#174f70;font:inherit;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;min-height:31px;box-shadow:none;transition:background .18s,transform .18s}.buyWholeRequestBtn:active{transform:scale(.995);background:#e7f1f7}.supplyLinkForced{color:#174f70;background:#edf5fa;border:1px solid #d4e5ef;border-radius:10px;padding:10px;font-size:12px;font-weight:800}.supplyLinkSummaryText small{font-size:11px}</style>
 <style id="v237-supply-rework">.supplyRequestActions{display:flex;gap:8px;margin:8px 0 4px}.supplyRequestActions button{flex:1;min-width:0;border:1px solid transparent;border-radius:10px;padding:9px 8px;font:inherit;font-size:11px;font-weight:800;min-height:34px;cursor:pointer;transition:background .18s,transform .18s}.supplyRequestActions button:active{transform:scale(.98)}.supplyEditRequestBtn{background:#eef5fb;color:#174f70;border-color:#d3e2ea}.supplyCancelRequestBtn{background:#fff0ef;color:#c4514a;border-color:#f3d0cd}.supplyEditRow{margin-top:12px;padding-top:11px;border-top:1px dashed var(--line,#e2e8f0)}.supplyEditRow>label{display:block;font-size:11px;font-weight:700;margin:0 0 5px}.supplyEditRow .finput{width:100%;box-sizing:border-box}#supplyEditOverlay .procHeadSub{margin:-2px 0 6px}#supplyEditOverlay .finput{box-sizing:border-box;height:42px;font-size:12px}#supplyEditOverlay .procGrid{grid-template-columns:1fr 1fr;gap:8px;margin-top:7px}#supplyEditOverlay .procGrid>div{min-width:0}#supplyEditOverlay .procGrid label{font-size:10px;color:var(--muted,#64748b);margin:0 0 3px;display:block}#supplyEditOverlay select.finput{padding:0 8px;text-overflow:ellipsis}body:has(#supplyEditOverlay:not(.hidden)){overflow:hidden;overscroll-behavior:none}
-.balance>strong{display:inline-block!important;margin:7px 0!important;vertical-align:baseline}
+.balance>strong{display:inline-block!important;margin:5px 0 1px!important;vertical-align:baseline}
 .balance>span{display:inline!important;font-size:13px!important;font-weight:800;opacity:.95;margin-right:7px}
-.balance .lastReconcile{position:relative;z-index:2;font-size:10px;opacity:.82;margin:4px 0 0;line-height:1.7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.balance .lastReconcile{position:relative;z-index:2;font-size:10px;opacity:.82;margin:1px 0 0;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .reconcileKey{position:absolute;top:15px;left:57px;width:34px;height:34px;padding:0;border:1px solid #ffffff42;border-radius:11px;background:#ffffff20;color:#fff;font:inherit;cursor:pointer;overflow:hidden;z-index:4;transition:width .5s cubic-bezier(.22,.72,.24,1),background .35s ease,border-color .35s ease,box-shadow .35s ease}
 .reconcileKey:active{transform:scale(.97)}
-.reconcileKey.expanded{width:170px}
-.reconcileKeyTick{position:absolute;top:0;left:0;width:34px;height:100%;display:flex;align-items:center;justify-content:center}
-.reconcileTickSvg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:26;stroke-dashoffset:0}
-.reconcileKeyText{position:absolute;top:0;left:34px;right:0;height:100%;display:flex;align-items:center;justify-content:flex-start;padding:0 10px;white-space:nowrap;font-size:10.5px;font-weight:800;color:#fff;opacity:0;transition:opacity .4s ease;direction:rtl}
-.reconcileKey.expanded .reconcileKeyText{opacity:1}
+.reconcileKey.expanded{width:142px}
+.reconcileKey .reconcileKeyTick{position:absolute;top:0;left:0;width:34px;height:100%;display:flex;align-items:center;justify-content:center;opacity:1}
+.reconcileKey .reconcileTickSvg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:26;stroke-dashoffset:0}
+.reconcileKey .reconcileKeyText{position:absolute;top:0;left:30px;height:100%;display:flex;align-items:center;justify-content:flex-end;padding:0 9px 0 2px;white-space:nowrap;font-size:10.5px;font-weight:800;line-height:1;color:#fff;opacity:0;visibility:hidden;overflow:hidden;transition:opacity .35s ease,visibility 0s linear .35s;direction:rtl}
+.reconcileKey.expanded .reconcileKeyText{opacity:1;visibility:visible;transition:opacity .35s ease,visibility 0s}
 .reconcileKey.confirm{background:#bfe4c6;border-color:#8fc7a2;color:#1f4d2b;box-shadow:0 0 0 3px #bfe4c633}
 .reconcileKey.confirm .reconcileTickSvg{animation:reconcileDraw .55s ease forwards}
 .reconcileKey.confirm .reconcileKeyText{color:#1f4d2b}
