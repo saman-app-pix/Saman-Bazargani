@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#ffffff" name="theme-color"/>
-<meta name="saman-build" content="v248"/>
+<meta name="saman-build" content="v249"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; manifest-src 'self'; connect-src 'self' https://eiobajtihwxdlfxufmbg.supabase.co wss://eiobajtihwxdlfxufmbg.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
@@ -530,7 +530,7 @@ textarea{min-height:64px}
 #pageWarehouse .warehouseBatchTools>button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:34px!important;height:auto!important;margin:0!important;padding:5px 3px!important;border-radius:8px!important;font-family:inherit!important;font-size:clamp(9px,2.45vw,11px)!important;font-weight:600!important;line-height:1.3!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;box-sizing:border-box!important}
 @media(max-width:360px){#pageWarehouse .warehouseSection>.listTabs>button{font-size:11px!important;padding:5px 3px!important}#pageWarehouse .warehouseBatchTools{gap:4px!important;padding:4px!important}#pageWarehouse .warehouseBatchTools>button{font-size:9px!important;padding:4px 2px!important;min-height:34px!important}}
 </style>
-<meta name="saman-build" content="v248">
+<meta name="saman-build" content="v249">
 
 <style id="v213-fund-transfer-split">
 .fundActOverlay,.fundPickerOverlay{position:fixed;inset:0;z-index:100520;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;background:rgba(15,28,45,.48);backdrop-filter:blur(2px)}
@@ -768,6 +768,10 @@ button.supplyLinkTag{border:0;font-family:inherit;text-align:right;cursor:pointe
   <label class="basketToggle"><input type="checkbox" id="purchaseBasketToggle"><span><b>ماندهٔ تأمین‌نشده به «تعهد روزهای بعد» برود</b><small>اگر واریزی امروز کافی نباشد، بقیهٔ مبلغ خرید به تعهد روزهای بعد می‌رود تا در روزهای آینده از واریزی‌های همان روزها تسویه شود.</small></span></label>
   <div class="basketAmountRow hidden" id="purchaseBasketAmountRow"><input class="finput moneyInput" id="purchaseBasketAmount" inputmode="numeric" placeholder="مبلغ تعهد (ریال)" aria-label="مبلغ تعهد روزهای بعد"><span class="basketMax" id="purchaseBasketMax"></span></div>
  </div>
+ <div class="v249PoolUse" id="purchasePoolUse">
+  <label class="v249PoolToggle"><input type="checkbox" id="purchasePoolToggle"><span>استفاده از سبد تخفیفات</span></label>
+  <div class="v249PoolRow hidden" id="purchasePoolRow"><input class="finput moneyInput" id="purchasePoolAmount" inputmode="numeric" placeholder="مبلغ مصرف (ریال)"><span class="v249PoolMax" id="purchasePoolMax"></span></div>
+ </div>
 </div>
 <div class="purchaseInvoiceMini" id="purchaseInvoiceMini">
  <button class="purchaseInvoiceCamera" id="purchaseInvoiceCamera" type="button" aria-label="بارگذاری عکس فاکتور" title="عکس فاکتور خرید"><svg viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></button>
@@ -792,6 +796,10 @@ button.supplyLinkTag{border:0;font-family:inherit;text-align:right;cursor:pointe
   <label>کارت رانندگان<input class="finput moneyInput" id="withdrawDriver" inputmode="numeric" placeholder="مبلغ" readonly></label>
   <label>تعهد فردا<input class="finput moneyInput" id="withdrawBasket" inputmode="numeric" placeholder="مبلغ"/></label>
  </div>
+ <div class="v249PoolUse" id="withdrawPoolUse">
+  <label class="v249PoolToggle"><input type="checkbox" id="withdrawPoolToggle"><span>استفاده از سبد تخفیفات</span></label>
+  <div class="v249PoolRow hidden" id="withdrawPoolRow"><input class="finput moneyInput" id="withdrawPoolAmount" inputmode="numeric" placeholder="مبلغ مصرف (ریال)"><span class="v249PoolMax" id="withdrawPoolMax"></span></div>
+ </div>
  <div class="sourceBox hidden" id="withdrawFundSourceBox">
   <div class="sourceTitle">انتخاب از واریزی‌های کارت رانندگان</div>
   <div id="withdrawFundOptions"></div>
@@ -802,10 +810,15 @@ button.supplyLinkTag{border:0;font-family:inherit;text-align:right;cursor:pointe
 <button class="primary save" id="saveBtn">ثبت واریزی</button>
 <button class="cancel hidden" id="cancelEdit">انصراف از ویرایش</button>
 </div>
+<div class="v249PoolStrip" id="v249PoolStrip"><span class="v249PoolLabel">سبد تخفیفات</span><b id="v249PoolStripAmount">۰ ریال</b><small id="v249PoolStripHint">قابل استفاده در خریدها</small></div>
 <div class="card" id="cashboxRechargePanel" style="margin-top:16px">
  <div class="procHead" style="margin-bottom:10px"><div><div class="ctitle" style="margin:0">ثبت شارژ تنخواه</div><p class="cashboxRechargeHint" style="color:var(--muted);font-size:12px;line-height:1.9;margin:0">شارژ تنخواه توسط مسئول خرید ثبت می‌شود.</p></div><button class="procPlus" id="toggleCashboxDraft" type="button" aria-label="ثبت شارژ تنخواه" aria-expanded="false">＋</button></div>
  <div id="cashboxDraftForm" class="procAnimated hidden">
   <div id="cashboxDraftList" class="requestDraft"></div>
+  <div class="v249PoolUse" id="cashboxPoolUse">
+   <label class="v249PoolToggle"><input type="checkbox" id="cashboxPoolToggle"><span>استفاده از سبد تخفیفات در این شارژ</span></label>
+   <div class="v249PoolRow hidden" id="cashboxPoolRow"><input class="finput moneyInput" id="cashboxPoolAmount" inputmode="numeric" placeholder="مبلغ مصرف (ریال)"><span class="v249PoolMax" id="cashboxPoolMax"></span></div>
+  </div>
   <div class="requestActions" style="margin-top:12px"><button class="outline" id="clearCashboxDraft" type="button">پاک کردن</button><button class="primary" id="saveCashboxDraft" type="button">ثبت شارژ تنخواه</button></div>
  </div>
 </div>
@@ -858,13 +871,15 @@ button.supplyLinkTag{border:0;font-family:inherit;text-align:right;cursor:pointe
  <div class="requestActions"><button class="outline" id="addProcItem" type="button">＋ افزودن قلم کالا</button><button class="outline" id="clearProcDraft" type="button">پاک کردن</button><button class="primary" id="submitProcRequest" type="button">ثبت درخواست خرید</button></div></div>
 </div>
 <div class="procSection" data-proc-panel="supply" id="approvalSection"><div class="procHead"><div><div class="procHeadTitle">درخواست‌های نیازمند تأیید</div><div class="procHeadSub">درخواست‌های کارشناس خرید ابتدا برای مدیر بازرگانی نمایش داده می‌شوند.</div></div></div><div id="approvalList" class="supplyList"></div></div>
+<div class="procSection" data-proc-panel="supply" id="procReturnedSection" hidden><div class="procHead"><div><div class="procHeadTitle">بازگشتی از انبار برای ویرایش</div><div class="procHeadSub">این اقلام توسط انبار برگردانده شده‌اند؛ تعداد خرید را اصلاح کن یا عدم خرید را ثبت کن.</div></div></div><div id="procReturnedList" class="supplyList"></div></div>
 <div class="procSection" data-proc-panel="supply"><div class="procHead"><div><div class="procHeadTitle">لیست تأمین</div><div class="procHeadSub">درخواست‌های باز و پاسخ‌داده‌شده جدا هستند.</div></div></div><div class="listTabs"><button class="active" data-list-mode="open" data-list-kind="supply">درخواست‌های باز</button><button data-list-mode="done" data-list-kind="supply">خریداری‌شده‌ها</button></div><div id="supplyArchiveControls" class="warehouseArchiveControls"><button type="button" id="supplyArchiveToggle" class="warehouseArchiveToggle" title="سوابق تکمیل‌شده"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v5l3 2"/><path d="M20.2 8A8.5 8.5 0 1 0 21 12"/><path d="M16 4h5v5"/></svg><span>سوابق تکمیل‌شده</span></button><div id="supplyArchiveSearch" class="warehouseArchiveSearch hidden"><div class="warehouseArchiveDateRow"><input id="supplyArchiveFrom" class="finput" placeholder="از تاریخ" readonly><input id="supplyArchiveTo" class="finput" placeholder="تا تاریخ" readonly></div><input id="supplyArchiveText" class="finput" placeholder="جستجو در شماره درخواست، درخواست‌دهنده و جزئیات کالا"><button type="button" id="supplyArchiveReset" class="warehouseArchiveReset">پاک‌کردن فیلترها</button></div></div><div id="supplyList" class="supplyList"></div></div>
 <div class="procSection hidden" data-proc-panel="quote"><div class="procHead"><div><div class="procHeadTitle">استعلام قیمت</div><div class="procHeadSub">درخواست استعلام جدید را فقط هنگام نیاز باز کن.</div></div><button class="procPlus" id="toggleQuoteDraft" type="button" aria-label="ثبت استعلام جدید" title="ثبت استعلام جدید">＋</button></div><div class="emptyProc quoteEmpty" id="quoteEmpty">هنوز درخواست استعلامی ثبت نشده است.<br>برای شروع روی <b>＋</b> بزن.</div><div class="quoteDraft hidden procAnimated" id="quoteDraftForm"><div class="quoteDraftTop"><b>درخواست استعلام جدید</b></div><div class="procField"><label class="flabel">نام کالا</label><input class="finput" id="quoteName" placeholder="نام کالا"></div><div class="procGrid quoteGrid"><div class="procField"><label class="flabel">تعداد دربسته</label><input class="finput" id="quotePack" inputmode="numeric" placeholder="مثلاً 10"></div><div class="procField"><label class="flabel">واحد</label><select class="finput" id="quoteUnit"><option value="">انتخاب واحد</option><option>عدد</option><option>کارتن</option><option>بسته</option><option>کیلوگرم</option><option>باکس</option></select></div></div><button class="primary" id="submitQuote" type="button" style="width:100%;margin-top:10px">ثبت استعلام قیمت</button></div><div class="listTabs" style="margin-top:14px"><button class="active" data-list-mode="open" data-list-kind="quote">استعلام‌های باز</button><button data-list-mode="done" data-list-kind="quote">استعلام‌های پاسخ‌داده‌شده</button></div><div id="quoteList" class="supplyList"></div></div>
 </div>
 </section>
 <section class="page" id="pageWarehouse">
  <div class="title">انبار</div>
- <div class="procSection warehouseSection">
+ <div class="listTabs warehousePages" role="tablist"><button type="button" class="active" data-warehouse-page="incoming">کالاهای در راه</button><button type="button" data-warehouse-page="returns">مرجوعی</button></div>
+ <div class="procSection warehouseSection" id="warehouseIncomingSection">
   <div class="procHead"><div><div class="procHeadTitle">کالاهای در راه</div><div class="procHeadSub">بر اساس نزدیک‌ترین تاریخ پیش‌بینی‌شدهٔ ورود مرتب شده‌اند.</div></div></div>
   <div class="listTabs"><button type="button" class="active" data-warehouse-mode="pending">در انتظار دریافت</button><button type="button" data-warehouse-mode="received">دریافت‌شده‌ها</button></div>
   <div id="warehouseArchiveControls" class="warehouseArchiveControls hidden">
@@ -872,6 +887,20 @@ button.supplyLinkTag{border:0;font-family:inherit;text-align:right;cursor:pointe
    <div id="warehouseArchiveSearch" class="warehouseArchiveSearch hidden"><div class="warehouseArchiveDateRow"><input id="warehouseArchiveFrom" class="finput" placeholder="از تاریخ" autocomplete="off"><input id="warehouseArchiveTo" class="finput" placeholder="تا تاریخ" autocomplete="off"></div><input id="warehouseArchiveText" class="finput" placeholder="جستجو در شرح، کالا و جزئیات درخواست"><button type="button" id="warehouseArchiveReset" class="warehouseArchiveReset">پاک‌کردن فیلترها</button></div>
   </div>
   <div id="warehouseList" class="supplyList"></div>
+ </div>
+ <div class="procSection warehouseSection warehouseReturnsSection hidden" id="warehouseReturnsSection">
+  <div class="procHead"><div><div class="procHeadTitle">مرجوعی</div><div class="procHeadSub">ثبت و پیگیری مرجوعی کالا</div></div><button class="procPlus" id="v249ReturnToggle" type="button" aria-label="ثبت مرجوعی" title="ثبت مرجوعی">＋</button></div>
+  <div id="v249ReturnForm" class="v249ReturnForm hidden">
+   <select class="finput" id="v249ReturnPick"></select>
+   <div class="v249ReturnGrid">
+    <input class="finput" id="v249ReturnName" placeholder="نام کالا">
+    <input class="finput" id="v249ReturnQty" inputmode="decimal" placeholder="تعداد">
+    <input class="finput" id="v249ReturnPack" inputmode="decimal" placeholder="دربسته">
+    <select class="finput" id="v249ReturnUnit"><option>عدد</option><option>کارتن</option><option>بسته</option><option>کیلوگرم</option><option>باکس</option></select>
+   </div>
+   <button class="primary" id="v249ReturnSubmit" type="button">ثبت مرجوعی و مبلغ بازگشتی</button>
+  </div>
+  <div id="v249ReturnHistory" class="v249ReturnHistory"></div>
  </div>
 </section><section class="page" id="pageManage">
 <div class="title manageTitle"><span>پنل کاربری</span></div>
@@ -1017,6 +1046,41 @@ button.supplyLinkTag{border:0;font-family:inherit;text-align:right;cursor:pointe
 .returnDest small{flex:1 1 100%;color:var(--muted);font-size:9px}
 #returnAmountModal .fundPickerCard{gap:6px}
 #returnAmountModal .flabel{margin-top:2px}
+</style>
+<style id="v249-styles">
+/* v249: انبار دو صفحه + برگشت به بازرگانی + سبد تخفیفات */
+#pricingFilters .filterRow{grid-template-columns:1fr 1fr!important}
+#pricingFilters .filterRow>div:last-child{grid-column:auto!important}
+#pageWarehouse .warehouseSection>.listTabs{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+.listTabs.warehousePages{margin:9px 0 11px}
+.v249PoolStrip{display:flex;align-items:center;gap:8px;margin:12px 0 0;padding:7px 12px;border:1px solid #f0dcae;border-radius:11px;background:linear-gradient(100deg,#fffaf0,#fff4dc);font-size:12px;color:#6a5320}
+.v249PoolStrip .v249PoolLabel{font-weight:800}
+.v249PoolStrip b{margin-inline-start:auto;font-weight:900;font-size:14px;color:#8a6a1e;white-space:nowrap}
+.v249PoolStrip small{color:#9c8552;font-size:10px;white-space:nowrap}
+.v249PoolUse{margin-top:9px;border:1px dashed #e6d6ab;border-radius:10px;padding:7px 9px;background:#fffdf6}
+.v249PoolToggle{display:flex;align-items:center;gap:7px;font-size:12px;color:#6a5320;font-weight:700}
+.v249PoolRow{display:flex;align-items:center;gap:7px;margin-top:7px}
+.v249PoolRow input{flex:1;min-width:0}
+.v249PoolMax{font-size:10px;color:#9c8552;white-space:nowrap}
+.warehouseReturnsSection .procHead{margin-bottom:6px}
+.v249ReturnForm{display:flex;flex-direction:column;gap:7px;margin:6px 0 10px;padding:9px;border:1px solid var(--line);border-radius:12px;background:#f8fafc}
+.v249ReturnGrid{display:grid;grid-template-columns:1.5fr .8fr .8fr .9fr;gap:6px}
+.v249ReturnHistory{display:flex;flex-direction:column;gap:6px}
+.v249ReturnItem{display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid #eee3f3;border-radius:11px;background:#fbf8fe}
+.v249ReturnDot{width:7px;height:7px;border-radius:50%;background:#7c5cbf;flex:none}
+.v249ReturnMain{flex:1;min-width:0}
+.v249ReturnMain b{font-size:12px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v249ReturnMain small{color:var(--muted);font-size:10px}
+.v249ReturnAmt{font-weight:900;font-size:12px;color:#2e6840;white-space:nowrap}
+.v249Empty{text-align:center;padding:12px;color:var(--muted);font-size:12px}
+.v249ReturnBtn{width:100%;margin-top:7px;height:30px;border:1px solid #e2c9a0;border-radius:9px;background:#fff8ea;color:#8a6a1e;font:inherit;font-size:11px;font-weight:700;cursor:pointer}
+.v249PendingBadge{display:inline-block;margin-top:6px;padding:4px 9px;border-radius:8px;background:#fdf3e3;color:#a0781f;font-size:10px;font-weight:700}
+.v249ProcReturn{border-color:#e2c9a0;background:#fffdf7}
+.v249ProcReturnBody{display:flex;flex-direction:column;gap:6px}
+.v249ProcReturnActions{display:grid;grid-template-columns:110px 1fr auto;gap:7px;align-items:center}
+#v249NotBuyModal .fundPickerCard{gap:6px}
+#v249NotBuyModal .flabel{margin-top:2px}
+@media(max-width:520px){.v249ReturnGrid{grid-template-columns:1fr 1fr}.v249ProcReturnActions{grid-template-columns:1fr 1fr}.v249ProcReturnActions input{grid-column:1/-1}}
 </style>
 <script src="./vendor/supabase-js-2.105.4.js"></script>
 <script>
@@ -2080,7 +2144,7 @@ function renderRoleDashboard(){
     const approved=procurement.filter(r=>r.approvalStatus==='approved');
     const waitingSupply=approved.filter(r=>(r.items||[]).some(i=>i.status==='pending')).length;
     const rejected=procurement.filter(r=>r.approvalStatus==='rejected').length;
-    const notBought=approved.filter(r=>(r.items||[]).some(i=>i.status==='unavailable')).length;
+    const notBought=approved.filter(r=>(r.items||[]).some(i=>i.status==='unavailable'&&String(i.unavailableDate||'')===String(today()))).length;
     if($('dashPendingApproval'))$('dashPendingApproval').textContent=fa(pending);
     if($('dashPendingSupply'))$('dashPendingSupply').textContent=fa(waitingSupply);
     if($('dashRejected'))$('dashRejected').textContent=fa(rejected);
@@ -2438,7 +2502,7 @@ async function updateWarehouseRequestReceipt(rid,received){if(!(isAdmin()||can('
 function beginPurchaseRegistration(rid,index){if(!(isAdmin()||can('supplyUpdate')||userHasNamedRole(current,'مسئول خرید')))return;const r=procurement.find(x=>String(x.id)===String(rid));if(!r)return;const indices=index===null?(r.items||[]).map((it,i)=>it.status==='pending'?i:-1).filter(i=>i>=0):[Number(index)];const chosen=indices.map(i=>({i,it:r.items[i]})).filter(x=>x.it&&x.it.status==='pending');if(!chosen.length){alert('قلمی برای خرید در این درخواست باقی نمانده است.');return}showPurchaseQtyDialog(r,chosen);}
 function showPurchaseQtyDialog(r,chosen){document.getElementById('purchaseQtyModal')?.remove();const overlay=document.createElement('div');overlay.id='purchaseQtyModal';overlay.className='purchaseQtyModal';overlay.innerHTML=`<div class="purchaseQtyCard" role="dialog" aria-modal="true" aria-labelledby="purchaseQtyTitle"><h3 class="purchaseQtyTitle" id="purchaseQtyTitle">تعداد نهایی خرید</h3><p class="purchaseQtySub">برای هر کالا مشخص کن دقیقاً به تعداد درخواست خرید شده یا تعداد نهایی تغییر کرده است.</p>${chosen.map(({i,it})=>`<div class="purchaseQtyRow" data-qty-dialog-row="${i}"><div class="purchaseQtyName">${esc(it.name)}</div><div class="purchaseQtyMeta">تعداد درخواست: ${fa(it.qty)} ${esc(it.unit||'')}</div><div class="purchaseQtyChoices"><label><input type="radio" name="dialogQtyMode${i}" value="same" checked> مطابق درخواست</label><label><input type="radio" name="dialogQtyMode${i}" value="changed"> تغییر تعداد</label></div><div class="purchaseQtyInput" data-dialog-qty-input="${i}" hidden><input type="number" min="0.001" step="any" inputmode="decimal" data-dialog-final-qty="${i}" value="${esc(it.qty)}" aria-label="تعداد نهایی ${esc(it.name)}"><span style="font-size:10px;white-space:nowrap">${esc(it.unit||'واحد')}</span></div></div>`).join('')}<div class="purchaseQtyActions"><button type="button" class="purchaseQtyCancel" data-qty-cancel>انصراف</button><button type="button" class="purchaseQtyConfirm" data-qty-confirm>ادامه به ثبت خرید</button></div></div>`;document.body.appendChild(overlay);overlay.querySelectorAll('input[type="radio"]').forEach(el=>el.addEventListener('change',()=>{const i=el.name.replace('dialogQtyMode','');const input=overlay.querySelector(`[data-dialog-qty-input="${i}"]`);if(input)input.hidden=el.value!=='changed'}));overlay.querySelector('[data-qty-cancel]').onclick=()=>overlay.remove();overlay.onclick=e=>{if(e.target===overlay)overlay.remove()};overlay.querySelector('[data-qty-confirm]').onclick=()=>{const quantities={};for(const {i,it} of chosen){const changed=overlay.querySelector(`input[name="dialogQtyMode${i}"]:checked`)?.value==='changed';const val=changed?Number(overlay.querySelector(`[data-dialog-final-qty="${i}"]`)?.value):Number(it.qty);if(!Number.isFinite(val)||val<=0){alert(`تعداد نهایی «${it.name}» باید بیشتر از صفر باشد.`);return}quantities[i]=val}overlay.remove();startPurchaseRegistration(r.id,chosen.map(x=>x.i),quantities)};}
 function startPurchaseRegistration(rid,indices,quantities={}){const r=procurement.find(x=>String(x.id)===String(rid));if(!r)return;const chosen=[];for(const i of indices){const it=r.items[i];if(!it||it.status!=='pending')continue;chosen.push({index:i,name:it.name,qty:it.qty,finalQty:Number(quantities[i]??it.qty),qtyChanged:Number(quantities[i]??it.qty)!==Number(it.qty),unit:it.unit||'',deliveryDate:it.deliveryDate||today(),deliveryDelayDays:Number(it.deliveryDelayDays||0)});}if(!chosen.length)return;forcedSupplyLink={requestId:r.id,mode:chosen.length===(r.items||[]).length?'whole':'items',items:chosen};go('add');setMode('purchase');renderSupplyLinkOptions();const sel=$('supplyLinkRequest');if(sel){sel.value=String(r.id);sel.disabled=true;renderSupplyLinkItems();}const linkBox=$('supplyLinkBox');if(linkBox){linkBox.classList.remove('hidden');linkBox.classList.add('autoLinked');const summary=linkBox.querySelector('.supplyLinkSummaryText small');if(summary)summary.textContent='اتصال خودکار انجام شده است';setSupplyLinkOpen(false);}const chosenSet=new Set(chosen.map(x=>Number(x.index)));if(chosen.length!==(r.items||[]).length){const modeRadio=document.querySelector('input[name="supplyLinkMode"][value="items"]');if(modeRadio)modeRadio.checked=true;document.querySelectorAll('[data-supply-link-item]').forEach(cb=>{cb.checked=chosenSet.has(Number(cb.dataset.supplyLinkItem))});if(typeof syncLinkedQtyRows==='function')syncLinkedQtyRows();}let auto=$('supplyLinkAutoStatus');if(!auto&&linkBox){auto=document.createElement('div');auto.id='supplyLinkAutoStatus';auto.className='supplyLinkHint supplyLinkForced';linkBox.parentNode.insertBefore(auto,linkBox);}if(auto){auto.classList.remove('hidden');auto.innerHTML=`اتصال خودکار به درخواست «${esc(r.title||r.description||chosen.map(x=>x.name).join('، '))}» · ${chosen.map(x=>`${esc(x.name)}: تعداد نهایی ${fa(x.finalQty)} ${esc(x.unit)}`).join('، ')}`;}if($('purchaseDeliveryDate'))$('purchaseDeliveryDate').value=chosen[0].deliveryDate||today();if($('purchaseDeliveryDelay'))$('purchaseDeliveryDelay').value=String(Number(chosen[0].deliveryDelayDays||0));updateAutoPurchaseDescription();renderProcurement();}
-async function updateProcStatus(rid,index,status){if(!(isAdmin()||can('supplyUpdate')||userHasNamedRole(current,'مسئول خرید')))return;const r=procurement.find(x=>String(x.id)===String(rid));if(!r||!r.items[index])return;const item=r.items[index];if(status==='unavailable'){const reason=await window.uiPrompt('علت امکان خرید نبودن را بنویسید:','');if(reason===null)return;if(!reason.trim()){alert('لطفاً علت را بنویسید.');return}item.reason=reason.trim();item.deliveryDate='';item.deliveryDelayDays=0;}else{const d=await window.uiPrompt('تاریخ اصلی تحویل به انبار را به شمسی وارد کنید (مثلاً 1405/07/20):',item.deliveryDate||today());if(d===null)return;const m=d.trim().match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);if(!m){alert('تاریخ را با قالب سال/ماه/روز وارد کنید؛ مثلاً 1405/07/20.');return}const y=Number(m[1]),mo=Number(m[2]),day=Number(m[3]);if(mo<1||mo>12||day<1||day>jalaliMonthDays(y,mo)){alert('تاریخ واردشده معتبر نیست.');return}const delayRaw=await window.uiPrompt('چند روز احتمال تأخیر در تحویل وجود دارد؟',String(item.deliveryDelayDays||0));if(delayRaw===null)return;const delay=Number(delayRaw.trim());if(!/^\d+$/.test(delayRaw.trim())||!Number.isSafeInteger(delay)||delay<0||delay>365){alert('تعداد روز تأخیر باید عددی بین ۰ تا ۳۶۵ باشد.');return}item.deliveryDate=`${y}/${String(mo).padStart(2,'0')}/${String(day).padStart(2,'0')}`;item.deliveryDelayDays=delay;item.reason='';}item.status=status;if(status==='bought'){item.buyerName=current?.name||'—';r.buyerName=item.buyerName;}save(PROC_K,procurement);renderProcurement();}
+async function updateProcStatus(rid,index,status){if(!(isAdmin()||can('supplyUpdate')||userHasNamedRole(current,'مسئول خرید')))return;const r=procurement.find(x=>String(x.id)===String(rid));if(!r||!r.items[index])return;const item=r.items[index];if(status==='unavailable'){const reason=await window.uiPrompt('علت امکان خرید نبودن را بنویسید:','');if(reason===null)return;if(!reason.trim()){alert('لطفاً علت را بنویسید.');return}item.reason=reason.trim();item.deliveryDate='';item.deliveryDelayDays=0;item.unavailableDate=today();}else{const d=await window.uiPrompt('تاریخ اصلی تحویل به انبار را به شمسی وارد کنید (مثلاً 1405/07/20):',item.deliveryDate||today());if(d===null)return;const m=d.trim().match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);if(!m){alert('تاریخ را با قالب سال/ماه/روز وارد کنید؛ مثلاً 1405/07/20.');return}const y=Number(m[1]),mo=Number(m[2]),day=Number(m[3]);if(mo<1||mo>12||day<1||day>jalaliMonthDays(y,mo)){alert('تاریخ واردشده معتبر نیست.');return}const delayRaw=await window.uiPrompt('چند روز احتمال تأخیر در تحویل وجود دارد؟',String(item.deliveryDelayDays||0));if(delayRaw===null)return;const delay=Number(delayRaw.trim());if(!/^\d+$/.test(delayRaw.trim())||!Number.isSafeInteger(delay)||delay<0||delay>365){alert('تعداد روز تأخیر باید عددی بین ۰ تا ۳۶۵ باشد.');return}item.deliveryDate=`${y}/${String(mo).padStart(2,'0')}/${String(day).padStart(2,'0')}`;item.deliveryDelayDays=delay;item.reason='';}item.status=status;if(status==='bought'){item.buyerName=current?.name||'—';r.buyerName=item.buyerName;}save(PROC_K,procurement);renderProcurement();}
 function roleNamesForFunds(){return userRoleIds(current).map(id=>roles.find(r=>String(r.id)===String(id))?.name||'')}
 function canManageFunds(){return isAdmin()||can('fundManage')||roleNamesForFunds().some(n=>/صندوق/.test(n))}
 function canUseFunds(){return isAdmin()||can('fundUse')||can('fundAllocate')||can('purchaseCreate')||roleNamesForFunds().some(n=>/خرید/.test(n))}
@@ -3606,11 +3670,7 @@ function v248DecorateReturnRows(){
 const _v248OrigRenderLedger=renderLedger;
 renderLedger=function(){const r=_v248OrigRenderLedger.apply(this,arguments);try{v248DecorateReturnRows()}catch(_){}return r};
 (function initV248Ui(){
- const tabs=document.querySelector('#pageWarehouse .warehouseSection > .listTabs');
- if(tabs&&!tabs.querySelector('[data-warehouse-mode="return"]')){
-  const b=document.createElement('button');b.type='button';b.dataset.warehouseMode='return';b.textContent='مرجوعی';
-  b.onclick=()=>setWarehouseMode('return');tabs.appendChild(b);
- }
+ document.querySelectorAll('#pageWarehouse [data-warehouse-mode="return"]').forEach(b=>b.remove());
  const box=$('warehouseList');
  box?.addEventListener('click',e=>{if(e.target.closest('#returnSubmit'))submitReturnForm()});
  box?.addEventListener('change',e=>{
@@ -3626,6 +3686,336 @@ renderLedger=function(){const r=_v248OrigRenderLedger.apply(this,arguments);try{
   const ed=e.target.closest('[data-basket-settle-edit]');if(ed){editBasketSettlement(ed.dataset.basketSettleEdit,Number(ed.dataset.basketSettleIndex));return}
   const del=e.target.closest('[data-basket-settle-del]');if(del){deleteBasketSettlement(del.dataset.basketSettleDel,Number(del.dataset.basketSettleIndex))}
  });
+})();
+
+/* ================= v249: انبار دو صفحه + برگشت به بازرگانی + سبد تخفیفات ================= */
+let v249WhPage='incoming';
+const _v249OrigSaveTx=saveTx;
+const _v249OrigSaveCashboxDraft=saveCashboxDraft;
+const _v249OrigBalanceDeltaOf=balanceDeltaOf;
+const _v249OrigRenderAll=renderAll;
+const _v249OrigRenderWarehouse=renderWarehouse;
+const _v249OrigRenderProcurement=renderProcurement;
+
+/* ---------- سبد تخفیفات: موجودی و مصرف ---------- */
+function v249PoolAvailable(){return (Array.isArray(discountPool)?discountPool:[]).reduce((s,p)=>s+Math.max(0,Number(p&&p.amount)||0),0)}
+function v249ConsumePool(amount){
+ let remaining=Math.max(0,Math.round(Number(amount)||0));const used=[];
+ const arr=Array.isArray(discountPool)?discountPool:[];const next=[];
+ arr.forEach(p=>{
+  const a=Math.max(0,Number(p&&p.amount)||0);
+  if(a<=0.000001)return;
+  if(remaining<=0.000001){next.push(p);return}
+  const take=Math.min(a,remaining);
+  try{if(p&&p.id)addDeletion(DISCOUNT_POOL_K,p.id)}catch(_){}
+  used.push({poolId:p&&p.id,fromDesc:(p&&p.fromDesc)||'',amount:take});
+  remaining-=take;
+  const left=a-take;
+  if(left>0.000001){next.push(Object.assign({},p,{id:'dp_'+Date.now()+'_'+Math.floor(Math.random()*1e6),amount:left}))}
+ });
+ discountPool=next;
+ try{save(DISCOUNT_POOL_K,discountPool,{force:true})}catch(_){}
+ return {used,leftover:Math.max(0,remaining)};
+}
+function v249ApplyPoolToTx(tx,amount){
+ if(!tx)return false;amount=Math.round(Math.max(0,Number(amount)||0));if(!(amount>0))return false;
+ if(amount>v249PoolAvailable()+0.5){alert('مبلغ سبد تخفیفات کافی نیست. موجودی: '+money(v249PoolAvailable())+' '+currencyUnit());return false}
+ const res=v249ConsumePool(amount);
+ tx.poolUsed=(Number(tx.poolUsed)||0)+amount;
+ tx.poolCredits=Array.isArray(tx.poolCredits)?tx.poolCredits:[];
+ res.used.forEach(u=>tx.poolCredits.push({poolId:u.poolId,fromDesc:u.fromDesc,amount:u.amount,date:today(),by:(current&&current.name)||''}));
+ if(!String(tx.desc||'').includes('سبد تخفیفات'))tx.desc=String(tx.desc||'')+' | مصرف سبد تخفیفات: '+money(amount)+' '+currencyUnit();
+ try{save(TXK,txs)}catch(_){}
+ try{renderDiscountPoolBox()}catch(_){}
+ return true;
+}
+function v249UpdatePoolStrip(){
+ const box=$('v249PoolStrip');if(!box)return;
+ const avail=v249PoolAvailable();
+ const a=$('v249PoolStripAmount');if(a)a.textContent=money(avail)+' '+currencyUnit();
+ const h=$('v249PoolStripHint');if(h)h.textContent=avail>0?'قابل استفاده در خرید، شارژ تنخواه و برداشت':'سبد تخفیفات خالی است';
+}
+function v249ActivePoolAmount(){
+ const which=mode==='purchase'?'purchase':mode==='withdraw'?'withdraw':'';
+ if(!which)return 0;
+ const t=$(which+'PoolToggle');if(!t||!t.checked)return 0;
+ return Math.max(0,Math.round(toRial($(which+'PoolAmount')?.value||'')||0));
+}
+function v249ResetPoolInputs(which){
+ const map={purchase:['purchasePoolToggle','purchasePoolAmount','purchasePoolRow'],withdraw:['withdrawPoolToggle','withdrawPoolAmount','withdrawPoolRow'],cashbox:['cashboxPoolToggle','cashboxPoolAmount','cashboxPoolRow']};
+ const ids=map[which];if(!ids)return;
+ const t=$(ids[0]);if(t)t.checked=false;
+ const a=$(ids[1]);if(a)a.value='';
+ const r=$(ids[2]);if(r)r.classList.add('hidden');
+}
+
+/* ---------- انبار: دو صفحه ---------- */
+function v249ShowWarehousePage(page){
+ v249WhPage=page==='returns'?'returns':'incoming';
+ const inc=$('warehouseIncomingSection'),ret=$('warehouseReturnsSection');
+ if(inc)inc.classList.toggle('hidden',v249WhPage!=='incoming');
+ if(ret)ret.classList.toggle('hidden',v249WhPage!=='returns');
+ document.querySelectorAll('[data-warehouse-page]').forEach(b=>b.classList.toggle('active',b.getAttribute('data-warehouse-page')===v249WhPage));
+}
+function v249CanReturnToProc(){return isAdmin()||can('warehouseReceive')||can('warehouseEdit')}
+function v249CanResolveReturn(){return supplyEditPermission()}
+function v249SetReturnFormOpen(open){
+ const f=$('v249ReturnForm'),btn=$('v249ReturnToggle');if(!f)return;
+ f.classList.toggle('hidden',!open);
+ if(btn)btn.textContent=open?'×':'＋';
+ if(open){const sel=$('v249ReturnPick');if(sel)sel.innerHTML=v248ReturnPickOptions()}
+}
+function v249RenderReturnHistory(){
+ const box=$('v249ReturnHistory');if(!box)return;
+ const list=(Array.isArray(txs)?txs:[]).filter(x=>x&&x.isReturn).slice().reverse();
+ if(!list.length){box.innerHTML='<div class="v249Empty">هنوز مرجوعی‌ای ثبت نشده است.</div>';return}
+ box.innerHTML=list.map(x=>{
+  const amt=Math.max(0,Number(x.returnAmount)||0);
+  const dest=x.returnDestination==='credit'?'سبد تخفیفات':'تنخواه';
+  const items=(Array.isArray(x.returnItems)?x.returnItems:[]).map(it=>esc(it.name||'کالا')+' × '+fa(it.qty)+' '+esc(it.unit||'')).join('، ');
+  return '<div class="v249ReturnItem"><span class="v249ReturnDot"></span><div class="v249ReturnMain"><b>'+(items||esc(x.desc||'مرجوعی'))+'</b><small>'+esc(x.date||'')+' · '+esc(dest)+(x.returnNote?' · '+esc(x.returnNote):'')+'</small></div><span class="v249ReturnAmt">+'+money(amt)+' '+currencyUnit()+'</span></div>';
+ }).join('');
+}
+function v249DecorateWarehouse(){
+ const box=$('warehouseList');if(!box)return;
+ if(String(warehouseMode||'pending')!=='pending')return;
+ const canRet=v249CanReturnToProc();
+ box.querySelectorAll('.warehouseGoodsRow').forEach(row=>{
+  const pick=row.querySelector('[data-warehouse-pick]');if(!pick)return;
+  const rid=pick.getAttribute('data-warehouse-pick'),i=Number(pick.getAttribute('data-warehouse-i'));
+  const r=(Array.isArray(procurement)?procurement:[]).find(x=>String(x.id)===String(rid));const it=r&&r.items&&r.items[i];
+  if(!it)return;
+  const info=row.querySelector('.warehouseGoodsInfo')||row;
+  if(it.procReturn&&it.procReturn.status==='pending'){row.classList.add('hidden');return}
+  if(canRet&&!info.querySelector('.v249ReturnBtn')){
+   const b=document.createElement('button');b.type='button';b.className='v249ReturnBtn';b.textContent='برگشت به بازرگانی برای ویرایش';
+   b.setAttribute('data-v249-rid',String(rid));b.setAttribute('data-v249-index',String(i));
+   info.appendChild(b);
+  }
+ });
+ box.querySelectorAll('.warehouseItem').forEach(card=>{
+  const rows=[...card.querySelectorAll('.warehouseGoodsRow')];
+  if(rows.length&&rows.every(r=>r.classList.contains('hidden')))card.classList.add('hidden');
+ });
+}
+async function v249RequestReturnToProc(rid,index){
+ if(!v249CanReturnToProc()){alert('دسترسی برگشت به بازرگانی برای این سمت فعال نیست.');return}
+ const r=(Array.isArray(procurement)?procurement:[]).find(x=>String(x.id)===String(rid));const it=r&&r.items&&r.items[index];
+ if(!r||!it||it.status!=='bought'){alert('این قلم قابل برگشت نیست.');return}
+ const reason=await window.uiPrompt('دلیل برگشت به بازرگانی (اختیاری):','');
+ if(reason===null)return;
+ const p=nowParts()||{};
+ it.procReturn={status:'pending',by:(current&&current.name)||'',byId:(current&&current.id)||'',date:today(),time:p.time||'',reason:String(reason||'').trim()};
+ save(PROC_K,procurement);
+ try{renderWarehouse()}catch(_){}
+ alert('درخواست برای اعمال ویرایش به بازرگانی ارسال شد.');
+}
+
+/* ---------- بازرگانی: اقلام برگشتی ---------- */
+function v249LinkedTxItem(rid,index){
+ const list=(Array.isArray(txs)?txs:[]).filter(t=>t&&t.supplyLink&&String(t.supplyLink.requestId)===String(rid));
+ for(const t of list){const arr=Array.isArray(t.supplyLink.items)?t.supplyLink.items:[];const li=arr.find(x=>Number(x.index)===Number(index));if(li)return {tx:t,li}}
+ return null;
+}
+function v249UpdateLinkedQty(rid,index,qty){const f=v249LinkedTxItem(rid,index);if(!f)return;f.li.qty=qty;try{save(TXK,txs)}catch(_){}}
+function v249ItemShareAmount(r,index){
+ const f=v249LinkedTxItem(r&&r.id,index);if(!f)return 0;
+ const total=Number(f.tx.purchase)||0;const items=Array.isArray(f.tx.supplyLink.items)?f.tx.supplyLink.items:[];
+ const sum=items.reduce((a,x)=>a+Math.max(0,Number(x.qty)||0),0);
+ const q=Math.max(0,Number(f.li.qty)||0);
+ if(!(total>0)||!(sum>0))return 0;
+ return Math.round(total*q/sum);
+}
+function v249PendingReturns(){
+ const out=[];
+ (Array.isArray(procurement)?procurement:[]).forEach(r=>{(r.items||[]).forEach((it,index)=>{if(it&&it.procReturn&&it.procReturn.status==='pending')out.push({r,it,index})})});
+ return out;
+}
+function v249RenderProcReturns(){
+ const sec=$('procReturnedSection'),box=$('procReturnedList');if(!sec||!box)return;
+ const arr=v249CanResolveReturn()?v249PendingReturns():[];
+ if(!arr.length){sec.classList.add('hidden');box.innerHTML='';return}
+ sec.classList.remove('hidden');
+ box.innerHTML=arr.map(o=>{
+  const r=o.r,it=o.it,index=o.index;
+  const cur=Number((it.boughtQty!=null?it.boughtQty:it.qty)||0);
+  const amount=v249ItemShareAmount(r,index);
+  const key=esc(String(r.id))+'|'+index;
+  return '<div class="supplyRequest v249ProcReturn"><div class="supplyRequestHead"><div><b>'+esc(it.name||'کالا')+'</b><small>درخواست #'+esc(r.id)+' · برگشت از انبار توسط '+esc((it.procReturn&&it.procReturn.by)||'-')+' در '+esc((it.procReturn&&it.procReturn.date)||'')+'</small></div><span class="statusPill pending">بازگشتی</span></div><div class="v249ProcReturnBody">'+
+   ((it.procReturn&&it.procReturn.reason)?'<div class="fundMeta">دلیل: '+esc(it.procReturn.reason)+'</div>':'')+
+   '<div class="fundMeta">تعداد فعلی: <b>'+fa(cur)+'</b> '+esc(it.unit||'')+(amount>0?' · سهم مبلغ: '+money(amount)+' '+currencyUnit():'')+'</div>'+
+   '<div class="v249ProcReturnActions"><input class="finput" inputmode="decimal" value="'+esc(String(cur))+'" data-v249-qty="'+key+'" aria-label="تعداد جدید"><button class="primary" type="button" data-v249-qty-save="'+key+'">اصلاح تعداد و ارسال به انبار</button><button class="outline" type="button" data-v249-notbuy="'+key+'">ثبت عدم خرید</button></div>'+
+   '</div></div>';
+ }).join('');
+}
+function v249SaveReturnQty(rid,index){
+ if(!v249CanResolveReturn()){alert('دسترسی ندارید.');return}
+ const r=(Array.isArray(procurement)?procurement:[]).find(x=>String(x.id)===String(rid));const it=r&&r.items&&r.items[index];
+ if(!r||!it)return;
+ const inp=document.querySelector('[data-v249-qty="'+String(rid)+'|'+index+'"]');
+ const qty=num(String((inp&&inp.value)||'').trim());
+ if(!(qty>0)){alert('تعداد جدید را درست وارد کن.');return}
+ it.qty=qty;it.boughtQty=qty;
+ try{v249UpdateLinkedQty(r.id,index,qty)}catch(_){}
+ it.procReturn=Object.assign({},it.procReturn||{},{status:'resolved',resolvedBy:(current&&current.name)||'',resolvedDate:today(),newQty:qty});
+ save(PROC_K,procurement);
+ try{renderProcurement()}catch(_){}
+ try{renderWarehouse()}catch(_){}
+ alert('تعداد اصلاح شد و درخواست دوباره به انبار ارسال شد.');
+}
+function v249OpenNotBought(rid,index){
+ if(!v249CanResolveReturn()){alert('دسترسی ندارید.');return}
+ const r=(Array.isArray(procurement)?procurement:[]).find(x=>String(x.id)===String(rid));const it=r&&r.items&&r.items[index];
+ if(!r||!it)return;
+ const amount=v249ItemShareAmount(r,index)||0;
+ document.getElementById('v249NotBuyModal')?.remove();
+ const overlay=document.createElement('div');overlay.id='v249NotBuyModal';overlay.className='fundPickerOverlay';
+ overlay.innerHTML='<div class="fundPickerCard" role="dialog" aria-modal="true">'+
+  '<div class="fundPickerHead"><b>تعیین تکلیف مبلغ خرید نشده</b><button type="button" class="fundPickerClose" aria-label="بستن">×</button></div>'+
+  '<p class="fundPickerHint">کالای «'+esc(it.name||'کالا')+'» خریداری نشده است. مشخص کن مبلغی که بابت این تراکنش خرید ثبت شده چه شد.</p>'+
+  '<label class="flabel" for="v249NotBuyAmount">مبلغ ('+currencyUnit()+')</label>'+
+  '<input id="v249NotBuyAmount" class="finput moneyInput" inputmode="numeric" value="'+(amount?esc(fa(moneyInputValue(amount))):'')+'" placeholder="0" autocomplete="off">'+
+  '<label class="flabel" for="v249NotBuyDest">مقصد / نحوهٔ برگشت</label>'+
+  '<select id="v249NotBuyDest" class="select"><option value="cashbox">برگشت به تنخواه</option><option value="driver">برگشت به کارت رانندگان</option><option value="credit">قابل استفاده در خرید دیگر (سبد تخفیفات)</option><option value="none">هزینه/سایر (فقط ثبت)</option></select>'+
+  '<label class="flabel" for="v249NotBuyNote">توضیح</label>'+
+  '<input id="v249NotBuyNote" class="finput" placeholder="علت عدم خرید یا توضیح برگشت" autocomplete="off">'+
+  '<div class="fundPickerActions"><button type="button" class="outline fundPickCancel">انصراف</button><button type="button" class="primary" id="v249NotBuyConfirm">ثبت عدم خرید</button></div>'+
+  '</div>';
+ document.body.appendChild(overlay);document.body.style.overflow='hidden';
+ const close=()=>{overlay.remove();document.body.style.overflow=''};
+ overlay.querySelector('.fundPickerClose').onclick=close;overlay.querySelector('.fundPickCancel').onclick=close;
+ overlay.addEventListener('click',e=>{if(e.target===overlay)close()});
+ const inp=overlay.querySelector('#v249NotBuyAmount');inp.addEventListener('input',()=>{inp.value=inp.value?fa(num(inp.value)):''});
+ overlay.querySelector('#v249NotBuyConfirm').onclick=()=>{
+  const amt=Math.round(toRial(inp.value)||0);
+  const dest=overlay.querySelector('#v249NotBuyDest').value||'none';
+  const note=String(overlay.querySelector('#v249NotBuyNote').value||'').trim();
+  close();
+  v249ConfirmNotBought(rid,index,{amount:amt,destination:dest,note});
+ };
+}
+function v249ConfirmNotBought(rid,index,info){
+ const r=(Array.isArray(procurement)?procurement:[]).find(x=>String(x.id)===String(rid));const it=r&&r.items&&r.items[index];
+ if(!r||!it)return;
+ const amt=Math.max(0,Math.round(Number(info.amount)||0));
+ const note=String(info.note||'').trim();
+ it.status='unavailable';
+ it.reason=note||'عدم خرید (بازگشتی از انبار)';
+ it.deliveryDate='';it.deliveryDelayDays=0;
+ it.unavailableDate=today();
+ it.notBoughtMoney={amount:amt,destination:info.destination||'none',note,date:today(),by:(current&&current.name)||''};
+ it.procReturn=Object.assign({},it.procReturn||{},{status:'resolved',resolvedBy:(current&&current.name)||'',resolvedDate:today(),notBought:true});
+ if(amt>0){
+  if(info.destination==='cashbox'||info.destination==='driver'){
+   const p=nowParts()||{};
+   txs.push({id:Date.now()+Math.floor(Math.random()*999999),date:today(),desc:'برگشت مبلغ عدم خرید: '+String(it.name||'کالا')+' · درخواست #'+r.id+(note?' · '+note:''),deposit:amt,depositType:info.destination,purchase:0,freight:0,purchaseSource:'',freightSource:'',purchaseCash:0,purchaseDriver:0,freightCash:0,freightDriver:0,notBoughtRefund:true,notBoughtRef:{requestId:r.id,index,by:(current&&current.name)||''},createdDate:p.date,createdTime:p.time});
+  }else if(info.destination==='credit'){
+   discountPool=Array.isArray(discountPool)?discountPool:[];
+   discountPool.push({id:'dp_'+Date.now()+'_'+Math.floor(Math.random()*1e6),amount:amt,fromTxId:null,fromDate:today(),fromDesc:'عدم خرید: '+String(it.name||'کالا'),createdDate:today(),by:(current&&current.name)||'',note});
+   try{save(DISCOUNT_POOL_K,discountPool,{force:true})}catch(_){}
+  }
+ }
+ save(PROC_K,procurement);try{save(TXK,txs)}catch(_){}
+ try{renderProcurement()}catch(_){}
+ try{renderAll()}catch(_){}
+ try{renderWarehouse()}catch(_){}
+ alert('عدم خرید ثبت شد'+(amt>0?' و تعیین تکلیف مبلغ ذخیره شد.':'.'));
+}
+
+/* ---------- بازنویسی‌ها ---------- */
+balanceDeltaOf=function(x){
+ const base=_v249OrigBalanceDeltaOf.apply(this,arguments);
+ if(!x)return base;
+ const pu=Number(x.poolUsed)||0;
+ if(!(pu>0))return base;
+ const isDeposit=!!x.deposit&&!Number(x.withdraw);
+ return isDeposit?base-pu:base+pu;
+};
+renderAll=function(){const r=_v249OrigRenderAll.apply(this,arguments);try{v249UpdatePoolStrip()}catch(_){}return r};
+renderWarehouse=function(){
+ if(v249WhPage==='returns'){
+  if($('warehouseIncomingSection'))$('warehouseIncomingSection').classList.add('hidden');
+  if($('warehouseReturnsSection'))$('warehouseReturnsSection').classList.remove('hidden');
+  const controls=$('warehouseArchiveControls');if(controls)controls.classList.add('hidden');
+  v249RenderReturnHistory();
+  return;
+ }
+ if($('warehouseIncomingSection'))$('warehouseIncomingSection').classList.remove('hidden');
+ if($('warehouseReturnsSection'))$('warehouseReturnsSection').classList.add('hidden');
+ const r=_v249OrigRenderWarehouse.apply(this,arguments);
+ try{v249DecorateWarehouse()}catch(_){}
+ return r;
+};
+renderProcurement=function(){const r=_v249OrigRenderProcurement.apply(this,arguments);try{v249RenderProcReturns()}catch(_){}return r};
+function v249SaveTxHandler(){
+ const m=mode,poolAmt=v249ActivePoolAmount(),editId=editingId,beforeLen=(Array.isArray(txs)?txs.length:0);
+ if(poolAmt>0&&poolAmt>v249PoolAvailable()+0.5){alert('مبلغ سبد تخفیفات کافی نیست. موجودی: '+money(v249PoolAvailable())+' '+currencyUnit());return}
+ _v249OrigSaveTx.apply(this,arguments);
+ let target=null;
+ if(editId){if(editingId===null)target=(Array.isArray(txs)?txs:[]).find(t=>String(t.id)===String(editId));}
+ else if((Array.isArray(txs)?txs.length:0)>beforeLen)target=txs[txs.length-1];
+ if(target){
+  if(poolAmt>0&&v249ApplyPoolToTx(target,poolAmt)){try{renderAll()}catch(_){}try{renderLedger()}catch(_){}}
+  v249ResetPoolInputs(m==='withdraw'?'withdraw':'purchase');
+ }
+}
+function v249SaveCashboxHandler(){
+ const t=$('cashboxPoolToggle');
+ const poolAmt=(t&&t.checked)?Math.max(0,Math.round(toRial($('cashboxPoolAmount')?.value||'')||0)):0;
+ if(poolAmt>0&&poolAmt>v249PoolAvailable()+0.5){alert('مبلغ سبد تخفیفات کافی نیست.');return}
+ const beforeLen=(Array.isArray(txs)?txs.length:0);
+ _v249OrigSaveCashboxDraft.apply(this,arguments);
+ if(poolAmt>0&&(Array.isArray(txs)?txs.length:0)>beforeLen){
+  const created=txs.slice(beforeLen);let rem=poolAmt;
+  for(const tx of created){if(rem<=0)break;const cap=Math.max(0,Number(tx.deposit)||0);const take=Math.min(cap,rem);if(take>0&&v249ApplyPoolToTx(tx,take))rem-=take;}
+  try{renderAll()}catch(_){}
+ }
+ v249ResetPoolInputs('cashbox');
+}
+
+/* ---------- سیم‌کشی ---------- */
+(function initV249Ui(){
+ document.querySelectorAll('[data-warehouse-page]').forEach(b=>b.addEventListener('click',()=>{v249ShowWarehousePage(b.getAttribute('data-warehouse-page'));try{renderWarehouse()}catch(_){}}));
+ $('v249ReturnToggle')?.addEventListener('click',()=>{const f=$('v249ReturnForm');v249SetReturnFormOpen(!!f&&f.classList.contains('hidden'))});
+ $('v249ReturnSubmit')?.addEventListener('click',()=>{
+  if(!v248CanReturn()){alert('دسترسی ثبت مرجوعی برای این سمت فعال نیست.');return}
+  const name=String($('v249ReturnName')?.value||'').trim();
+  const qty=num(String($('v249ReturnQty')?.value||'').trim());
+  const pack=num(String($('v249ReturnPack')?.value||'').trim());
+  const unit=String($('v249ReturnUnit')?.value||'').trim()||'عدد';
+  if(!name){alert('نام کالا را وارد کن.');return}
+  if(!(qty>0)){alert('تعداد مرجوعی را درست وارد کن.');return}
+  openReturnAmountModal({items:[{name,qty,pack,unit}]});
+  ['v249ReturnName','v249ReturnQty','v249ReturnPack'].forEach(id=>{const el=$(id);if(el)el.value=''});
+  v249SetReturnFormOpen(false);
+ });
+ $('v249ReturnPick')?.addEventListener('change',e=>{
+  const sel=e.target;const v=String(sel.value||'');if(!v)return;
+  const o=sel.selectedOptions&&sel.selectedOptions[0];if(!o)return;
+  if($('v249ReturnName'))$('v249ReturnName').value=o.getAttribute('data-name')||'';
+  if($('v249ReturnQty'))$('v249ReturnQty').value=o.getAttribute('data-qty')||'';
+  if($('v249ReturnPack'))$('v249ReturnPack').value=o.getAttribute('data-pack')||'';
+  if($('v249ReturnUnit')&&o.getAttribute('data-unit'))$('v249ReturnUnit').value=o.getAttribute('data-unit');
+ });
+ $('warehouseList')?.addEventListener('click',e=>{
+  const btn=e.target.closest('.v249ReturnBtn');if(!btn)return;
+  v249RequestReturnToProc(btn.getAttribute('data-v249-rid'),Number(btn.getAttribute('data-v249-index')));
+ });
+ $('procReturnedList')?.addEventListener('click',e=>{
+  const sv=e.target.closest('[data-v249-qty-save]');
+  if(sv){const p=String(sv.getAttribute('data-v249-qty-save')).split('|');v249SaveReturnQty(Number(p[0]),Number(p[1]));return}
+  const nb=e.target.closest('[data-v249-notbuy]');
+  if(nb){const p=String(nb.getAttribute('data-v249-notbuy')).split('|');v249OpenNotBought(Number(p[0]),Number(p[1]));return}
+ });
+ [['purchasePoolToggle','purchasePoolRow','purchasePoolMax'],['withdrawPoolToggle','withdrawPoolRow','withdrawPoolMax'],['cashboxPoolToggle','cashboxPoolRow','cashboxPoolMax']].forEach(cfg=>{
+  const t=$(cfg[0]);if(!t)return;
+  t.addEventListener('change',()=>{const r=$(cfg[1]);if(r)r.classList.toggle('hidden',!t.checked);const m=$(cfg[2]);if(m)m.textContent='موجودی: '+money(v249PoolAvailable())+' '+currencyUnit()});
+ });
+ ['purchasePoolAmount','withdrawPoolAmount','cashboxPoolAmount'].forEach(id=>{const el=$(id);if(!el)return;el.addEventListener('input',()=>{el.value=el.value?fa(num(el.value)):''})});
+ if($('saveBtn'))$('saveBtn').onclick=v249SaveTxHandler;
+ if($('saveCashboxDraft'))$('saveCashboxDraft').onclick=v249SaveCashboxHandler;
+ if($('cancelEdit'))$('cancelEdit').onclick=()=>{try{resetForm()}catch(_){}v249ResetPoolInputs('purchase');v249ResetPoolInputs('withdraw')};
+ try{v249UpdatePoolStrip()}catch(_){}
 })();
 
 boot();
