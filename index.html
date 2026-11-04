@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#ffffff" name="theme-color"/>
-<meta name="saman-build" content="v249"/>
+<meta name="saman-build" content="v250"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; manifest-src 'self'; connect-src 'self' https://eiobajtihwxdlfxufmbg.supabase.co wss://eiobajtihwxdlfxufmbg.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
@@ -530,7 +530,7 @@ textarea{min-height:64px}
 #pageWarehouse .warehouseBatchTools>button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:34px!important;height:auto!important;margin:0!important;padding:5px 3px!important;border-radius:8px!important;font-family:inherit!important;font-size:clamp(9px,2.45vw,11px)!important;font-weight:600!important;line-height:1.3!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;box-sizing:border-box!important}
 @media(max-width:360px){#pageWarehouse .warehouseSection>.listTabs>button{font-size:11px!important;padding:5px 3px!important}#pageWarehouse .warehouseBatchTools{gap:4px!important;padding:4px!important}#pageWarehouse .warehouseBatchTools>button{font-size:9px!important;padding:4px 2px!important;min-height:34px!important}}
 </style>
-<meta name="saman-build" content="v249">
+<meta name="saman-build" content="v250">
 
 <style id="v213-fund-transfer-split">
 .fundActOverlay,.fundPickerOverlay{position:fixed;inset:0;z-index:100520;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;background:rgba(15,28,45,.48);backdrop-filter:blur(2px)}
@@ -789,6 +789,7 @@ button.supplyLinkTag{border:0;font-family:inherit;text-align:right;cursor:pointe
   <option value="cashbox">تنخواه</option>
   <option value="driver">واریزی کارت رانندگان</option>
   <option value="basket">تعهد فردا</option>
+  <option value="pool">سبد تخفیفات</option>
   <option value="mixed">ترکیبی</option>
  </select>
  <div class="withdrawMixed hidden" id="withdrawMixed">
@@ -796,9 +797,8 @@ button.supplyLinkTag{border:0;font-family:inherit;text-align:right;cursor:pointe
   <label>کارت رانندگان<input class="finput moneyInput" id="withdrawDriver" inputmode="numeric" placeholder="مبلغ" readonly></label>
   <label>تعهد فردا<input class="finput moneyInput" id="withdrawBasket" inputmode="numeric" placeholder="مبلغ"/></label>
  </div>
- <div class="v249PoolUse" id="withdrawPoolUse">
-  <label class="v249PoolToggle"><input type="checkbox" id="withdrawPoolToggle"><span>استفاده از سبد تخفیفات</span></label>
-  <div class="v249PoolRow hidden" id="withdrawPoolRow"><input class="finput moneyInput" id="withdrawPoolAmount" inputmode="numeric" placeholder="مبلغ مصرف (ریال)"><span class="v249PoolMax" id="withdrawPoolMax"></span></div>
+ <div class="v249PoolUse hidden" id="withdrawPoolUse">
+  <div class="v249PoolRow" id="withdrawPoolRow" style="margin-top:0"><input class="finput moneyInput" id="withdrawPoolAmount" inputmode="numeric" placeholder="مبلغ استفاده از سبد تخفیفات (ریال)" aria-label="مبلغ استفاده از سبد تخفیفات"><span class="v249PoolMax" id="withdrawPoolMax"></span></div>
  </div>
  <div class="sourceBox hidden" id="withdrawFundSourceBox">
   <div class="sourceTitle">انتخاب از واریزی‌های کارت رانندگان</div>
@@ -810,17 +810,15 @@ button.supplyLinkTag{border:0;font-family:inherit;text-align:right;cursor:pointe
 <button class="primary save" id="saveBtn">ثبت واریزی</button>
 <button class="cancel hidden" id="cancelEdit">انصراف از ویرایش</button>
 </div>
-<div class="v249PoolStrip" id="v249PoolStrip"><span class="v249PoolLabel">سبد تخفیفات</span><b id="v249PoolStripAmount">۰ ریال</b><small id="v249PoolStripHint">قابل استفاده در خریدها</small></div>
 <div class="card" id="cashboxRechargePanel" style="margin-top:16px">
  <div class="procHead" style="margin-bottom:10px"><div><div class="ctitle" style="margin:0">ثبت شارژ تنخواه</div><p class="cashboxRechargeHint" style="color:var(--muted);font-size:12px;line-height:1.9;margin:0">شارژ تنخواه توسط مسئول خرید ثبت می‌شود.</p></div><button class="procPlus" id="toggleCashboxDraft" type="button" aria-label="ثبت شارژ تنخواه" aria-expanded="false">＋</button></div>
  <div id="cashboxDraftForm" class="procAnimated hidden">
   <div id="cashboxDraftList" class="requestDraft"></div>
-  <div class="v249PoolUse" id="cashboxPoolUse">
-   <label class="v249PoolToggle"><input type="checkbox" id="cashboxPoolToggle"><span>استفاده از سبد تخفیفات در این شارژ</span></label>
-   <div class="v249PoolRow hidden" id="cashboxPoolRow"><input class="finput moneyInput" id="cashboxPoolAmount" inputmode="numeric" placeholder="مبلغ مصرف (ریال)"><span class="v249PoolMax" id="cashboxPoolMax"></span></div>
-  </div>
   <div class="requestActions" style="margin-top:12px"><button class="outline" id="clearCashboxDraft" type="button">پاک کردن</button><button class="primary" id="saveCashboxDraft" type="button">ثبت شارژ تنخواه</button></div>
  </div>
+</div>
+<div class="card v249PoolCard hidden" id="v249PoolStrip" style="margin-top:16px">
+ <div class="v249PoolCardRow"><span class="v249PoolLabel">سبد تخفیفات</span><b id="v249PoolStripAmount">۰ ریال</b><small id="v249PoolStripHint">خرید، برداشت و شارژ تنخواه</small></div>
 </div>
 <div class="card" id="driverFundsPanel" style="margin-top:16px">
  <div class="ctitle">مدیریت واریزی کارت رانندگان</div>
@@ -891,7 +889,7 @@ button.supplyLinkTag{border:0;font-family:inherit;text-align:right;cursor:pointe
  <div class="procSection warehouseSection warehouseReturnsSection hidden" id="warehouseReturnsSection">
   <div class="procHead"><div><div class="procHeadTitle">مرجوعی</div><div class="procHeadSub">ثبت و پیگیری مرجوعی کالا</div></div><button class="procPlus" id="v249ReturnToggle" type="button" aria-label="ثبت مرجوعی" title="ثبت مرجوعی">＋</button></div>
   <div id="v249ReturnForm" class="v249ReturnForm hidden">
-   <select class="finput" id="v249ReturnPick"></select>
+   <button type="button" class="finput v250PickBtn" id="v249ReturnPickBtn">— انتخاب از خریدهای تکمیل‌شدهٔ انبار (اختیاری) —</button>
    <div class="v249ReturnGrid">
     <input class="finput" id="v249ReturnName" placeholder="نام کالا">
     <input class="finput" id="v249ReturnQty" inputmode="decimal" placeholder="تعداد">
@@ -1081,6 +1079,53 @@ button.supplyLinkTag{border:0;font-family:inherit;text-align:right;cursor:pointe
 #v249NotBuyModal .fundPickerCard{gap:6px}
 #v249NotBuyModal .flabel{margin-top:2px}
 @media(max-width:520px){.v249ReturnGrid{grid-template-columns:1fr 1fr}.v249ProcReturnActions{grid-template-columns:1fr 1fr}.v249ProcReturnActions input{grid-column:1/-1}}
+</style>
+<style id="v250-styles">
+/* v250: پالایش رابط کاربری سبد تخفیفات، برگشت کل درخواست و فرم مرجوعی */
+/* کارت سبد تخفیفات: یک‌خطی و جمع‌وجور */
+.v249PoolCard{padding:12px 13px}
+.v249PoolCardRow{display:flex;align-items:center;gap:8px;flex-wrap:nowrap;min-width:0}
+.v249PoolCardRow .v249PoolLabel{font-weight:800;font-size:12px;color:#6a5320;white-space:nowrap;flex:0 0 auto}
+.v249PoolCardRow b{margin-inline-start:auto;font-weight:900;font-size:14px;color:#8a6a1e;white-space:nowrap;flex:0 0 auto}
+.v249PoolCardRow small{color:#9c8552;font-size:10px;white-space:nowrap;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis}
+.v249PoolCard.hidden{display:none!important}
+@media(max-width:420px){.v249PoolCardRow small{display:none}}
+/* کلید برگشت کل درخواست به بازرگانی: تمام‌عرض زیر سه کلید انبار */
+#pageWarehouse .warehouseBatchTools>button.v250ReturnReqBtn{grid-column:1/-1!important;width:100%!important;min-height:38px!important;height:auto!important;display:flex!important;align-items:center;justify-content:center;border:1px solid #e2c9a0!important;border-radius:9px!important;background:#fff8ea!important;color:#8a6a1e!important;font:inherit!important;font-size:clamp(9px,2.7vw,11px)!important;font-weight:700!important;padding:8px 10px!important;white-space:nowrap!important;cursor:pointer;margin-top:2px}
+/* صفحهٔ تعیین تکلیف مبلغ بازگشتی مرجوعی: هم‌خوان با بقیهٔ اپ */
+#returnAmountModal .fundPickerCard{width:min(380px,100%);padding:14px;border-radius:16px}
+#returnAmountModal .fundPickerHead b{font-size:13px}
+#returnAmountModal .fundPickerHint{font-size:11px;line-height:1.85;margin:6px 0 10px}
+#returnAmountModal .flabel{margin:0 0 5px;font-size:11px;font-weight:700;color:#53616c}
+#returnAmountModal .finput{height:40px;min-height:40px;font-size:13px;padding:0 11px;border-radius:10px}
+#returnAmountModal .returnDest{padding:8px 10px;font-size:11.5px;border-radius:10px}
+#returnAmountModal .returnDest small{font-size:9.5px}
+#returnAmountModal .fundPickerActions{gap:8px;margin-top:12px}
+#returnAmountModal .fundPickerActions button{height:40px!important;min-height:40px!important;line-height:1;padding:0 10px!important;font:inherit!important;font-size:12px!important;font-weight:700!important;border-radius:10px!important;border:1px solid transparent!important}
+#returnAmountModal .fundPickerActions .fundPickCancel{background:#eef2f6!important;color:#25313a!important;border-color:#d7dee5!important}
+#returnAmountModal .fundPickerActions .primary{background:#2475a7!important;color:#fff!important;border-color:transparent!important}
+/* فرم مرجوعی: ریزتر و اپ‌استایل */
+.v250PickBtn{display:flex!important;align-items:center;justify-content:flex-start;height:40px!important;min-height:40px!important;font:inherit!important;font-size:12px!important;color:#53616c!important;text-align:right;cursor:pointer;background:#fff!important}
+.v250PickBtn:active{background:#f5f8fb!important}
+#v249ReturnForm .v249ReturnGrid input,#v249ReturnForm .v249ReturnGrid select{height:38px!important;min-height:38px!important;font-size:12px!important;border-radius:10px!important}
+#v249ReturnForm #v249ReturnSubmit{height:40px!important;min-height:40px!important;border-radius:10px!important;font-size:12px!important;font-weight:700!important;background:#2475a7!important;color:#fff!important}
+/* پیکر اپ برای انتخاب از خریدهای تکمیل‌شده */
+.v250PickOverlay{position:fixed;inset:0;z-index:100540;display:flex;align-items:flex-end;justify-content:center;background:rgba(15,28,45,.48);backdrop-filter:blur(2px)}
+.v250PickSheet{width:min(520px,100%);max-height:82vh;display:flex;flex-direction:column;background:#fff;border-radius:18px 18px 0 0;box-shadow:0 -18px 55px #0f172a35;overflow:hidden}
+.v250PickHead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 15px 10px;border-bottom:1px solid #eef2f6}
+.v250PickHead b{font-size:13px}
+.v250PickClose{border:0;background:#eef2f6;color:#425466;width:30px;height:30px;border-radius:9px;font-size:16px;line-height:1;cursor:pointer}
+.v250PickList{overflow:auto;padding:8px 10px 14px;display:flex;flex-direction:column;gap:7px}
+.v250PickItem{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid #e2e8f0;border-radius:12px;background:#fbfdff;cursor:pointer;text-align:right;width:100%;font:inherit}
+.v250PickItem:hover{background:#f2f7fc;border-color:#cfe0ee}
+.v250PickItemMain{flex:1;min-width:0}
+.v250PickItemMain b{display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.v250PickItemMain small{color:#7b8792;font-size:10px}
+.v250PickItemAmt{font-size:11px;font-weight:700;color:#425466;white-space:nowrap}
+.v250PickEmpty{text-align:center;color:#7b8792;font-size:12px;padding:22px 10px}
+@media(min-width:560px){.v250PickOverlay{align-items:center}.v250PickSheet{border-radius:18px}}
+/* ادغام سبد تخفیفات در منبع شارژ/برداشت */
+.v249PoolUse .v249PoolRow{margin-top:0}
 </style>
 <script src="./vendor/supabase-js-2.105.4.js"></script>
 <script>
@@ -4016,6 +4061,248 @@ function v249SaveCashboxHandler(){
  if($('saveCashboxDraft'))$('saveCashboxDraft').onclick=v249SaveCashboxHandler;
  if($('cancelEdit'))$('cancelEdit').onclick=()=>{try{resetForm()}catch(_){}v249ResetPoolInputs('purchase');v249ResetPoolInputs('withdraw')};
  try{v249UpdatePoolStrip()}catch(_){}
+})();
+
+/* ================= v250: پالایش رابط کاربری ================= */
+(function v250Layer(){
+ 'use strict';
+
+ /* ---------- کارت سبد تخفیفات: یک‌خطی و پنهان در حالت صفر ---------- */
+ v249UpdatePoolStrip=function(){
+  const box=$('v249PoolStrip');if(!box)return;
+  const avail=v249PoolAvailable();
+  box.classList.toggle('hidden',!(avail>0));
+  if(!(avail>0))return;
+  const a=$('v249PoolStripAmount');if(a)a.textContent=money(avail)+' '+currencyUnit();
+  const h=$('v249PoolStripHint');if(h)h.textContent='خرید، برداشت و شارژ تنخواه';
+ };
+
+ /* ---------- برگشت کل درخواست به بازرگانی (یک کلید برای کل درخواست) ---------- */
+ v249DecorateWarehouse=function(){
+  const box=$('warehouseList');if(!box)return;
+  if(String(warehouseMode||'pending')!=='pending')return;
+  const canRet=v249CanReturnToProc();
+  box.querySelectorAll('.warehouseItem').forEach(card=>{
+   const pick=card.querySelector('[data-warehouse-pick]');
+   const rid=pick?pick.getAttribute('data-warehouse-pick'):null;
+   const r=rid?(Array.isArray(procurement)?procurement:[]).find(x=>String(x.id)===String(rid)):null;
+   if(r&&r.procReturn&&r.procReturn.status==='pending'){card.classList.add('hidden');return}
+   const tools=card.querySelector('.warehouseBatchTools');
+   if(tools&&canRet&&rid&&!tools.querySelector('.v250ReturnReqBtn')){
+    const b=document.createElement('button');
+    b.type='button';b.className='v250ReturnReqBtn';
+    b.textContent='برگشت کل درخواست به بازرگانی برای ویرایش';
+    b.setAttribute('data-v250-return-rid',String(rid));
+    tools.appendChild(b);
+   }
+  });
+ };
+ v249RequestReturnToProc=async function(rid){
+  if(!v249CanReturnToProc()){alert('دسترسی برگشت به بازرگانی برای این سمت فعال نیست.');return}
+  const r=(Array.isArray(procurement)?procurement:[]).find(x=>String(x.id)===String(rid));
+  if(!r){alert('درخواست یافت نشد.');return}
+  const bought=(r.items||[]).filter(it=>it&&it.status==='bought');
+  if(!bought.length){alert('این درخواست قلم خریداری‌شده‌ای برای برگشت ندارد.');return}
+  const reason=await window.uiPrompt('دلیل برگشت کل درخواست به بازرگانی (اختیاری):','');
+  if(reason===null)return;
+  const p=nowParts()||{};
+  r.procReturn={status:'pending',by:(current&&current.name)||'',byId:(current&&current.id)||'',date:today(),time:p.time||'',reason:String(reason||'').trim()};
+  save(PROC_K,procurement);
+  try{renderWarehouse()}catch(_){}
+  try{renderProcurement()}catch(_){}
+  alert('کل درخواست برای اعمال ویرایش به بازرگانی ارسال شد.');
+ };
+
+ /* ---------- بازرگانی: تعیین تکلیف کل درخواست برگشتی ---------- */
+ v249PendingReturns=function(){
+  const out=[];
+  (Array.isArray(procurement)?procurement:[]).forEach(r=>{if(r&&r.procReturn&&r.procReturn.status==='pending')out.push(r)});
+  return out;
+ };
+ v249RenderProcReturns=function(){
+  const sec=$('procReturnedSection'),box=$('procReturnedList');if(!sec||!box)return;
+  const arr=v249CanResolveReturn()?v249PendingReturns():[];
+  if(!arr.length){sec.classList.add('hidden');box.innerHTML='';return}
+  sec.classList.remove('hidden');
+  box.innerHTML=arr.map(r=>{
+   const bought=(r.items||[]).map((it,index)=>({it,index})).filter(x=>x.it&&x.it.status==='bought');
+   const rows=bought.map(({it,index})=>{
+    const cur=Number((it.boughtQty!=null?it.boughtQty:it.qty)||0);
+    const amount=v249ItemShareAmount(r,index);
+    const key=esc(String(r.id))+'|'+index;
+    return '<div class="v249ProcReturnBody" style="border-top:1px dashed #eee3f3;padding-top:7px;margin-top:7px"><div class="fundMeta"><b>'+esc(it.name||'کالا')+'</b> · تعداد فعلی: <b>'+fa(cur)+'</b> '+esc(it.unit||'')+(amount>0?' · سهم مبلغ: '+money(amount)+' '+currencyUnit():'')+'</div><div class="v249ProcReturnActions"><input class="finput" inputmode="decimal" value="'+esc(String(cur))+'" data-v249-qty="'+key+'" aria-label="تعداد جدید"><button class="primary" type="button" data-v249-qty-save="'+key+'">اصلاح تعداد</button><button class="outline" type="button" data-v249-notbuy="'+key+'">ثبت عدم خرید</button></div></div>';
+   }).join('');
+   return '<div class="supplyRequest v249ProcReturn"><div class="supplyRequestHead"><div><b>درخواست #'+esc(r.id)+'</b><small>برگشت کل درخواست توسط '+esc((r.procReturn&&r.procReturn.by)||'-')+' در '+esc((r.procReturn&&r.procReturn.date)||'')+' · '+fa(bought.length)+' قلم خریداری‌شده</small></div><span class="statusPill pending">بازگشتی</span></div>'+((r.procReturn&&r.procReturn.reason)?'<div class="fundMeta">دلیل: '+esc(r.procReturn.reason)+'</div>':'')+(bought.length?rows:'<div class="fundMeta">قلم خریداری‌شده‌ای باقی نمانده است؛ برای ارسال به انبار تأیید کن.</div>')+'<button class="primary" type="button" data-v250-resolve="'+esc(String(r.id))+'" style="margin-top:9px;height:40px">تأیید نهایی و ارسال کل درخواست به انبار</button></div>';
+  }).join('');
+ };
+ v249SaveReturnQty=function(rid,index){
+  if(!v249CanResolveReturn()){alert('دسترسی ندارید.');return}
+  const r=(Array.isArray(procurement)?procurement:[]).find(x=>String(x.id)===String(rid));
+  const it=r&&r.items&&r.items[index];
+  if(!r||!it)return;
+  const inp=document.querySelector('[data-v249-qty="'+String(rid)+'|'+index+'"]');
+  const qty=num(String((inp&&inp.value)||'').trim());
+  if(!(qty>0)){alert('تعداد جدید را درست وارد کن.');return}
+  it.qty=qty;it.boughtQty=qty;
+  try{v249UpdateLinkedQty(r.id,index,qty)}catch(_){}
+  save(PROC_K,procurement);
+  try{renderProcurement()}catch(_){}
+  try{renderWarehouse()}catch(_){}
+ };
+ function v250ResolveRequestReturn(rid){
+  if(!v249CanResolveReturn()){alert('دسترسی ندارید.');return}
+  const r=(Array.isArray(procurement)?procurement:[]).find(x=>String(x.id)===String(rid));
+  if(!r||!r.procReturn)return;
+  r.procReturn=Object.assign({},r.procReturn,{status:'resolved',resolvedBy:(current&&current.name)||'',resolvedDate:today()});
+  save(PROC_K,procurement);
+  try{renderProcurement()}catch(_){}
+  try{renderWarehouse()}catch(_){}
+  alert('درخواست تأیید و دوباره به انبار ارسال شد.');
+ }
+ v249ConfirmNotBought=function(rid,index,info){
+  const r=(Array.isArray(procurement)?procurement:[]).find(x=>String(x.id)===String(rid));
+  const it=r&&r.items&&r.items[index];
+  if(!r||!it)return;
+  const amt=Math.max(0,Math.round(Number(info.amount)||0));
+  const note=String(info.note||'').trim();
+  it.status='unavailable';
+  it.reason=note||'عدم خرید (بازگشتی از انبار)';
+  it.deliveryDate='';it.deliveryDelayDays=0;
+  it.unavailableDate=today();
+  it.notBoughtMoney={amount:amt,destination:info.destination||'none',note,date:today(),by:(current&&current.name)||''};
+  if(amt>0){
+   if(info.destination==='cashbox'||info.destination==='driver'){
+    const p=nowParts()||{};
+    txs.push({id:Date.now()+Math.floor(Math.random()*999999),date:today(),desc:'برگشت مبلغ عدم خرید: '+String(it.name||'کالا')+' · درخواست #'+r.id+(note?' · '+note:''),deposit:amt,depositType:info.destination,purchase:0,freight:0,purchaseSource:'',freightSource:'',purchaseCash:0,purchaseDriver:0,freightCash:0,freightDriver:0,notBoughtRefund:true,notBoughtRef:{requestId:r.id,index,by:(current&&current.name)||''},createdDate:p.date,createdTime:p.time});
+   }else if(info.destination==='credit'){
+    discountPool=Array.isArray(discountPool)?discountPool:[];
+    discountPool.push({id:'dp_'+Date.now()+'_'+Math.floor(Math.random()*1e6),amount:amt,fromTxId:null,fromDate:today(),fromDesc:'عدم خرید: '+String(it.name||'کالا'),createdDate:today(),by:(current&&current.name)||'',note});
+    try{save(DISCOUNT_POOL_K,discountPool,{force:true})}catch(_){}
+   }
+  }
+  save(PROC_K,procurement);try{save(TXK,txs)}catch(_){}
+  try{renderProcurement()}catch(_){}
+  try{renderAll()}catch(_){}
+  try{renderWarehouse()}catch(_){}
+  alert('عدم خرید ثبت شد'+(amt>0?' و تعیین تکلیف مبلغ ذخیره شد.':'.'));
+ };
+
+ /* ---------- برداشت: ادغام سبد تخفیفات در منبع برداشت ---------- */
+ const _v250OrigWithdrawPartsOf=withdrawPartsOf;
+ withdrawPartsOf=function(x){
+  const src=(x&&x.withdrawSource)||'cashbox';
+  const total=Math.max(0,Number(x&&x.withdraw)||0);
+  if(src==='pool')return {cashbox:0,driver:0,basket:0,pool:total};
+  const base=_v250OrigWithdrawPartsOf.apply(this,arguments);
+  return {cashbox:base.cashbox,driver:base.driver,basket:base.basket,pool:0};
+ };
+ withdrawSourceLabel=function(x){
+  const p=withdrawPartsOf(x);const labels=[];
+  if(p.pool>0)labels.push('سبد تخفیفات');
+  if(p.cashbox>0)labels.push('تنخواه');
+  if(p.driver>0)labels.push('کارت رانندگان');
+  if(p.basket>0)labels.push('تعهد فردا');
+  return labels.length?labels.join(' + '):'تنخواه';
+ };
+ v249ActivePoolAmount=function(){
+  if(mode==='withdraw'){
+   const src=String(($('withdrawSource')&&$('withdrawSource').value)||'cashbox');
+   if(src!=='pool')return 0;
+   return Math.max(0,Math.round(toRial(($('withdrawPoolAmount')&&$('withdrawPoolAmount').value)||'')||0));
+  }
+  if(mode==='purchase'){
+   const t=$('purchasePoolToggle');if(!t||!t.checked)return 0;
+   return Math.max(0,Math.round(toRial(($('purchasePoolAmount')&&$('purchasePoolAmount').value)||'')||0));
+  }
+  return 0;
+ };
+ v249ResetPoolInputs=function(which){
+  if(which==='withdraw'){const u=$('withdrawPoolUse');if(u)u.classList.add('hidden');const a=$('withdrawPoolAmount');if(a)a.value='';return}
+  if(which==='purchase'){const t=$('purchasePoolToggle');if(t)t.checked=false;const a=$('purchasePoolAmount');if(a)a.value='';const r=$('purchasePoolRow');if(r)r.classList.add('hidden');return}
+ };
+ function v250SyncWithdrawPool(){
+  const src=String(($('withdrawSource')&&$('withdrawSource').value)||'cashbox');
+  const use=$('withdrawPoolUse');if(use)use.classList.toggle('hidden',src!=='pool');
+  const max=$('withdrawPoolMax');if(max)max.textContent='موجودی: '+money(v249PoolAvailable())+' '+currencyUnit();
+  if(src==='pool'&&editingId){
+   const amt=$('withdrawPoolAmount');
+   if(amt&&!amt.value){
+    const tx=(Array.isArray(txs)?txs:[]).find(t=>String(t.id)===String(editingId));
+    const pu=tx?Math.max(0,Number((tx.withdrawParts&&tx.withdrawParts.pool)||0)):0;
+    if(pu>0)amt.value=fa(moneyInputValue(pu));
+   }
+  }
+ }
+ const _v250OrigSetMode=setMode;
+ setMode=function(m){const r=_v250OrigSetMode.apply(this,arguments);try{v250SyncWithdrawPool()}catch(_){}return r};
+
+ /* ---------- شارژ تنخواه: ادغام سبد تخفیفات در منبع شارژ ---------- */
+ cashboxDraftHtml=function(item,i){
+  const src=(item.source==='driver'||item.source==='pool')?item.source:'cashbox';
+  const uses=Array.isArray(item.fundUses)?item.fundUses:[];
+  const usesTotal=uses.reduce((a,u)=>a+Math.max(0,Number(u.amount)||0),0);
+  const picks=uses.map(u=>{const f=driverFunds.find(x=>String(x.id)===String(u.fundId));return (f?(f.desc||'واریزی کارت رانندگان'):'واریزی حذف‌شده')}).join(' ، ');
+  const amountBlock='<label class="flabel">مبلغ (ریال)</label><input class="finput moneyInput" data-cashbox-prop="amount" inputmode="numeric" value="'+esc(item.amount||'')+'" placeholder="50,000,000">';
+  const poolBlock='<div class="v249PoolUse" style="margin-top:0"><div class="v249PoolRow" style="margin-top:0"><input class="finput moneyInput" data-cashbox-prop="amount" inputmode="numeric" value="'+esc(item.amount||'')+'" placeholder="مبلغ استفاده از سبد تخفیفات (ریال)" aria-label="مبلغ استفاده از سبد تخفیفات"><span class="v249PoolMax">موجودی: '+money(v249PoolAvailable())+' '+currencyUnit()+'</span></div></div>';
+  const driverBlock='<div class="cashboxDriverPick"><div class="cashboxDriverPickTop">'+(uses.length?('<span class="cashboxPickNames">انتخاب‌شده: '+esc(picks)+'</span>'):'<span class="cashboxPickNames cashboxPickEmpty">هنوز واریزی‌ای انتخاب نشده است</span>')+'<button type="button" class="outline cashboxPickBtn" data-cashbox-pick="'+i+'">انتخاب واریزی‌ها</button></div><div class="cashboxPickTotal">مبلغ شارژ: <b>'+money(usesTotal)+' '+currencyUnit()+'</b></div></div>';
+  return '<div class="requestItem" data-cashbox-draft="'+i+'"><div class="requestItemTop"><span class="requestItemNo">شارژ تنخواه '+(i+1)+'</span></div><div class="twocol"><div><label class="flabel">تاریخ شمسی</label><div class="datePickWrap"><input class="finput jalaliInput" data-cashbox-prop="date" value="'+esc(item.date||today())+'" readonly><button class="calendarBtn" type="button" data-open-cashbox-date="1">▣</button></div></div><div><label class="flabel">منبع شارژ</label><select class="select" data-cashbox-prop="source" aria-label="منبع شارژ تنخواه"><option value="cashbox"'+(src==='cashbox'?' selected':'')+'>نقد / تنخواه</option><option value="driver"'+(src==='driver'?' selected':'')+'>از واریزی کارت رانندگان</option><option value="pool"'+(src==='pool'?' selected':'')+'>سبد تخفیفات</option></select></div></div>'+(src==='driver'?driverBlock:(src==='pool'?poolBlock:amountBlock))+'<label class="flabel">شرح شارژ تنخواه</label><input class="finput" data-cashbox-prop="desc" value="'+esc(item.desc||'')+'" placeholder="شارژ تنخواه"></div>';
+ };
+ function v250SaveCashboxHandler(){
+  const rows=cashboxDraft.map(x=>({poolUsed:(x&&x.source==='pool')?Math.max(0,Math.round(toRial(x&&x.amount)||0)):0}));
+  const needPool=rows.reduce((a,r)=>a+r.poolUsed,0);
+  if(needPool>v249PoolAvailable()+0.5){alert('موجودی سبد تخفیفات کافی نیست. موجودی: '+money(v249PoolAvailable())+' '+currencyUnit());return}
+  const beforeLen=(Array.isArray(txs)?txs.length:0);
+  _v249OrigSaveCashboxDraft.apply(this,arguments);
+  if(needPool>0&&(Array.isArray(txs)?txs.length:0)>beforeLen){
+   const created=txs.slice(beforeLen);
+   for(let i=0;i<created.length;i++){const pu=rows[i]?rows[i].poolUsed:0;if(pu>0){try{v249ApplyPoolToTx(created[i],pu)}catch(_){}}}
+   try{renderAll()}catch(_){}
+  }
+ }
+
+ /* ---------- فرم مرجوعی: پیکر اپ به‌جای select پیش‌فرض مرورگر ---------- */
+ function v250OpenReturnPick(){
+  const opts=[];
+  (Array.isArray(procurement)?procurement:[]).forEach(r=>{
+   if(!r||r.approvalStatus!=='approved')return;
+   (r.items||[]).forEach((it,index)=>{
+    if(!it||it.status!=='bought'||!it.deliveryDate||!it.warehouseReceived)return;
+    opts.push({id:r.id,index,name:it.name||'کالا',qty:Number(it.qty)||0,pack:Number(it.pack)||0,unit:it.unit||''});
+   });
+  });
+  document.getElementById('v250PickOverlay')?.remove();
+  const ov=document.createElement('div');ov.id='v250PickOverlay';ov.className='v250PickOverlay';
+  const body=opts.length?opts.slice().reverse().map(o=>'<button type="button" class="v250PickItem" data-v250-pick="1" data-name="'+esc(o.name)+'" data-qty="'+esc(o.qty)+'" data-pack="'+esc(o.pack)+'" data-unit="'+esc(o.unit)+'"><span class="v250PickItemMain"><b>'+esc(o.name)+'</b><small>درخواست #'+esc(o.id)+'</small></span><span class="v250PickItemAmt">'+fa(o.qty)+(o.pack?' · '+fa(o.pack)+' عددی':'')+(o.unit?' '+esc(o.unit):'')+'</span></button>').join(''):'<div class="v250PickEmpty">کالای تکمیل‌شدهٔ قابل انتخابی وجود ندارد.</div>';
+  ov.innerHTML='<div class="v250PickSheet" role="dialog" aria-modal="true"><div class="v250PickHead"><b>انتخاب از خریدهای تکمیل‌شده</b><button type="button" class="v250PickClose" aria-label="بستن">×</button></div><div class="v250PickList">'+body+'</div></div>';
+  document.body.appendChild(ov);document.body.style.overflow='hidden';
+  const close=()=>{ov.remove();document.body.style.overflow=''};
+  ov.querySelector('.v250PickClose').onclick=close;
+  ov.addEventListener('click',e=>{
+   if(e.target===ov){close();return}
+   const b=e.target.closest('[data-v250-pick]');if(!b)return;
+   if($('v249ReturnName'))$('v249ReturnName').value=b.getAttribute('data-name')||'';
+   if($('v249ReturnQty'))$('v249ReturnQty').value=b.getAttribute('data-qty')||'';
+   if($('v249ReturnPack'))$('v249ReturnPack').value=b.getAttribute('data-pack')||'';
+   const u=b.getAttribute('data-unit');if(u&&$('v249ReturnUnit'))$('v249ReturnUnit').value=u;
+   close();
+  });
+ }
+
+ /* ---------- سیم‌کشی ---------- */
+ $('warehouseList')?.addEventListener('click',e=>{
+  const b=e.target.closest('.v250ReturnReqBtn');if(!b)return;
+  v249RequestReturnToProc(b.getAttribute('data-v250-return-rid'));
+ });
+ $('procReturnedList')?.addEventListener('click',e=>{
+  const b=e.target.closest('[data-v250-resolve]');if(!b)return;
+  v250ResolveRequestReturn(b.getAttribute('data-v250-resolve'));
+ });
+ $('v249ReturnPickBtn')?.addEventListener('click',()=>{try{v250OpenReturnPick()}catch(_){}});
+ $('withdrawSource')?.addEventListener('change',()=>{try{v250SyncWithdrawPool()}catch(_){}});
+ if($('saveCashboxDraft'))$('saveCashboxDraft').onclick=v250SaveCashboxHandler;
+ try{v250SyncWithdrawPool()}catch(_){}
+ try{v249UpdatePoolStrip()}catch(_){}
+ try{renderCashboxDraft()}catch(_){}
 })();
 
 boot();
