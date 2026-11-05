@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#ffffff" name="theme-color"/>
-<meta name="saman-build" content="v252"/>
+<meta name="saman-build" content="v253"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; manifest-src 'self'; connect-src 'self' https://eiobajtihwxdlfxufmbg.supabase.co wss://eiobajtihwxdlfxufmbg.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
@@ -530,7 +530,7 @@ textarea{min-height:64px}
 #pageWarehouse .warehouseBatchTools>button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:34px!important;height:auto!important;margin:0!important;padding:5px 3px!important;border-radius:8px!important;font-family:inherit!important;font-size:clamp(9px,2.45vw,11px)!important;font-weight:600!important;line-height:1.3!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;box-sizing:border-box!important}
 @media(max-width:360px){#pageWarehouse .warehouseSection>.listTabs>button{font-size:11px!important;padding:5px 3px!important}#pageWarehouse .warehouseBatchTools{gap:4px!important;padding:4px!important}#pageWarehouse .warehouseBatchTools>button{font-size:9px!important;padding:4px 2px!important;min-height:34px!important}}
 </style>
-<meta name="saman-build" content="v252">
+<meta name="saman-build" content="v253">
 
 <style id="v213-fund-transfer-split">
 .fundActOverlay,.fundPickerOverlay{position:fixed;inset:0;z-index:100520;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;background:rgba(15,28,45,.48);backdrop-filter:blur(2px)}
@@ -1676,7 +1676,7 @@ function bindDriverLockSync(){
 }
 function syncLockedFromTotal(){
  if(!driverEditLock)return;
- const p=toRial($('txPurchase')?.value),drv=Number(driverEditLockDriverAmount)||0;
+ const p=Math.max(0,toRial($('txPurchase')?.value)-((typeof v253ActivePurchasePoolAmount==='function')?v253ActivePurchasePoolAmount():0)),drv=Number(driverEditLockDriverAmount)||0;
  let basket=0;
  if(purchaseBasketToggleOn()){
   const max=Math.max(0,p-drv),inp=$('purchaseBasketAmount');
@@ -1692,10 +1692,10 @@ function syncLockedFromCash(){
  if(!driverEditLock)return;
  const drv=Number(driverEditLockDriverAmount)||0,cash=toRial($('purchaseCash')?.value);
  if(purchaseBasketToggleOn()){
-  const p=toRial($('txPurchase')?.value||''),max=Math.max(0,p-drv),b=Math.max(0,Math.min(max-cash,max)),inp=$('purchaseBasketAmount');
+  const p=Math.max(0,toRial($('txPurchase')?.value||'')-((typeof v253ActivePurchasePoolAmount==='function')?v253ActivePurchasePoolAmount():0)),max=Math.max(0,p-drv),b=Math.max(0,Math.min(max-cash,max)),inp=$('purchaseBasketAmount');
   if(inp){inp.dataset.userEdited='1';inp.value=b?money(b):'';}
  }else{
-  const total=cash+drv,t=$('txPurchase');
+  const total=cash+drv+((typeof v253ActivePurchasePoolAmount==='function')?v253ActivePurchasePoolAmount():0),t=$('txPurchase');
   if(t)t.value=total?money(total):'';
  }
 }
@@ -2057,7 +2057,7 @@ function updatePurchaseBasketPreview(fundTotal){
  row.classList.toggle('hidden',!on);
  const inp=$('purchaseBasketAmount');
  if(driverEditLock){
-  const p=toRial($('txPurchase')?.value||''),locked=Number(driverEditLockDriverAmount)||0,max=Math.max(0,p-locked);
+  const pRaw=toRial($('txPurchase')?.value||''),pu=(typeof v253ActivePurchasePoolAmount==='function')?v253ActivePurchasePoolAmount():0,p=Math.max(0,pRaw-pu),locked=Number(driverEditLockDriverAmount)||0,max=Math.max(0,p-locked);
   const maxEl=$('purchaseBasketMax');
   if(maxEl)maxEl.textContent='حداکثر: '+money(max)+' '+currencyUnit();
   let basket=0;
@@ -2072,7 +2072,7 @@ function updatePurchaseBasketPreview(fundTotal){
  }
  if(!on){syncLockedBasketReadonly();return}
  const p=toRial($('txPurchase')?.value||'');
- const src=$('purchaseSource')?.value||'cashbox';let cashPortion=src==='cashbox'?p:(src==='mixed'?toRial($('purchaseCash')?.value||''):0);if(src==='driver')cashPortion=0;if(!(cashPortion>=0))cashPortion=0;const remainder=Math.max(0,p-cashPortion-(Number(fundTotal)||0));if(inp&&!inp.dataset.userEdited)inp.value=remainder?fa(remainder):'';const maxEl=$('purchaseBasketMax');if(maxEl)maxEl.textContent='حداکثر: '+money(remainder)+' '+currencyUnit();syncLockedBasketReadonly();
+ const src=$('purchaseSource')?.value||'cashbox';const poolUse=(typeof v253ActivePurchasePoolAmount==='function')?v253ActivePurchasePoolAmount():0;let cashPortion=src==='cashbox'?Math.max(0,p-poolUse):(src==='mixed'?toRial($('purchaseCash')?.value||''):0);if(src==='driver')cashPortion=0;if(!(cashPortion>=0))cashPortion=0;const remainder=Math.max(0,p-cashPortion-(Number(fundTotal)||0)-poolUse);if(inp&&!inp.dataset.userEdited)inp.value=remainder?fa(remainder):'';const maxEl=$('purchaseBasketMax');if(maxEl)maxEl.textContent='حداکثر: '+money(remainder)+' '+currencyUnit();syncLockedBasketReadonly();
 }
 function updatePurchaseFundTotal(){const total=selectedPurchaseFundUses().reduce((a,x)=>a+x.amount,0);const el=$('purchaseFundTotal');if(el)el.textContent='جمع مصرف از واریزی‌ها: '+money(total)+' '+currencyUnit();updatePurchaseBasketPreview(total)}
 (function initPurchaseBasket(){
@@ -2136,8 +2136,8 @@ function saveTx(){
   }else if(releasedAllocs.length){save(FUND_K,driverFunds)}
   save(TXK,txs);resetForm();renderAll();go('ledger');return;
  }
- if(mode==='deposit'&&!can('depositCreate')){alert('دسترسی ثبت واریزی برای این سمت فعال نیست.');return}if(mode==='deposit'&&!isAdmin()){if(isPurchasingRole()&&!isFundManagerRole()&&$('depositType').value!=='cashbox'){alert('مسئول خرید فقط مجاز به ثبت واریزی شارژ تنخواه است.');return}if(isFundManagerRole()&&!isPurchasingRole()&&$('depositType').value!=='driver'){alert('مدیر صندوق فقط مجاز به ثبت واریزی کارت رانندگان است.');return}}if(mode==='purchase'&&!can('purchaseCreate')){alert('دسترسی ثبت خرید برای این سمت فعال نیست.');return}const desc=$('txDesc').value.trim();if(!desc){alert('شرح / توضیحات را وارد کنید.');return}const d=mode==='deposit'?toRial($('txDeposit').value):0,p=mode==='purchase'?toRial($('txPurchase').value):0,f=0;const official=mode==='purchase'&&!!$('txOfficialInvoice')?.checked;if(!(d||p||f)){alert('مبلغ را وارد کنید.');return}if(mode==='purchase'&&!official&&!driverEditLock&&!purchaseBasketToggleOn()&&availableDriverFundBalance()<=0.000001){const usesDriver=sel=>sel.value==='driver'||(sel.value==='mixed'&&((num($(sel.id.replace('Source','Cash')).value)>0&&$(sel.id.replace('Source','Part1Source')).value==='driver')||(num($(sel.id.replace('Source','Driver')).value)>0&&$(sel.id.replace('Source','Part2Source')).value==='driver')));if(usesDriver($('purchaseSource'))||usesDriver($('freightSource'))){alert('ماندهٔ قابل استفاده‌ای از کارت رانندگان وجود ندارد؛ منبع خرید و کرایه را روی تنخواه بگذارید.');return}}let item;if(mode==='deposit')item={id:editingId||Date.now(),date:$('txDate').value.trim()||today(),desc,deposit:d,depositType:$('depositType').value,purchase:0,freight:0,purchaseSource:'',freightSource:'',purchaseCash:0,purchaseDriver:0,freightCash:0,freightDriver:0};else{const uses=(official||driverEditLock)?[]:selectedPurchaseFundUses();if(uses.length&&!canUseFunds()){alert('دسترسی استفاده از واریزی‌های صندوق برای این نقش فعال نیست.');return}let fundTotal=0;for(const u of uses){const fund=driverFunds.find(x=>String(x.id)===u.fundId);if(!fund||!fundSelectableForPurchase(fund)||u.amount>fundAvailableForEdit(fund)+0.000001){alert('این واریزی برگشت‌خورده یا تسویه‌شده است، یا ماندهٔ قابل استفادهٔ کافی ندارد.');renderPurchaseFundOptions();return}fundTotal+=u.amount}if(fundTotal>p){alert('جمع مصرف از واریزی‌های صندوق نمی‌تواند از اصل مبلغ خرید بیشتر باشد.');return}const basketOn=!official&&!driverEditLock&&purchaseBasketToggleOn();let basketAmount=0;let ps;if(official){ps={cash:0,driver:0}}else if(driverEditLock){const _locked=Number(driverEditLockDriverAmount)||0;if(p<_locked-0.000001){alert('مبلغ اصل خرید نمی‌تواند از بخش تأمین‌شده با کارت رانندگان کمتر باشد.');return}const _basketMax=Math.max(0,p-_locked);let _basket=0;if(purchaseBasketToggleOn()){const _raw=$('purchaseBasketAmount')?String($('purchaseBasketAmount').value||'').trim():'';_basket=_raw!==''?Math.max(0,Math.min(toRial(_raw),_basketMax)):_basketMax}basketAmount=_basket;const _cash=Math.max(0,p-_locked-_basket);ps={cash:_cash,driver:Math.min(_locked,p)}}else if(basketOn){const _src=$('purchaseSource').value;let _cash=_src==='cashbox'?p:(_src==='mixed'?toRial($('purchaseCash').value):0);if(_src==='driver')_cash=0;if(!(_cash>=0))_cash=0;const _remainder=Math.max(0,p-_cash-fundTotal);const _raw=$('purchaseBasketAmount')?String($('purchaseBasketAmount').value||'').trim():'';basketAmount=_raw!==''?Math.max(0,Math.min(toRial(_raw),_remainder)):_remainder;_cash+=(_remainder-basketAmount);ps={cash:_cash,driver:fundTotal};$('purchaseSource').value=_cash<=0?'driver':(fundTotal<=0?'cashbox':'mixed');$('purchaseCash').value=_cash?fa(_cash):'';$('purchaseDriver').value=fundTotal?fa(fundTotal):''}
-else if(fundTotal>0){const cash=p-fundTotal;ps={cash,driver:fundTotal};$('purchaseSource').value=cash===0?'driver':'mixed';$('purchaseCash').value=cash?fa(cash):'';$('purchaseDriver').value=fundTotal?fa(fundTotal):''}else{ps=validateMixed($('purchaseSource').value,p,'purchaseCash','purchaseDriver','خرید');if(!ps)return}if(official)ps={cash:0,driver:0};const fs={cash:0,driver:0};const supplyLink=driverEditLock?((txs.find(x=>x.id===editingId)||{}).supplyLink||null):selectedSupplyLink();if(supplyLink===undefined)return;item={id:editingId||Date.now(),date:$('txDate').value.trim()||today(),desc,deposit:0,depositType:'',purchase:p,freight:f,purchaseSource:official?'official':$('purchaseSource').value,freightSource:official?'official':'cashbox',purchaseCash:ps.cash,purchaseDriver:ps.driver,freightCash:fs.cash,freightDriver:fs.driver,driverFundUses:uses.map(u=>({...u})),supplyLink,purchaseDeliveryDate:String($('purchaseDeliveryDate')?.value||today()).trim(),purchaseDeliveryDelayDays:Number($('purchaseDeliveryDelay')?.value||0),noFreight:!!$('txNoFreight')?.checked,invoicePhoto:purchaseInvoiceChanged?purchaseInvoicePhoto:(txs.find(x=>x.id===editingId)?.invoicePhoto||purchaseInvoicePhoto||''),officialInvoice:official};if(basketAmount>0.000001){item.purchaseBasket={amount:basketAmount,remaining:basketAmount,createdDate:today(),createdBy:current?.name||'',settlements:[]}}if(driverEditLock){const _o=txs.find(x=>x.id===editingId)||{};item.purchaseSource=ps.cash<=0.000001?(ps.driver>0.000001?'driver':'cashbox'):(ps.driver<=0.000001?'cashbox':'mixed');item.freight=Number(_o.freight)||0;item.freightSource=_o.freightSource||'cashbox';item.freightCash=Number(_o.freightCash)||0;item.freightDriver=Number(_o.freightDriver)||0;item.driverFundUses=Array.isArray(_o.driverFundUses)?_o.driverFundUses.map(u=>({...u})):[];item.driverFundKind=_o.driverFundKind;item.driverFundId=_o.driverFundId;item.driverFundAllocationId=_o.driverFundAllocationId;item.driverFundAllocationIds=Array.isArray(_o.driverFundAllocationIds)?[..._o.driverFundAllocationIds]:_o.driverFundAllocationIds;item.supplyLink=_o.supplyLink;item.noFreight=!!_o.noFreight;item.purchaseDeliveryDate=_o.purchaseDeliveryDate;item.purchaseDeliveryDelayDays=_o.purchaseDeliveryDelayDays;if(basketAmount>0.000001){const _settled=_o.purchaseBasket?Math.max(0,(Number(_o.purchaseBasket.amount)||0)-(Number(_o.purchaseBasket.remaining)||0)):0;item.purchaseBasket={amount:basketAmount,remaining:Math.max(0,basketAmount-_settled),createdDate:(_o.purchaseBasket&&_o.purchaseBasket.createdDate)||today(),createdBy:(_o.purchaseBasket&&_o.purchaseBasket.createdBy)||(current&&current.name)||'',settlements:(_o.purchaseBasket&&Array.isArray(_o.purchaseBasket.settlements))?_o.purchaseBasket.settlements.map(s=>({...s})):[]}}else{item.purchaseBasket=_o.purchaseBasket}}}
+ if(mode==='deposit'&&!can('depositCreate')){alert('دسترسی ثبت واریزی برای این سمت فعال نیست.');return}if(mode==='deposit'&&!isAdmin()){if(isPurchasingRole()&&!isFundManagerRole()&&$('depositType').value!=='cashbox'){alert('مسئول خرید فقط مجاز به ثبت واریزی شارژ تنخواه است.');return}if(isFundManagerRole()&&!isPurchasingRole()&&$('depositType').value!=='driver'){alert('مدیر صندوق فقط مجاز به ثبت واریزی کارت رانندگان است.');return}}if(mode==='purchase'&&!can('purchaseCreate')){alert('دسترسی ثبت خرید برای این سمت فعال نیست.');return}const desc=$('txDesc').value.trim();if(!desc){alert('شرح / توضیحات را وارد کنید.');return}const d=mode==='deposit'?toRial($('txDeposit').value):0,p=mode==='purchase'?toRial($('txPurchase').value):0,f=0;const official=mode==='purchase'&&!!$('txOfficialInvoice')?.checked;if(!(d||p||f)){alert('مبلغ را وارد کنید.');return}if(mode==='purchase'&&!official&&!driverEditLock&&!purchaseBasketToggleOn()&&availableDriverFundBalance()<=0.000001){const usesDriver=sel=>sel.value==='driver'||(sel.value==='mixed'&&((num($(sel.id.replace('Source','Cash')).value)>0&&$(sel.id.replace('Source','Part1Source')).value==='driver')||(num($(sel.id.replace('Source','Driver')).value)>0&&$(sel.id.replace('Source','Part2Source')).value==='driver')));if(usesDriver($('purchaseSource'))||usesDriver($('freightSource'))){alert('ماندهٔ قابل استفاده‌ای از کارت رانندگان وجود ندارد؛ منبع خرید و کرایه را روی تنخواه بگذارید.');return}}let item;if(mode==='deposit')item={id:editingId||Date.now(),date:$('txDate').value.trim()||today(),desc,deposit:d,depositType:$('depositType').value,purchase:0,freight:0,purchaseSource:'',freightSource:'',purchaseCash:0,purchaseDriver:0,freightCash:0,freightDriver:0};else{const uses=(official||driverEditLock)?[]:selectedPurchaseFundUses();if(uses.length&&!canUseFunds()){alert('دسترسی استفاده از واریزی‌های صندوق برای این نقش فعال نیست.');return}const poolAmt=(official||driverEditLock)?0:v253ActivePurchasePoolAmount();if(poolAmt>p+0.5){alert('مبلغ سبد تخفیفات نمی‌تواند از اصل مبلغ خرید بیشتر باشد.');return}const pT=Math.max(0,p-poolAmt);let fundTotal=0;for(const u of uses){const fund=driverFunds.find(x=>String(x.id)===u.fundId);if(!fund||!fundSelectableForPurchase(fund)||u.amount>fundAvailableForEdit(fund)+0.000001){alert('این واریزی برگشت‌خورده یا تسویه‌شده است، یا ماندهٔ قابل استفادهٔ کافی ندارد.');renderPurchaseFundOptions();return}fundTotal+=u.amount}if(fundTotal>pT){alert('جمع مصرف از واریزی‌های صندوق و سبد تخفیفات نمی‌تواند از اصل مبلغ خرید بیشتر باشد.');return}const basketOn=!official&&!driverEditLock&&purchaseBasketToggleOn();let basketAmount=0;let ps;if(official){ps={cash:0,driver:0}}else if(driverEditLock){const _locked=Number(driverEditLockDriverAmount)||0;if(pT<_locked-0.000001){alert('مبلغ اصل خرید نمی‌تواند از بخش تأمین‌شده با کارت رانندگان و سبد تخفیفات کمتر باشد.');return}const _basketMax=Math.max(0,pT-_locked);let _basket=0;if(purchaseBasketToggleOn()){const _raw=$('purchaseBasketAmount')?String($('purchaseBasketAmount').value||'').trim():'';_basket=_raw!==''?Math.max(0,Math.min(toRial(_raw),_basketMax)):_basketMax}basketAmount=_basket;const _cash=Math.max(0,pT-_locked-_basket);ps={cash:_cash,driver:Math.min(_locked,pT)}}else if(basketOn){const _src=$('purchaseSource').value;let _cash=_src==='cashbox'?pT:(_src==='mixed'?toRial($('purchaseCash').value):0);if(_src==='driver')_cash=0;if(!(_cash>=0))_cash=0;if(_src!=='cashbox'&&_cash+fundTotal+poolAmt>p+0.5){alert('جمع مبلغ تنخواه و واریزی‌های صندوق و سبد تخفیفات نمی‌تواند از اصل مبلغ خرید بیشتر باشد.');return}const _remainder=Math.max(0,pT-_cash-fundTotal);const _raw=$('purchaseBasketAmount')?String($('purchaseBasketAmount').value||'').trim():'';if(_raw!==''&&$('purchaseBasketAmount')&&$('purchaseBasketAmount').dataset.userEdited&&toRial(_raw)>_remainder+0.5){alert('مبلغ تعهد روزهای بعد نمی‌تواند از ماندهٔ تأمین‌نشده ('+money(_remainder)+' '+currencyUnit()+') بیشتر باشد.');return}basketAmount=_raw!==''?Math.max(0,Math.min(toRial(_raw),_remainder)):_remainder;_cash+=(_remainder-basketAmount);ps={cash:_cash,driver:fundTotal};$('purchaseSource').value=_cash<=0?'driver':(fundTotal<=0?'cashbox':'mixed');$('purchaseCash').value=_cash?fa(_cash):'';$('purchaseDriver').value=fundTotal?fa(fundTotal):''}
+else if(fundTotal>0){const cash=Math.max(0,pT-fundTotal);ps={cash,driver:fundTotal};$('purchaseSource').value=cash===0?'driver':'mixed';$('purchaseCash').value=cash?fa(cash):'';$('purchaseDriver').value=fundTotal?fa(fundTotal):''}else{ps=validateMixed($('purchaseSource').value,p,'purchaseCash','purchaseDriver','خرید');if(!ps)return;if(poolAmt>0){let _pl=poolAmt;const _pc=Math.min(ps.cash,_pl);ps.cash-=_pc;_pl-=_pc;const _pd=Math.min(ps.driver,_pl);ps.driver-=_pd;_pl-=_pd;if(_pl>0.5){alert('مبلغ سبد تخفیفات از مبلغ قابل تأمین این خرید بیشتر است.');return}}}if(official)ps={cash:0,driver:0};const fs={cash:0,driver:0};const supplyLink=driverEditLock?((txs.find(x=>x.id===editingId)||{}).supplyLink||null):selectedSupplyLink();if(supplyLink===undefined)return;item={id:editingId||Date.now(),date:$('txDate').value.trim()||today(),desc,deposit:0,depositType:'',purchase:p,freight:f,purchaseSource:official?'official':$('purchaseSource').value,freightSource:official?'official':'cashbox',purchaseCash:ps.cash,purchaseDriver:ps.driver,freightCash:fs.cash,freightDriver:fs.driver,driverFundUses:uses.map(u=>({...u})),supplyLink,purchaseDeliveryDate:String($('purchaseDeliveryDate')?.value||today()).trim(),purchaseDeliveryDelayDays:Number($('purchaseDeliveryDelay')?.value||0),noFreight:!!$('txNoFreight')?.checked,invoicePhoto:purchaseInvoiceChanged?purchaseInvoicePhoto:(txs.find(x=>x.id===editingId)?.invoicePhoto||purchaseInvoicePhoto||''),officialInvoice:official};if(basketAmount>0.000001){item.purchaseBasket={amount:basketAmount,remaining:basketAmount,createdDate:today(),createdBy:current?.name||'',settlements:[]}}if(driverEditLock){const _o=txs.find(x=>x.id===editingId)||{};item.purchaseSource=ps.cash<=0.000001?(ps.driver>0.000001?'driver':'cashbox'):(ps.driver<=0.000001?'cashbox':'mixed');item.freight=Number(_o.freight)||0;item.freightSource=_o.freightSource||'cashbox';item.freightCash=Number(_o.freightCash)||0;item.freightDriver=Number(_o.freightDriver)||0;item.driverFundUses=Array.isArray(_o.driverFundUses)?_o.driverFundUses.map(u=>({...u})):[];item.driverFundKind=_o.driverFundKind;item.driverFundId=_o.driverFundId;item.driverFundAllocationId=_o.driverFundAllocationId;item.driverFundAllocationIds=Array.isArray(_o.driverFundAllocationIds)?[..._o.driverFundAllocationIds]:_o.driverFundAllocationIds;item.supplyLink=_o.supplyLink;item.noFreight=!!_o.noFreight;item.purchaseDeliveryDate=_o.purchaseDeliveryDate;item.purchaseDeliveryDelayDays=_o.purchaseDeliveryDelayDays;if(basketAmount>0.000001){const _settled=_o.purchaseBasket?Math.max(0,(Number(_o.purchaseBasket.amount)||0)-(Number(_o.purchaseBasket.remaining)||0)):0;item.purchaseBasket={amount:basketAmount,remaining:Math.max(0,basketAmount-_settled),createdDate:(_o.purchaseBasket&&_o.purchaseBasket.createdDate)||today(),createdBy:(_o.purchaseBasket&&_o.purchaseBasket.createdBy)||(current&&current.name)||'',settlements:(_o.purchaseBasket&&Array.isArray(_o.purchaseBasket.settlements))?_o.purchaseBasket.settlements.map(s=>({...s})):[]}}else{item.purchaseBasket=_o.purchaseBasket}}}
 if(editingId){const old=txs.find(x=>x.id===editingId);if(old&&!driverEditLock&&mode==='purchase'){const oldBasketUses=(Array.isArray(old.driverFundUses)?old.driverFundUses:[]).filter(u=>u&&u.basket);const newUses=(Array.isArray(item.driverFundUses)?item.driverFundUses:[]).filter(u=>u&&!u.basket);if(oldBasketUses.length){item.driverFundUses=newUses.concat(oldBasketUses.map(u=>({...u})));item.purchaseDriver=(Number(item.purchaseDriver)||0)+oldBasketUses.reduce((a,u)=>a+Math.max(0,Number(u.amount)||0),0)}else{item.driverFundUses=newUses}if(old.purchaseBasket){const _ob=old.purchaseBasket;const _settled=Math.max(0,(Number(_ob.amount)||0)-(Number(_ob.remaining)||0));const _newAmount=Number(item.purchaseBasket&&item.purchaseBasket.amount||0);if(_newAmount>0.000001){item.purchaseBasket={amount:_newAmount,remaining:Math.max(0,_newAmount-_settled),createdDate:_ob.createdDate||today(),createdBy:_ob.createdBy||'',settlements:Array.isArray(_ob.settlements)?_ob.settlements.map(s=>({...s})):[]}}else{delete item.purchaseBasket}}if(releaseTxFundAllocations(editingId,{onlyNonBasket:true}).length)save(FUND_K,driverFunds)}txs=txs.map(x=>x.id===editingId?item:x)}else txs.push(item);
 if(mode==='purchase'&&!driverEditLock&&item.supplyLink?.requestId){const linkedReq=procurement.find(r=>String(r.id)===String(item.supplyLink.requestId));if(linkedReq){{const deliveryDate=String($('purchaseDeliveryDate')?.value||today()).trim();const dm=deliveryDate.match(/^(\d{4})\/(\d{1,2})\/(\d{1,2})$/);const delayRaw=String($('purchaseDeliveryDelay')?.value??0);const delay=Number(delayRaw);if(!dm||Number(dm[2])<1||Number(dm[2])>12||Number(dm[3])<1||Number(dm[3])>jalaliMonthDays(Number(dm[1]),Number(dm[2]))||`${dm[1]}/${String(Number(dm[2])).padStart(2,'0')}/${String(Number(dm[3])).padStart(2,'0')}`<today()||!/^[0-9]+$/.test(delayRaw)||!Number.isSafeInteger(delay)||delay<0||delay>365){alert('تاریخ تحویل یا تعداد روز تأخیر معتبر نیست.');return}const linkItems=item.supplyLink.items||[];linkItems.forEach(x=>{const it=linkedReq.items[Number(x.index)];if(it){it.status='bought';it.requestedQtyAtPurchase=Number(x.requestedQty??it.qty);it.boughtQty=Number(x.qty??it.qty);it.purchaseQtyChanged=Number(it.boughtQty)!==Number(it.qty);it.deliveryDate=`${dm[1]}/${String(Number(dm[2])).padStart(2,'0')}/${String(Number(dm[3])).padStart(2,'0')}`;it.deliveryDelayDays=delay;it.buyerName=current?.name||'—';linkedReq.buyerName=it.buyerName;}})}linkedReq.noFreight=!!item.noFreight;linkedReq.noFreightTxId=item.noFreight?item.id:null;save(PROC_K,procurement)}}if(mode==='purchase'&&item.driverFundUses?.length){item.driverFundUses.filter(u=>u&&!u.basket).forEach(u=>{const fund=driverFunds.find(x=>String(x.id)===u.fundId);if(!fund)return;fund.allocations=fund.allocations||[];fund.allocations.push({id:'fa_'+item.id+'_'+String(u.fundId)+'_'+Math.floor(Math.random()*9999),date:item.date,amount:u.amount,kind:'purchase',desc:item.desc||'',by:current?.name||'',txId:item.id})});save(FUND_K,driverFunds)}save(TXK,txs);resetForm();renderAll();go('ledger')}
 
@@ -2261,7 +2261,7 @@ function sourceDetailHtml(x){
  }
  if(x.deposit)return `<div class="details"><div><span>نوع واریزی</span><b>${sourceText(x.depositType)}</b></div><div><span>مبلغ</span><b>${money(x.deposit)} ریال</b></div></div>`;
  const discount=x.discount&&Number(x.discount.amount)>0?x.discount:null;const credits=Array.isArray(x.discountCredits)?x.discountCredits.filter(c=>Number(c&&c.amount)>0):[];
- return `<div class="details">${sourceBlock('اصل خرید',effectivePurchaseOf(x),x.purchaseSource,x.purchaseCash,x.purchaseDriver)}${sourceBlock('کرایه',x.freight,x.freightSource,x.freightCash,x.freightDriver)}${x.officialInvoice?`<div><span>وضعیت</span><b>پرداخت از حساب شرکت</b><small>بدون اثر در ماندهٔ حساب</small></div>`:''}<div><span>جمع سند</span><b>${money(effectivePurchaseOf(x)+(Number(x.freight)||0))} ریال</b></div>${discount?`<div><span>تخفیف ثبت‌شده</span><b>${money(discount.amount)} ریال (${fa(discount.percent)}٪)</b><small>مبلغ اولیه: ${money(discount.oldPurchase)} ریال${discount.note?' · '+esc(discount.note):''}</small></div>`:''}${credits.length?`<div><span>اعتبار منتقل‌شده به این خرید</span><b>${credits.map(c=>esc((c.fromDesc||'خرید')+' · '+money(Number(c.amount)||0)+' ریال')).join('<br>')}</b>${x.discountTransferNote?`<small>توضیحات مختصر: ${esc(x.discountTransferNote)}</small>`:''}</div>`:''}${x.purchaseBasket&&Number(x.purchaseBasket.amount||0)>0?`<div><span>تعهد روزهای بعد</span><b>مانده: ${money(Math.max(0,Number(x.purchaseBasket.remaining||0)))} ریال از ${money(Number(x.purchaseBasket.amount||0))} ریال</b></div>`:''}${(()=>{const _du=(Array.isArray(x.driverFundUses)?x.driverFundUses:[]).filter(z=>!z.basket&&Number(z.amount)>0);return _du.length?`<div><span>کارت‌های رانندگان این خرید</span><b>${_du.map(z=>esc((z.desc||driverFunds.find(f=>String(f.id)===String(z.fundId))?.desc||'کارت رانندگان')+' · '+money(Number(z.amount)||0)+' ریال')).join('<br>')}</b></div>`:''})()}</div>`}
+ return `<div class="details">${sourceBlock('اصل خرید',effectivePurchaseOf(x),x.purchaseSource,x.purchaseCash,x.purchaseDriver)}${sourceBlock('کرایه',x.freight,x.freightSource,x.freightCash,x.freightDriver)}${x.officialInvoice?`<div><span>وضعیت</span><b>پرداخت از حساب شرکت</b><small>بدون اثر در ماندهٔ حساب</small></div>`:''}<div><span>جمع سند</span><b>${money(effectivePurchaseOf(x)+(Number(x.freight)||0))} ریال</b></div>${discount?`<div><span>تخفیف ثبت‌شده</span><b>${money(discount.amount)} ریال (${fa(discount.percent)}٪)</b><small>مبلغ اولیه: ${money(discount.oldPurchase)} ریال${discount.note?' · '+esc(discount.note):''}</small></div>`:''}${credits.length?`<div><span>اعتبار منتقل‌شده به این خرید</span><b>${credits.map(c=>esc((c.fromDesc||'خرید')+' · '+money(Number(c.amount)||0)+' ریال')).join('<br>')}</b>${x.discountTransferNote?`<small>توضیحات مختصر: ${esc(x.discountTransferNote)}</small>`:''}</div>`:''}${x.purchaseBasket&&Number(x.purchaseBasket.amount||0)>0?`<div><span>تعهد روزهای بعد</span><b>مانده: ${money(Math.max(0,Number(x.purchaseBasket.remaining||0)))} ریال از ${money(Number(x.purchaseBasket.amount||0))} ریال</b></div>`:''}${Number(x.poolUsed)>0?`<div><span>مصرف سبد تخفیفات</span><b>${money(Number(x.poolUsed)||0)} ریال</b><small>این مبلغ از اصل تعهد/خرید کسر شده است${Array.isArray(x.poolCredits)&&x.poolCredits.length?' · '+x.poolCredits.map(c=>esc((c.fromDesc||'اعتبار تخفیف')+' · '+money(Number(c.amount)||0)+' ریال')).join('، '):''}</small></div>`:''}${(()=>{const _du=(Array.isArray(x.driverFundUses)?x.driverFundUses:[]).filter(z=>!z.basket&&Number(z.amount)>0);return _du.length?`<div><span>کارت‌های رانندگان این خرید</span><b>${_du.map(z=>esc((z.desc||driverFunds.find(f=>String(f.id)===String(z.fundId))?.desc||'کارت رانندگان')+' · '+money(Number(z.amount)||0)+' ریال')).join('<br>')}</b></div>`:''})()}</div>`}
 function dateKey(s){return String(s||'').replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[^0-9]/g,'')}
 function amountMatches(x,needle){if(!needle)return true;const n=num(needle);const p=withdrawPartsOf(x);return [x.deposit,x.withdraw,x.purchase,x.freight,x.purchase+x.freight,x.purchaseCash,x.purchaseDriver,x.freightCash,x.freightDriver,p.cashbox,p.driver,p.basket].some(v=>Number(v)===n)}
 const openLedgerTxs=new Set();
@@ -3774,6 +3774,7 @@ function v249ApplyPoolToTx(tx,amount){
  if(amount>v249PoolAvailable()+0.5){alert('مبلغ سبد تخفیفات کافی نیست. موجودی: '+money(v249PoolAvailable())+' '+currencyUnit());return false}
  const res=v249ConsumePool(amount);
  tx.poolUsed=(Number(tx.poolUsed)||0)+amount;
+ tx.v253PoolApplied=true;
  tx.poolCredits=Array.isArray(tx.poolCredits)?tx.poolCredits:[];
  res.used.forEach(u=>tx.poolCredits.push({poolId:u.poolId,fromDesc:u.fromDesc,amount:u.amount,date:today(),by:(current&&current.name)||''}));
  if(!String(tx.desc||'').includes('سبد تخفیفات'))tx.desc=String(tx.desc||'')+' | مصرف سبد تخفیفات: '+money(amount)+' '+currencyUnit();
@@ -4000,14 +4001,18 @@ renderWarehouse=function(){
 };
 renderProcurement=function(){const r=_v249OrigRenderProcurement.apply(this,arguments);try{v249RenderProcReturns()}catch(_){}return r};
 function v249SaveTxHandler(){
- const m=mode,poolAmt=v249ActivePoolAmount(),editId=editingId,beforeLen=(Array.isArray(txs)?txs.length:0);
- if(poolAmt>0&&poolAmt>v249PoolAvailable()+0.5){alert('مبلغ سبد تخفیفات کافی نیست. موجودی: '+money(v249PoolAvailable())+' '+currencyUnit());return}
+ const m=mode,editId=editingId,beforeLen=(Array.isArray(txs)?txs.length:0);
+ const oldTxBefore=editId?((Array.isArray(txs)?txs:[]).find(t=>String(t.id)===String(editId))||null):null;
+ const alreadyPool=oldTxBefore?Math.max(0,Number(oldTxBefore.poolUsed)||0):0;
+ const poolAmt=(m==='purchase'&&typeof v253EditPoolUsed==='number'&&v253EditPoolUsed>0)?v253EditPoolUsed:v249ActivePoolAmount();
+ if(poolAmt>0&&alreadyPool<=0&&poolAmt>v249PoolAvailable()+0.5){alert('مبلغ سبد تخفیفات کافی نیست. موجودی: '+money(v249PoolAvailable())+' '+currencyUnit());return}
  _v249OrigSaveTx.apply(this,arguments);
  let target=null;
  if(editId){if(editingId===null)target=(Array.isArray(txs)?txs:[]).find(t=>String(t.id)===String(editId));}
  else if((Array.isArray(txs)?txs.length:0)>beforeLen)target=txs[txs.length-1];
  if(target){
-  if(poolAmt>0&&v249ApplyPoolToTx(target,poolAmt)){try{renderAll()}catch(_){}try{renderLedger()}catch(_){}}
+  if(editId&&alreadyPool>0){target.poolUsed=alreadyPool;target.poolCredits=Array.isArray(oldTxBefore.poolCredits)?oldTxBefore.poolCredits.map(c=>({...c})):[];target.v253PoolApplied=true;try{save(TXK,txs)}catch(_){}try{renderAll()}catch(_){}}
+  else if(poolAmt>0&&v249ApplyPoolToTx(target,poolAmt)){try{renderAll()}catch(_){}try{renderLedger()}catch(_){}}
   v249ResetPoolInputs(m==='withdraw'?'withdraw':'purchase');
  }
 }
@@ -4315,6 +4320,57 @@ function v249SaveCashboxHandler(){
  try{v249UpdatePoolStrip()}catch(_){}
  try{renderCashboxDraft()}catch(_){}
 })();
+
+/* ================= v253: اصلاح محاسبهٔ سبد تخفیفات در خرید و تعهد روزهای بعد ================= */
+let v253EditPoolUsed=0;
+/* مبلغ سبد تخفیفات فعال برای فرم خرید (در ویرایش، همان مبلغ مصرف‌شدهٔ قبلی) */
+function v253ActivePurchasePoolAmount(){
+ if(v253EditPoolUsed>0)return Math.max(0,Math.round(v253EditPoolUsed));
+ if(mode!=='purchase')return 0;
+ const t=$('purchasePoolToggle');if(!t||!t.checked)return 0;
+ return Math.max(0,Math.round(toRial($('purchasePoolAmount')?.value||'')||0));
+}
+/* ترمیم یک‌بارهٔ خریدهایی که سبد تخفیفاتشان مصرف شده ولی از تعهد/تنخواه کسر نشده بود */
+function v253HealPoolBaskets(){
+ if(!Array.isArray(txs))return false;
+ let changed=false;
+ txs.forEach(x=>{try{
+  if(!x)return;
+  const pu=Math.max(0,Math.round(Number(x.poolUsed)||0));
+  if(pu<=0)return;
+  if(x.v253PoolApplied)return;
+  const isDep=!!x.deposit&&!Number(x.withdraw);
+  const isWd=isWithdrawTx(x);
+  if(!isDep&&!isWd){
+   let left=pu;
+   if(x.purchaseBasket&&Number(x.purchaseBasket.amount)>0){
+    const amt=Math.max(0,Number(x.purchaseBasket.amount)||0);
+    const rem=Math.max(0,Number(x.purchaseBasket.remaining)||0);
+    const settled=Math.max(0,amt-rem);
+    const applied=Math.min(amt,left);
+    const newAmt=amt-applied;
+    x.purchaseBasket.amount=newAmt;
+    x.purchaseBasket.remaining=Math.max(0,newAmt-settled);
+    left-=applied;
+   }
+   if(left>0)x.purchaseCash=Math.max(0,(Number(x.purchaseCash)||0)-left);
+  }
+  x.v253PoolApplied=true;
+  changed=true;
+ }catch(_){}});
+ if(changed){try{save(TXK,txs)}catch(_){}}
+ return changed;
+}
+const _v253OrigReloadFromLocal=reloadFromLocal;
+reloadFromLocal=function(){const r=_v253OrigReloadFromLocal.apply(this,arguments);try{v253HealPoolBaskets()}catch(_){}return r};
+const _v253OrigResetForm=resetForm;
+resetForm=function(){v253EditPoolUsed=0;try{const t=$('purchasePoolToggle');if(t)t.disabled=false;const a=$('purchasePoolAmount');if(a)a.disabled=false;}catch(_){}return _v253OrigResetForm.apply(this,arguments)};
+const _v253OrigResetPoolInputs=v249ResetPoolInputs;
+v249ResetPoolInputs=function(which){if(which==='purchase'||which===undefined){v253EditPoolUsed=0;try{const t=$('purchasePoolToggle');if(t)t.disabled=false;const a=$('purchasePoolAmount');if(a)a.disabled=false;}catch(_){}}return _v253OrigResetPoolInputs.apply(this,arguments)};
+const _v253OrigEditTx=editTx;
+editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,arguments);try{const x=(Array.isArray(txs)?txs:[]).find(t=>String(t.id)===String(id));if(x&&!x.deposit&&!isWithdrawTx(x)){const pu=Math.max(0,Number(x.poolUsed)||0);if(pu>0){v253EditPoolUsed=pu;const t=$('purchasePoolToggle');if(t){t.checked=true;t.disabled=true;}const a=$('purchasePoolAmount');if(a){a.value=fa(moneyInputValue(pu));a.disabled=true;}const rw=$('purchasePoolRow');if(rw)rw.classList.remove('hidden');const mx=$('purchasePoolMax');if(mx)mx.textContent='موجودی: '+money(v249PoolAvailable())+' '+currencyUnit();}}}catch(_){}return r};
+/* وقتی مبلغ/تیک سبد تخفیفات عوض شود، پیش‌نمایش تعهد فوراً به‌روز شود */
+['purchasePoolToggle','purchasePoolAmount'].forEach(id=>{const el=$(id);if(!el)return;const h=()=>{try{updatePurchaseBasketPreview(selectedPurchaseFundUses().reduce((a,x)=>a+x.amount,0))}catch(_){}};el.addEventListener('input',h);el.addEventListener('change',h);});
 
 boot();
 })();
