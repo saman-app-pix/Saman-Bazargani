@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#ffffff" name="theme-color"/>
-<meta name="saman-build" content="v254"/>
+<meta name="saman-build" content="v255"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; manifest-src 'self'; connect-src 'self' https://eiobajtihwxdlfxufmbg.supabase.co wss://eiobajtihwxdlfxufmbg.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
@@ -530,7 +530,7 @@ textarea{min-height:64px}
 #pageWarehouse .warehouseBatchTools>button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:34px!important;height:auto!important;margin:0!important;padding:5px 3px!important;border-radius:8px!important;font-family:inherit!important;font-size:clamp(9px,2.45vw,11px)!important;font-weight:600!important;line-height:1.3!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;box-sizing:border-box!important}
 @media(max-width:360px){#pageWarehouse .warehouseSection>.listTabs>button{font-size:11px!important;padding:5px 3px!important}#pageWarehouse .warehouseBatchTools{gap:4px!important;padding:4px!important}#pageWarehouse .warehouseBatchTools>button{font-size:9px!important;padding:4px 2px!important;min-height:34px!important}}
 </style>
-<meta name="saman-build" content="v254">
+<meta name="saman-build" content="v255">
 
 <style id="v213-fund-transfer-split">
 .fundActOverlay,.fundPickerOverlay{position:fixed;inset:0;z-index:100520;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;background:rgba(15,28,45,.48);backdrop-filter:blur(2px)}
@@ -943,13 +943,209 @@ button.supplyLinkTag{border:0;font-family:inherit;text-align:right;cursor:pointe
 <button class="outline danger" id="deleteAll" style="width:100%">حذف همه تراکنش‌ها</button>
 </div>
 </section>
+<section class="page" id="pagePeople">
+<div class="content">
+ <div class="title">اشخاص</div>
+ <div class="pplSum" id="pplSum">
+  <div class="pplSumCard"><span class="pplSumLabel">اشخاص</span><b class="pplSumVal" id="pplSumCount">0</b></div>
+  <div class="pplSumCard"><span class="pplSumLabel">بدهی ما</span><b class="pplSumVal" id="pplSumDebt">0</b></div>
+  <div class="pplSumCard"><span class="pplSumLabel">طلب ما</span><b class="pplSumVal" id="pplSumCredit">0</b></div>
+ </div>
+ <div class="pplBar">
+  <div class="pplSearchWrap" id="pplSearchWrap">
+   <button type="button" class="pplIconBtn" id="pplSearchBtn" title="جست‌وجو" aria-label="جست‌وجو"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></svg></button>
+   <input type="search" class="pplSearch hidden" id="pplSearch" placeholder="جست‌وجو در نام و نوع…" autocomplete="off"/>
+  </div>
+  <span class="pplBarSpacer"></span>
+  <button type="button" class="pplIconBtn" id="pplSortBtn" title="مرتب‌سازی" aria-label="مرتب‌سازی"><svg viewBox="0 0 24 24"><path d="M7 4v15"/><path d="m3.5 15.5 3.5 3.5 3.5-3.5"/><path d="M17 20V5"/><path d="m13.5 8.5 3.5-3.5 3.5 3.5"/></svg></button>
+  <button type="button" class="pplIconBtn" id="pplFilterBtn" title="فیلتر نوع" aria-label="فیلتر نوع"><svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M7 12h10"/><path d="M10 18h4"/></svg></button>
+  <button type="button" class="pplIconBtn" id="pplThemeBtn" title="طرح کارت‌ها" aria-label="طرح کارت‌ها"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="3"/><path d="M7 9h10"/><path d="M7 13h6"/></svg></button>
+  <button type="button" class="pplIconBtn pplAccent" id="pplAddBtn" title="افزودن شخص" aria-label="افزودن شخص"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+ </div>
+ <div class="pplPops" id="pplPops"></div>
+ <div class="pplGrid" id="pplGrid"></div>
+</div>
+</section>
+<div class="pplSheet hidden" id="pplLedgerSheet" role="dialog" aria-modal="true">
+ <div class="pplShade" data-ppl-close="1"></div>
+ <div class="pplSheetPanel">
+  <div class="pplBalBox" id="pplBalBox">
+   <div class="pplBalTop">
+    <div class="pplBalIdCol">
+     <div class="pplBalName" id="pplBalName"></div>
+     <div class="pplBalType" id="pplBalType"></div>
+    </div>
+    <div class="pplBalAmtCol">
+     <b class="pplBalAmt" id="pplBalAmt"></b>
+     <span class="pplBalLbl" id="pplBalLbl"></span>
+    </div>
+   </div>
+   <div class="pplBalPhone" id="pplBalPhone"></div>
+   <div class="pplBalTools">
+    <button type="button" class="pplBalTool" id="pplLedgerSearchBtn" aria-label="جست‌وجو در گردش"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></svg></button>
+    <button type="button" class="pplBalTool" id="pplLedgerExcelBtn" aria-label="خروجی اکسل"><svg viewBox="0 0 24 24"><path d="M12 3v11"/><path d="m8 10.5 4 4 4-4"/><path d="M5 19.5h14"/></svg></button>
+   </div>
+  </div>
+  <div class="pplLedgerSearch hidden" id="pplLedgerSearch"><input type="search" id="pplLedgerSearchInput" placeholder="جست‌وجو در این گردش…" autocomplete="off"/></div>
+  <div class="pplLedgerList" id="pplLedgerList"></div>
+  <div class="pplSheetCloseRow"><button type="button" class="pplSheetCloseBtn" data-ppl-close="1">بستن</button></div>
+ </div>
+</div>
+<div class="pplSheet hidden" id="pplPersonSheet" role="dialog" aria-modal="true">
+ <div class="pplShade" data-ppl-close="1"></div>
+ <div class="pplSheetPanel">
+  <div class="pplFormHead"><b id="pplFormTitle">شخص جدید</b><button type="button" class="pplX" data-ppl-close="1" aria-label="بستن">×</button></div>
+  <label class="pplLabel">نام شخص <span class="pplReq">*</span></label>
+  <input type="text" class="pplInput" id="pplName" placeholder="نام شخص یا شرکت"/>
+  <label class="pplLabel">نوع</label>
+  <div class="pplTypeRow">
+   <select class="pplInput" id="pplType"></select>
+   <button type="button" class="pplMiniBtn" id="pplNewTypeBtn">نوع جدید</button>
+  </div>
+  <div class="pplNewType hidden" id="pplNewTypeWrap">
+   <input type="text" class="pplInput" id="pplNewTypeInput" placeholder="نام نوع جدید"/>
+   <button type="button" class="pplMiniBtn" id="pplNewTypeSave">افزودن</button>
+  </div>
+  <label class="pplLabel">شماره تماس (اختیاری)</label>
+  <input type="text" class="pplInput" id="pplPhone" inputmode="tel" placeholder="۰۹…"/>
+  <label class="pplLabel">ماندهٔ اولیه (اختیاری)</label>
+  <input type="text" class="pplInput" id="pplOpening" inputmode="numeric" placeholder="0"/>
+  <div class="pplFormActions">
+   <button type="button" class="pplPrimary" id="pplSubmit">ثبت شخص جدید</button>
+   <button type="button" class="pplGhost" data-ppl-close="1">انصراف</button>
+  </div>
+ </div>
+</div>
+<style id="ppl-styles">
+#pagePeople .title{margin-bottom:10px}
+.pplSum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.pplSumCard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 6px;text-align:center;box-shadow:var(--shadow)}
+.pplSumLabel{display:block;font-size:11.5px;color:var(--muted);margin-bottom:5px}
+.pplSumVal{font-size:16px;font-weight:bold;color:var(--text);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pplBar{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.pplBarSpacer{flex:1}
+.pplSearchWrap{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
+.pplSearch{flex:1;min-width:0;height:40px;border:1px solid var(--line);border-radius:12px;padding:0 12px;font-family:inherit;font-size:13px;background:var(--card);color:var(--text)}
+.pplSearch.hidden{display:none}
+.pplIconBtn{width:40px;height:40px;min-width:40px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--blue);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s;padding:0}
+.pplIconBtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pplIconBtn:hover{background:#eef4f9}
+.pplIconBtn:active{transform:scale(.94)}
+.pplIconBtn.pplAccent{background:var(--blue);border-color:var(--blue);color:#fff}
+.pplIconBtn.pplAccent:hover{background:var(--blue2)}
+.pplIconBtn.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.pplPops{margin-bottom:10px}
+.pplPop{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;box-shadow:var(--shadow)}
+.pplPop.hidden{display:none}
+.pplPopTitle{font-size:12px;color:var(--muted);margin:0 2px 8px}
+.pplPopRow{display:flex;flex-wrap:wrap;gap:7px}
+.pplPopChip{border:1px solid var(--line);background:#f7fafc;border-radius:10px;padding:7px 11px;font-family:inherit;font-size:12.5px;color:var(--text);cursor:pointer}
+.pplPopChip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.pplPatSwatch{display:flex;flex-direction:column;align-items:center;gap:5px;border:2px solid transparent;border-radius:12px;padding:5px;background:none;cursor:pointer;font-family:inherit;font-size:11px;color:var(--muted)}
+.pplPatSwatch.on{border-color:var(--blue);color:var(--blue)}
+.pplPatSwatch i{display:block;width:52px;height:34px;border-radius:9px;background-image:linear-gradient(135deg,#35795f,#63ab8e);background-size:var(--patSize,auto);position:relative;overflow:hidden}
+.pplPatSwatch i::after{content:'';position:absolute;inset:0;background-image:var(--pat,none);background-size:var(--patSize,auto)}
+.pplGrid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:600px){.pplGrid{grid-template-columns:1fr 1fr}}
+.pplCard{position:relative;overflow:hidden;border-radius:18px;padding:15px 16px;min-height:150px;display:flex;flex-direction:column;justify-content:space-between;color:#fff;background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 8px 20px rgba(20,45,65,.16);cursor:pointer}
+.pplCard::before{content:'';position:absolute;inset:0;background-image:var(--pat,none);background-size:var(--patSize,auto);pointer-events:none}
+.pplCard::after{content:'';position:absolute;inset:0;background:radial-gradient(120% 90% at 100% 0%,rgba(255,255,255,.14),transparent 60%);pointer-events:none}
+.pplCard>*{position:relative;z-index:1}
+.pplCardTop{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.pplCardName{font-size:16px;font-weight:bold;line-height:1.5;text-shadow:0 1px 2px rgba(0,0,0,.12)}
+.pplCardType{font-size:8.5px;background:rgba(255,255,255,.22);border-radius:20px;padding:3px 8px;white-space:nowrap;font-weight:bold;letter-spacing:.2px}
+.pplCardMid{display:flex;align-items:center;gap:10px;margin:8px 0}
+.pplChip{width:36px;height:26px;border-radius:6px;background:linear-gradient(135deg,#f2d79b,#caa54e);box-shadow:inset 0 0 0 1px rgba(255,255,255,.5);position:relative;flex-shrink:0}
+.pplChip::before{content:'';position:absolute;inset:6px 5px;border:1px solid rgba(120,90,20,.5);border-radius:3px}
+.pplWaves{display:flex;gap:2px;align-items:center;opacity:.85}
+.pplWaves i{display:block;width:3px;border:1.4px solid rgba(255,255,255,.85);border-radius:50%;border-left-color:transparent;border-top-color:transparent;border-bottom-color:transparent;height:14px}
+.pplWaves i:nth-child(1){height:8px}
+.pplWaves i:nth-child(2){height:13px}
+.pplWaves i:nth-child(3){height:18px}
+.pplCardHr{flex:1}
+.pplCardBalRow{display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
+.pplCardBal{font-size:20px;font-weight:bold;line-height:1.2}
+.pplCardBalLbl{font-size:12px;opacity:.95;margin-inline-start:6px}
+.pplCardBalLbl.debt{color:#ffbfa3}
+.pplCardBalLbl.credit{color:#a9edc6}
+.pplDot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-inline-end:5px;vertical-align:middle}
+.pplEmpty{grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:34px 10px;background:var(--card);border:1px dashed var(--line);border-radius:16px}
+/* Sheets */
+.pplSheet{position:fixed;inset:0;z-index:1400;display:flex;align-items:flex-end;justify-content:center}
+.pplSheet.hidden{display:none}
+.pplShade{position:absolute;inset:0;background:rgba(16,32,45,.42);backdrop-filter:blur(1px)}
+.pplSheetPanel{position:relative;width:100%;max-width:680px;max-height:92vh;overflow:auto;background:var(--bg);border-radius:22px 22px 0 0;padding:14px 14px 20px;box-shadow:0 -8px 30px rgba(0,0,0,.2);animation:pplUp .22s ease}
+@keyframes pplUp{from{transform:translateY(28px);opacity:.4}to{transform:none;opacity:1}}
+.pplBalBox{position:relative;overflow:hidden;border-radius:18px;padding:16px 16px 42px;color:#fff;background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 8px 20px rgba(20,45,65,.18);margin-bottom:12px}
+.pplBalBox::before{content:'';position:absolute;inset:0;background-image:var(--pat,none);background-size:var(--patSize,auto);pointer-events:none}
+.pplBalBox::after{content:'';position:absolute;inset:0;background:radial-gradient(120% 90% at 100% 0%,rgba(255,255,255,.14),transparent 60%);pointer-events:none}
+.pplBalBox>*{position:relative;z-index:1}
+.pplBalTop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.pplBalName{font-size:17px;font-weight:bold;line-height:1.5}
+.pplBalType{display:inline-block;font-size:8.5px;background:rgba(255,255,255,.22);border-radius:20px;padding:3px 8px;margin-top:6px;font-weight:bold}
+.pplBalAmtCol{text-align:left;flex-shrink:0}
+.pplBalAmt{font-size:19px;font-weight:bold;display:block;line-height:1.2}
+.pplBalLbl{font-size:12px;opacity:.95;display:block;margin-top:3px}
+.pplBalLbl.debt{color:#ffbfa3}
+.pplBalLbl.credit{color:#a9edc6}
+.pplBalPhone{font-size:12px;opacity:.92;margin-top:9px;direction:ltr;text-align:start;unicode-bidi:embed}
+.pplBalPhone.empty{display:none}
+.pplBalTools{position:absolute;left:13px;bottom:12px;display:flex;gap:7px;z-index:2}
+.pplBalTool{width:32px;height:32px;border-radius:10px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.16);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.pplBalTool svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.pplBalTool:active{transform:scale(.93)}
+.pplLedgerSearch{padding:0 2px 10px}
+.pplLedgerSearch.hidden{display:none}
+.pplLedgerSearch input{width:100%;height:40px;border:1px solid var(--line);border-radius:12px;padding:0 12px;font-family:inherit;font-size:13px;background:var(--card);color:var(--text)}
+.pplLedgerList{display:flex;flex-direction:column;gap:8px}
+.pplRow{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:10px 12px}
+.pplRowIco{width:34px;height:34px;min-width:34px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.pplRowIco svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pplRowIco.t-purchase{background:#eaf1f7;color:#2f6f9e}
+.pplRowIco.t-withdraw{background:#fdecec;color:#c0504a}
+.pplRowIco.t-deposit{background:#e9f6ee;color:#2e7d55}
+.pplRowIco.t-return{background:#fdf1e6;color:#b8802f}
+.pplRowIco.t-discount{background:#f1ecf8;color:#6b57a0}
+.pplRowIco.t-adjust{background:#eef1f4;color:#556b82}
+.pplRowMain{flex:1;min-width:0}
+.pplRowTitle{font-size:13.5px;font-weight:bold;color:var(--text);display:flex;align-items:center;gap:6px}
+.pplRowMeta{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.7}
+.pplRowAmt{font-size:13.5px;font-weight:bold;white-space:nowrap;text-align:left}
+.pplRowAmt.debt{color:var(--red)}
+.pplRowAmt.credit{color:var(--green)}
+.pplRowRun{font-size:10.5px;color:var(--muted);margin-top:2px;display:block;text-align:left}
+.pplTag{font-size:9.5px;background:#eef4f9;color:var(--blue);border-radius:20px;padding:2px 7px;font-weight:normal}
+.pplRemain{font-size:11px;color:#b8802f;margin-top:3px}
+.pplSheetCloseRow{margin-top:14px}
+.pplSheetCloseBtn{width:100%;height:46px;border:none;border-radius:13px;background:#e8eef3;color:var(--text);font-family:inherit;font-size:14px;font-weight:bold;cursor:pointer}
+.pplEmptyLedger{text-align:center;color:var(--muted);font-size:13px;padding:26px 10px;background:var(--card);border:1px dashed var(--line);border-radius:14px}
+/* Person form */
+.pplFormHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.pplFormHead b{font-size:17px}
+.pplX{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--muted);font-size:18px;line-height:1;cursor:pointer}
+.pplLabel{display:block;font-size:12.5px;color:var(--muted);margin:12px 2px 6px}
+.pplReq{color:var(--red)}
+.pplInput{width:100%;height:46px;border:1px solid var(--line);border-radius:13px;padding:0 13px;font-family:inherit;font-size:14px;background:var(--card);color:var(--text);box-sizing:border-box}
+select.pplInput{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 20px,calc(100% - 13px) 20px;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+.pplTypeRow{display:flex;gap:8px}
+.pplTypeRow .pplInput{flex:1}
+.pplMiniBtn{border:1px solid var(--line);background:var(--card);color:var(--blue);border-radius:13px;padding:0 13px;font-family:inherit;font-size:12.5px;cursor:pointer;white-space:nowrap}
+.pplNewType{display:flex;gap:8px;margin-top:8px}
+.pplNewType.hidden{display:none}
+.pplNewType .pplInput{flex:1}
+.pplFormActions{display:flex;gap:8px;margin-top:18px}
+.pplPrimary{flex:1;height:48px;border:none;border-radius:14px;background:var(--blue);color:#fff;font-family:inherit;font-size:14.5px;font-weight:bold;cursor:pointer}
+.pplPrimary:hover{background:var(--blue2)}
+.pplGhost{height:48px;border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--muted);font-family:inherit;font-size:13.5px;padding:0 16px;cursor:pointer}
+.pplTick{width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+</style>
 </main>
 <nav class="bottom"><div class="nav">
 
 
 
 
-<button class="active" data-go="home"><span class="ico"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg></span>خانه</button><button data-go="add" id="addNav"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/><path d="M5 5h4" opacity=".35"/></svg></span>ثبت</button><button data-go="ledger"><span class="ico"><svg viewBox="0 0 24 24"><path d="M5 5h14v14H5z"/><path d="M8 9h8M8 12h8M8 15h5"/></svg></span>گردش حساب</button><button data-go="pricing"><span class="ico" style="font-weight:900;font-size:21px">$</span>قیمت‌گذاری</button><button data-go="procurement"><span class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h2l2 10h10l2-7H7"/><path d="M9 19h.01M17 19h.01"/></svg></span>بازرگانی</button><button data-go="warehouse"><span class="ico"><svg viewBox="0 0 24 24"><path d="M3 17V8h8l3 5h4a3 3 0 0 1 3 3v1H3Z"/><path d="M11 8v5M14 13h-3M19 5v12M22 5v12M6.5 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM17.5 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg></span>انبار</button><button data-go="manage"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>پنل کاربری</button></div></nav>
+<button class="active" data-go="home"><span class="ico"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg></span>خانه</button><button data-go="add" id="addNav"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/><path d="M5 5h4" opacity=".35"/></svg></span>ثبت</button><button data-go="ledger"><span class="ico"><svg viewBox="0 0 24 24"><path d="M5 5h14v14H5z"/><path d="M8 9h8M8 12h8M8 15h5"/></svg></span>گردش حساب</button><button data-go="pricing"><span class="ico" style="font-weight:900;font-size:21px">$</span>قیمت‌گذاری</button><button data-go="procurement"><span class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h2l2 10h10l2-7H7"/><path d="M9 19h.01M17 19h.01"/></svg></span>بازرگانی</button><button data-go="warehouse"><span class="ico"><svg viewBox="0 0 24 24"><path d="M3 17V8h8l3 5h4a3 3 0 0 1 3 3v1H3Z"/><path d="M11 8v5M14 13h-3M19 5v12M22 5v12M6.5 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM17.5 20a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/></svg></span>انبار</button><button data-go="manage"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span>پنل کاربری</button><button data-go="people"><span class="ico"><svg viewBox="0 0 24 24"><path d="M9 12a3.2 3.2 0 1 0 0-6.4A3.2 3.2 0 0 0 9 12Z"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 6.3a3 3 0 0 1 0 5.4"/><path d="M17.5 20a6 6 0 0 0-2-4.5"/></svg></span>اشخاص</button></div></nav>
 </div>
 <div id="notificationModal" class="notificationModal hidden" role="dialog" aria-modal="true" aria-labelledby="notificationTitle"><div class="notificationShade" data-close-notifications="1"></div><div class="notificationDialog"><div class="notificationHead"><div><b id="notificationTitle">پیام‌ها</b><small id="notificationSubtitle">پیام‌های مرتبط با شما</small></div><button type="button" id="closeNotifications" class="notificationClose" aria-label="بستن">×</button></div><div class="notificationPages" role="tablist" aria-label="صفحه پیام‌ها"><button type="button" class="notificationPageTab active" data-message-page="unread" role="tab" aria-selected="true">خوانده‌نشده</button><button type="button" class="notificationPageTab" data-message-page="read" role="tab" aria-selected="false">خوانده‌شده</button></div><div class="notificationSearchWrap"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg><input id="notificationSearch" type="search" placeholder="جست‌وجو در پیام‌ها..." autocomplete="off" aria-label="جست‌وجو در همه بخش‌های پیام"/><button id="clearNotificationSearch" type="button" aria-label="پاک‌کردن جست‌وجو" class="hidden">×</button></div><div class="notificationToolbar"><button type="button" id="markNotificationsRead">خواندن همه</button></div><div id="notificationList" class="notificationList"></div></div></div>
 
@@ -1132,15 +1328,15 @@ button.supplyLinkTag{border:0;font-family:inherit;text-align:right;cursor:pointe
 (function(){
 'use strict';
 const $=id=>document.getElementById(id);
-const APP='bazargani_saman_v1', TXK=APP+'_tx', UK=APP+'_users', UPK=APP+'_lastUpdate', FUND_K=APP+'_driver_funds', FUND_DAY_CLOSE_K=APP+'_driver_fund_day_closures', CLEAR_K=APP+'_clear_v1', DEL_K=APP+'_deleted_v1', RECON_K=APP+'_recons';
+const APP='bazargani_saman_v1', TXK=APP+'_tx', UK=APP+'_users', UPK=APP+'_lastUpdate', FUND_K=APP+'_driver_funds', FUND_DAY_CLOSE_K=APP+'_driver_fund_day_closures', CLEAR_K=APP+'_clear_v1', DEL_K=APP+'_deleted_v1', RECON_K=APP+'_recons', PEOPLE_K=APP+'_people', PTYPE_K=APP+'_person_types';
 // Supabase cloud connection (publishable key; safe to include in browser code).
 const SUPABASE_URL='https://eiobajtihwxdlfxufmbg.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_Jw-XUnzexgGbJO011YDdIw_MJsMitbi';
 const supabase=window.supabase?.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,experimental:{passkey:true}}});
 const DISCOUNT_POOL_K=APP+'_discount_pool';
-const CLOUD_KEYS=[TXK,UK,UPK,FUND_K,FUND_DAY_CLOSE_K,APP+'_roles',APP+'_procurement',APP+'_quotes',DISCOUNT_POOL_K,APP+'_recons','bazargani_last_publish_v1',CLEAR_K,DEL_K];
+const CLOUD_KEYS=[TXK,UK,UPK,FUND_K,FUND_DAY_CLOSE_K,APP+'_roles',APP+'_procurement',APP+'_quotes',DISCOUNT_POOL_K,APP+'_recons','bazargani_last_publish_v1',CLEAR_K,DEL_K,PEOPLE_K,PTYPE_K];
 // v232: فهرست‌های اصلی که هرگز نباید با نسخهٔ ناقص/کهنه بازنویسی شوند و همیشه «اجتماعی» ادغام می‌شوند.
-const CORE_ARRAY_KEYS=[TXK,FUND_K,APP+'_procurement',APP+'_quotes',DISCOUNT_POOL_K,RECON_K];
+const CORE_ARRAY_KEYS=[TXK,FUND_K,APP+'_procurement',APP+'_quotes',DISCOUNT_POOL_K,RECON_K,PEOPLE_K];
 let cloudUser=null,cloudSyncTimer=null,cloudSyncBusy=false,cloudSyncAgain=false,cloudRealtimeChannel=null,cloudPollTimer=null,lastCloudUpdatedAt='';
 let cloudClearKeys=new Set();
 // v223: کلیدهای تغییرکردهٔ محلی که هنوز به سرور نرفته‌اند (پایدار در localStorage).
@@ -1153,6 +1349,10 @@ let cloudReady=false,cloudRecoveryDone=false,cloudDamaged=false;
 let driverFunds=load(FUND_K,[]), driverFundDayClosures=load(FUND_DAY_CLOSE_K,{});
 let txs=load(TXK,[]),users=load(UK,[]),current=null,mode='deposit',editingId=null;
 let discountPool=load(DISCOUNT_POOL_K,[]);
+// v255: اشخاص (تأمین‌کننده/مشتری/همکار/سایر) + نوع‌های شخص + طرح پس‌زمینهٔ کارت‌ها
+let persons=load(PEOPLE_K,[]);
+let personTypes=load(PTYPE_K,['تأمین‌کننده','مشتری','همکار','سایر']);
+let peoplePattern=(()=>{try{return localStorage.getItem('bazargani_people_pattern_v1')||'rings'}catch(_){return 'rings'}})();
 let purchaseInvoicePhoto='',purchaseInvoiceChanged=false;
 function loadNumberStyle(){try{localStorage.setItem('bazargani_number_style_v1','en')}catch(e){}return 'en'}
 function loadCurrency(){try{return localStorage.getItem('bazargani_currency_v1')||'rial'}catch(e){return 'rial'}}
@@ -1170,7 +1370,7 @@ const persianDate=d=>{const parts=new Intl.DateTimeFormat('en-US-u-ca-persian',{
 const today=()=>persianDate(new Date());
 const nowParts=()=>{const d=new Date();return {date:persianDate(d),time:new Intl.DateTimeFormat('en-US',{hour:'2-digit',minute:'2-digit',hour12:false}).format(d),iso:d.toISOString()}};
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-const sourceText=s=>s==='cashbox'?'تنخواه':s==='driver'?'کارت رانندگان':s==='official'?'واریز مستقیم از حساب شرکت':s==='credit'?'اعتبار خرید بعدی':s==='return'?'مرجوعی':'ترکیبی';
+const sourceText=s=>s==='cashbox'?'تنخواه':s==='driver'?'کارت رانندگان':s==='person'?'حساب شخص':s==='official'?'واریز مستقیم از حساب شرکت':s==='credit'?'اعتبار خرید بعدی':s==='return'?'مرجوعی':'ترکیبی';
 function load(k,f){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(f))}catch(e){return f}}
 // v232: به هر رکوردِ «تغییرکرده» یک مهر زمان (_m) می‌زند تا ادغام چنددستگاهی بتواند
 // تازه‌ترین نسخه را تشخیص دهد و هیچ رکوردی با نسخهٔ کهنه‌تر بازنویسی/پاک نشود.
@@ -1497,7 +1697,7 @@ async function hydrateDevice(){try{await openDeviceDB()}catch(e){return false}
  txs=load(TXK,[]);users=load(UK,[]);return true}
 const isStrongPassword=p=>typeof p==='string'&&p.length>=10&&/[a-z]/.test(p)&&/[A-Z]/.test(p)&&/\d/.test(p);
 const RK=APP+'_roles';
-const defaultPermissions={homeView:true,cardFinance:false,cardProcurement:false,cardFundManager:false,financeReconcile:false,financeReconcileLedger:false,txView:false,depositCreate:false,depositEdit:false,depositDelete:false,purchaseCreate:false,purchaseEdit:false,purchaseDelete:false,fundUse:false,ledgerView:true,ledgerEdit:false,pricingView:false,pricingEdit:false,pricingFinalize:false,pricingReturn:false,procurementView:false,procurementListView:true,procurementCreate:false,procurementApprove:false,supplyUpdate:false,quoteCreate:false,quoteView:true,quoteRespond:false,quoteEdit:false,warehouseView:false,warehouseReceive:false,warehouseEdit:false,fundView:false,fundManage:false,fundAllocate:false,fundReturn:false,fundCloseDay:false,fundSplit:false,cashboxCharge:false,manage:false,manageUsers:false,manageRoles:false,settingsView:true,notificationsView:true,import:false,export:false,publish:false,deleteAll:false};
+const defaultPermissions={homeView:true,cardFinance:false,cardProcurement:false,cardFundManager:false,financeReconcile:false,financeReconcileLedger:false,txView:false,depositCreate:false,depositEdit:false,depositDelete:false,purchaseCreate:false,purchaseEdit:false,purchaseDelete:false,fundUse:false,ledgerView:true,ledgerEdit:false,pricingView:false,pricingEdit:false,pricingFinalize:false,pricingReturn:false,procurementView:false,procurementListView:true,procurementCreate:false,procurementApprove:false,supplyUpdate:false,quoteCreate:false,quoteView:true,quoteRespond:false,quoteEdit:false,warehouseView:false,warehouseReceive:false,warehouseEdit:false,fundView:false,fundManage:false,fundAllocate:false,fundReturn:false,fundCloseDay:false,fundSplit:false,cashboxCharge:false,manage:false,manageUsers:false,manageRoles:false,settingsView:true,notificationsView:true,peopleView:true,import:false,export:false,publish:false,deleteAll:false};
 // v200: نقشهٔ گروه‌بندی‌شدهٔ دسترسی‌ها برای صفحهٔ مدیریت سمت‌ها. هر آیتم: [کلید, عنوان, توضیح]
 const PERM_GROUPS=[
  {id:'home',title:'خانه و داشبورد',icon:'home',items:[
@@ -1517,7 +1717,9 @@ const PERM_GROUPS=[
  {id:'ledger',title:'گردش حساب',icon:'list',items:[
    ['ledgerView','مشاهدهٔ گردش حساب','دیدن فهرست تراکنش‌ها'],
    ['ledgerEdit','ویرایش و حذف ردیف‌ها','اصلاح یا حذف از داخل گردش']]},
- {id:'pricing',title:'قیمت‌گذاری',icon:'tag',items:[
+ {id:'people',title:'اشخاص',icon:'list',items:[
+    ['peopleView','مشاهدهٔ صفحهٔ اشخاص','دیدن فهرست اشخاص و گردش حساب هر شخص']]},
+  {id:'pricing',title:'قیمت‌گذاری',icon:'tag',items:[
    ['pricingView','مشاهدهٔ قیمت‌گذاری','دیدن تب قیمت‌گذاری'],
    ['pricingEdit','ثبت و ویرایش قیمت','واردکردن قیمت پایهٔ کالاها'],
    ['pricingFinalize','نهایی‌سازی سند قیمت','بستن سند قیمت یک نوبت تحویل'],
@@ -4373,6 +4575,433 @@ const _v253OrigEditTx=editTx;
 editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,arguments);try{const x=(Array.isArray(txs)?txs:[]).find(t=>String(t.id)===String(id));if(x&&!x.deposit&&!isWithdrawTx(x)){const pu=Math.max(0,Number(x.poolUsed)||0);if(pu>0){v253EditPoolUsed=pu;const t=$('purchasePoolToggle');if(t){t.checked=true;t.disabled=true;}const a=$('purchasePoolAmount');if(a){a.value=fa(moneyInputValue(pu));a.disabled=true;}const rw=$('purchasePoolRow');if(rw)rw.classList.remove('hidden');const mx=$('purchasePoolMax');if(mx)mx.textContent='موجودی: '+money(v249PoolAvailable())+' '+currencyUnit();}}}catch(_){}return r};
 /* وقتی مبلغ/تیک سبد تخفیفات عوض شود، پیش‌نمایش تعهد فوراً به‌روز شود */
 ['purchasePoolToggle','purchasePoolAmount'].forEach(id=>{const el=$(id);if(!el)return;const h=()=>{try{updatePurchaseBasketPreview(selectedPurchaseFundUses().reduce((a,x)=>a+x.amount,0))}catch(_){}};el.addEventListener('input',h);el.addEventListener('change',h);});
+
+/* ================= v255: صفحهٔ اشخاص (اشخاص / تأمین‌کننده / مشتری) ================= */
+(function(){
+ 'use strict';
+ var PATTERNS={
+  rings:{pat:'radial-gradient(circle at 88% -12%,transparent 92px,rgba(255,255,255,.16) 93px,transparent 95px),radial-gradient(circle at 88% -12%,transparent 150px,rgba(255,255,255,.09) 151px,transparent 153px)',size:'auto'},
+  glow:{pat:'radial-gradient(130% 95% at 100% 0%,rgba(255,255,255,.22),transparent 58%),radial-gradient(95% 75% at 0% 100%,rgba(255,255,255,.08),transparent 60%)',size:'auto'},
+  hairline:{pat:'repeating-linear-gradient(115deg,rgba(255,255,255,.07) 0 1px,transparent 1px 24px)',size:'auto'},
+  arc:{pat:'radial-gradient(circle at 8% 122%,transparent 120px,rgba(255,255,255,.16) 121px,transparent 123px),radial-gradient(circle at 8% 122%,transparent 168px,rgba(255,255,255,.08) 169px,transparent 171px)',size:'auto'},
+  dots:{pat:'radial-gradient(rgba(255,255,255,.15) 1px,transparent 1.3px)',size:'18px 18px'}
+ };
+ var PAT_ORDER=['rings','glow','hairline','arc','dots'];
+ var PAT_LABEL={rings:'حلقه‌ای',glow:'درخشش',hairline:'خط مویی',arc:'کمان',dots:'نقطه‌ای'};
+ var TYPE_PALETTE=[['#2f6f9e','#5e9bc6'],['#35795f','#63ab8e'],['#5b4880','#9280bb'],['#9a5a6b','#cb8a9b'],['#556b82','#8aa1b9'],['#8a7050','#c0a479']];
+ var ROW_LABEL={purchase:'خرید',deposit:'واریزی',withdraw:'برداشت',return:'مرجوعی',adjust:'ماندهٔ اولیه'};
+ var DEFAULT_TYPES=['تأمین‌کننده','مشتری','همکار','سایر'];
+
+ var pplFilter={}, pplSort='type', pplSearchText='', pplOpenPop='';
+ var pplCurrentId=null, pplReturnPersonId='', pplDepDest='cashbox';
+
+ function $(id){return document.getElementById(id)}
+ function pplTypeIdx(t){var i=personTypes.indexOf(t);return i<0?0:i}
+ function pplPalette(t){return TYPE_PALETTE[pplTypeIdx(t)%TYPE_PALETTE.length]}
+ function pplPattern(){return PATTERNS[peoplePattern]||PATTERNS.rings}
+ function pplApplyPat(el){var p=pplPattern();try{el.style.setProperty('--pat',p.pat);el.style.setProperty('--patSize',p.size)}catch(_){}}
+ function pplApplyColor(el,t){var c=pplPalette(t);try{el.style.setProperty('--c1',c[0]);el.style.setProperty('--c2',c[1])}catch(_){}}
+ function pplById(id){return persons.find(function(p){return String(p.id)===String(id)})}
+ function pplArr(){return Array.isArray(persons)?persons:[]}
+ function pplSavePersons(){try{save(PEOPLE_K,persons)}catch(_){}}
+ function pplSaveTypes(){try{save(PTYPE_K,personTypes)}catch(_){}}
+ function pplCanSee(){try{if(isAdmin&&isAdmin())return true;var r=current?((getRole(current)||{}).permissions||{}):{};return r.peopleView!==false}catch(_){return true}}
+
+ function pplSettlements(x){return (x&&x.purchaseBasket&&Array.isArray(x.purchaseBasket.settlements))?x.purchaseBasket.settlements:[]}
+ function pplTxDelta(x){
+  if(!x)return 0;
+  if(x.isReturn)return -(Math.abs(Number(x.returnAmount)||Number(x.deposit)||0));
+  if(isWithdrawTx(x))return -(Number(x.withdraw)||0);
+  if(Number(x.deposit)>0)return Number(x.deposit)||0;
+  var gross=Number(x.purchase)||0;
+  if(x.officialInvoice)return 0;
+  var disc=Number(x.poolUsed)||0;
+  var paid=(Number(x.purchaseCash)||0)+(Number(x.purchaseDriver)||0);
+  var settled=pplSettlements(x).reduce(function(a,s){return a+(Number(s&&s.amount)||0)},0);
+  return gross-disc-paid-settled;
+ }
+ function pplBalance(p){var b=Number(p.opening)||0;txs.forEach(function(x){if(String((x&&x.personId)||'')===String(p.id))b+=pplTxDelta(x)});return b}
+ function pplRows(p){
+  var list=txs.filter(function(x){return String((x&&x.personId)||'')===String(p.id)});
+  list.sort(function(a,b){var da=String(a.date||''),db=String(b.date||'');if(da!==db)return da<db?-1:1;return (Number(a.id)||0)-(Number(b.id)||0)});
+  var run=Number(p.opening)||0,out=[];
+  if(run!==0)out.push({t:'adjust',date:'',desc:'ماندهٔ اولیه',delta:run,run:run,row:null});
+  list.forEach(function(x){
+   var d=pplTxDelta(x);run+=d;
+   var t=x.isReturn?'return':(isWithdrawTx(x)?'withdraw':(Number(x.deposit)>0?'deposit':'purchase'));
+   out.push({t:t,date:x.date||'',desc:x.desc||ROW_LABEL[t],delta:d,run:run,row:x});
+  });
+  return out;
+ }
+
+ function pplCardHTML(p){
+  var bal=pplBalance(p);
+  var debt=bal>0, credit=bal<0;
+  var lbl=debt?'بدهکار':(credit?'بستانکار':'تسویه');
+  var cls=debt?'debt':(credit?'credit':'');
+  var dot=debt?'#ffbfa3':(credit?'#a9edc6':'rgba(255,255,255,.75)');
+  return '<div class="pplCard" data-ppl-card="'+esc(String(p.id))+'">'
+   +'<div class="pplCardTop"><div class="pplCardName">'+esc(p.name||'بدون نام')+'</div><span class="pplCardType">'+esc(p.type||'—')+'</span></div>'
+   +'<div class="pplCardMid"><span class="pplChip"></span><span class="pplWaves"><i></i><i></i><i></i></span></div>'
+   +'<div class="pplCardBalRow"><div><b class="pplCardBal">'+money(Math.abs(bal))+' '+esc(currencyUnit())+'</b><span class="pplCardBalLbl '+cls+'"><i class="pplDot" style="background:'+dot+'"></i>'+lbl+'</span></div></div>'
+   +'</div>';
+ }
+ function pplRenderSummary(){
+  var arr=pplArr(),debt=0,credit=0;
+  arr.forEach(function(p){var b=pplBalance(p);if(b>0)debt+=b;else if(b<0)credit+=-b});
+  if($('pplSumCount'))$('pplSumCount').textContent=fa(arr.length);
+  if($('pplSumDebt'))$('pplSumDebt').textContent=money(debt);
+  if($('pplSumCredit'))$('pplSumCredit').textContent=money(credit);
+ }
+ function pplRenderGrid(){
+  var grid=$('pplGrid');if(!grid)return;
+  var q=pplSearchText.trim().toLowerCase();
+  var list=pplArr().filter(function(p){
+   if(Object.keys(pplFilter).length&&!pplFilter[p.type||''])return false;
+   if(q){var hay=((p.name||'')+' '+(p.type||'')+' '+(p.phone||'')).toLowerCase();if(hay.indexOf(q)<0)return false}
+   return true;
+  });
+  list.sort(function(a,b){
+   if(pplSort==='name')return String(a.name||'').localeCompare(String(b.name||''),'fa');
+   if(pplSort==='debt')return pplBalance(b)-pplBalance(a);
+   if(pplSort==='credit')return pplBalance(a)-pplBalance(b);
+   var ta=pplTypeIdx(a.type),tb=pplTypeIdx(b.type);if(ta!==tb)return ta-tb;return String(a.name||'').localeCompare(String(b.name||''),'fa');
+  });
+  if(!list.length){grid.innerHTML='<div class="pplEmpty">هنوز شخصی ثبت نشده است. با دکمهٔ + یک شخص اضافه کن.</div>';return}
+  grid.innerHTML=list.map(pplCardHTML).join('');
+  Array.prototype.forEach.call(grid.querySelectorAll('[data-ppl-card]'),function(el){
+   var p=pplById(el.getAttribute('data-ppl-card'));if(!p)return;
+   pplApplyPat(el);pplApplyColor(el,p.type);
+  });
+ }
+ function pplRenderPops(){
+  var box=$('pplPops');if(!box)return;
+  ['pplSortBtn','pplFilterBtn','pplThemeBtn'].forEach(function(id){var b=$(id);if(b)b.classList.remove('on')});
+  if(!pplOpenPop){box.innerHTML='';return}
+  if(pplOpenPop==='sort'){
+   if($('pplSortBtn'))$('pplSortBtn').classList.add('on');
+   var opts=[['type','نوع'],['debt','بدهی ما'],['credit','طلب ما'],['name','نام']];
+   box.innerHTML='<div class="pplPop"><div class="pplPopTitle">مرتب‌سازی</div><div class="pplPopRow">'+opts.map(function(o){return '<button type="button" class="pplPopChip'+(pplSort===o[0]?' on':'')+'" data-ppl-sort="'+o[0]+'">'+o[1]+'</button>'}).join('')+'</div></div>';
+  }else if(pplOpenPop==='filter'){
+   if($('pplFilterBtn'))$('pplFilterBtn').classList.add('on');
+   box.innerHTML='<div class="pplPop"><div class="pplPopTitle">فیلتر نوع</div><div class="pplPopRow">'+personTypes.map(function(t){return '<button type="button" class="pplPopChip'+(pplFilter[t]?' on':'')+'" data-ppl-filter="'+esc(t)+'">'+esc(t)+'</button>'}).join('')+(Object.keys(pplFilter).length?'<button type="button" class="pplPopChip" data-ppl-filter-clear="1">پاک‌کردن</button>':'')+'</div></div>';
+  }else if(pplOpenPop==='theme'){
+   if($('pplThemeBtn'))$('pplThemeBtn').classList.add('on');
+   box.innerHTML='<div class="pplPop"><div class="pplPopTitle">طرح پس‌زمینهٔ کارت‌ها</div><div class="pplPopRow">'+PAT_ORDER.map(function(k){var p=PATTERNS[k];return '<button type="button" class="pplPatSwatch'+(peoplePattern===k?' on':'')+'" data-ppl-pat="'+k+'"><i style="--pat:'+p.pat+';--patSize:'+p.size+'"></i>'+PAT_LABEL[k]+'</button>'}).join('')+'</div></div>';
+  }
+ }
+ function pplRenderAll(){pplRenderSummary();pplRenderGrid();pplRenderPops()}
+
+ function pplIcon(t){
+  var s={
+   purchase:'<svg viewBox="0 0 24 24"><path d="M6 7h12l-1.2 12H7.2z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>',
+   deposit:'<svg viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m6 13 6 6 6-6"/></svg>',
+   withdraw:'<svg viewBox="0 0 24 24"><path d="M12 19V5"/><path d="m6 11 6-6 6 6"/></svg>',
+   return:'<svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>',
+   adjust:'<svg viewBox="0 0 24 24"><path d="M4 12h16"/><path d="M12 4v16"/></svg>'
+  };
+  return s[t]||s.purchase;
+ }
+ function pplRowHTML(r){
+  var sign=r.delta>0?'debt':(r.delta<0?'credit':'');
+  var arrow=r.delta>0?'+':(r.delta<0?'−':'');
+  var meta='';
+  if(r.row){
+   meta=esc(r.date||'');
+   if(r.t==='purchase'){
+    var gross=Number(r.row.purchase)||0,disc=Number(r.row.poolUsed)||0,paid=(Number(r.row.purchaseCash)||0)+(Number(r.row.purchaseDriver)||0);
+    var settle=pplSettlements(r.row).reduce(function(a,s){return a+(Number(s&&s.amount)||0)},0);
+    var remain=Math.max(0,gross-disc-paid-settle);
+    if(disc>0)meta+=' · تخفیف '+money(disc);
+    if(paid>0)meta+=' · پرداخت '+money(paid);
+    if(r.row.officialInvoice)meta+=' · پرداخت از حساب شرکت';
+    if(!r.row.officialInvoice&&remain>0)meta+='<div class="pplRemain">مانده این خرید: '+money(remain)+' '+esc(currencyUnit())+'</div>';
+   }else if(r.t==='return'){
+    meta+=' · '+(r.row.returnDestination==='credit'?'قابل استفاده در خرید دیگر':'بازگشت به تنخواه');
+   }else if(r.t==='withdraw'){
+    meta+=' · منبع: '+esc(sourceText(r.row.withdrawSource||'cashbox'));
+   }else if(r.t==='deposit'){
+    meta+=' · '+esc(sourceText(r.row.depositType||'cashbox'));
+   }
+  }else{meta='مانده آغازین';}
+  return '<div class="pplRow"><span class="pplRowIco t-'+r.t+'">'+pplIcon(r.t)+'</span><div class="pplRowMain"><div class="pplRowTitle">'+esc(r.desc||ROW_LABEL[r.t]||'')+'</div><div class="pplRowMeta">'+meta+'</div></div><div><div class="pplRowAmt '+sign+'">'+arrow+' '+money(Math.abs(r.delta))+'</div><span class="pplRowRun">مانده: '+money(Math.abs(r.run))+' '+(r.run>0?'بدهکار':(r.run<0?'بستانکار':'تسویه'))+'</span></div></div>';
+ }
+ function pplRenderLedgerRows(){
+  var list=$('pplLedgerList');if(!list)return;
+  var p=pplById(pplCurrentId);if(!p){list.innerHTML='';return}
+  var q=String($('pplLedgerSearchInput')?$('pplLedgerSearchInput').value:'').trim().toLowerCase();
+  var rows=pplRows(p);
+  if(q)rows=rows.filter(function(r){return (String(r.desc||'')+' '+String(r.date||'')).toLowerCase().indexOf(q)>=0});
+  if(!rows.length){list.innerHTML='<div class="pplEmptyLedger">گردشی برای این شخص ثبت نشده است.</div>';return}
+  list.innerHTML=rows.slice().reverse().map(pplRowHTML).join('');
+ }
+ function pplOpenLedger(id){
+  var p=pplById(id);if(!p)return;
+  pplCurrentId=id;
+  var bal=pplBalance(p),debt=bal>0,credit=bal<0;
+  if($('pplBalName'))$('pplBalName').textContent=p.name||'بدون نام';
+  if($('pplBalType'))$('pplBalType').textContent=p.type||'';
+  if($('pplBalAmt'))$('pplBalAmt').textContent=money(Math.abs(bal))+' '+currencyUnit();
+  if($('pplBalLbl')){$('pplBalLbl').textContent=debt?'بدهکار':(credit?'بستانکار':'تسویه');$('pplBalLbl').className='pplBalLbl '+(debt?'debt':(credit?'credit':''))}
+  if($('pplBalPhone')){$('pplBalPhone').textContent=p.phone?('☎ '+p.phone):'';$('pplBalPhone').className='pplBalPhone'+(p.phone?'':' empty')}
+  var box=$('pplBalBox');if(box){pplApplyPat(box);pplApplyColor(box,p.type)}
+  if($('pplLedgerSearch'))$('pplLedgerSearch').classList.add('hidden');
+  if($('pplLedgerSearchInput'))$('pplLedgerSearchInput').value='';
+  pplRenderLedgerRows();
+  if($('pplLedgerSheet'))$('pplLedgerSheet').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+ }
+ function pplCloseSheets(){
+  ['pplLedgerSheet','pplPersonSheet'].forEach(function(id){var el=$(id);if(el)el.classList.add('hidden')});
+  document.body.style.overflow='';
+ }
+
+ function pplTypeOptions(sel){
+  return personTypes.map(function(t){return '<option value="'+esc(t)+'"'+(t===sel?' selected':'')+'>'+esc(t)+'</option>'}).join('');
+ }
+ function pplFillTypeSelect(sel){var t=$('pplType');if(t)t.innerHTML=pplTypeOptions(sel||t.value||personTypes[0]||'')}
+ function pplPersonOptions(){
+  var arr=pplArr().slice().sort(function(a,b){return String(a.name||'').localeCompare(String(b.name||''),'fa')});
+  return '<option value="">— بدون شخص —</option>'+arr.map(function(p){return '<option value="'+esc(String(p.id))+'">'+esc(p.name||'')+(p.type?' ('+esc(p.type)+')':'')+'</option>'}).join('');
+ }
+ function pplRefreshPersonSelects(){
+  var s=$('pplTxPerson');if(s){var cur=s.value;s.innerHTML=pplPersonOptions();s.value=cur}
+  var d=$('pplDepPerson');if(d){var cur2=d.value;d.innerHTML=pplPersonOptions();d.value=cur2}
+ }
+ function pplOpenPersonSheet(id){
+  var p=id?pplById(id):null;
+  if($('pplFormTitle'))$('pplFormTitle').textContent=p?('ویرایش '+(p.name||'شخص')):'شخص جدید';
+  if($('pplName'))$('pplName').value=p?(p.name||''):'';
+  if($('pplPhone'))$('pplPhone').value=p?(p.phone||''):'';
+  if($('pplOpening'))$('pplOpening').value=p?(p.opening?moneyInputValue(p.opening):''):'';
+  if($('pplNewTypeWrap'))$('pplNewTypeWrap').classList.add('hidden');
+  if($('pplNewTypeInput'))$('pplNewTypeInput').value='';
+  pplFillTypeSelect(p?(p.type||''):(personTypes[0]||''));
+  if($('pplPersonSheet'))$('pplPersonSheet').setAttribute('data-edit-id',p?String(p.id):'');
+  if($('pplPersonSheet'))$('pplPersonSheet').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+  setTimeout(function(){if($('pplName'))$('pplName').focus()},60);
+ }
+ function pplSubmitPerson(){
+  var name=String($('pplName')?$('pplName').value:'').trim();
+  if(!name){alert('نام شخص را وارد کن.');return}
+  var type=String($('pplType')?$('pplType').value:(personTypes[0]||'سایر'));
+  var phone=String($('pplPhone')?$('pplPhone').value:'').trim();
+  var opening=Math.round(toRial($('pplOpening')?$('pplOpening').value:'')||0);
+  var editId=$('pplPersonSheet')?$('pplPersonSheet').getAttribute('data-edit-id'):'';
+  if(editId){
+   var p=pplById(editId);
+   if(p){p.name=name;p.type=type;p.phone=phone;p.opening=opening;pplSavePersons()}
+  }else{
+   persons=pplArr().concat([{id:String(Date.now())+String(Math.floor(Math.random()*9999)),name:name,type:type,phone:phone,opening:opening,createdDate:today(),by:(current&&current.name)||''}]);
+   pplSavePersons();
+  }
+  pplCloseSheets();
+  pplRenderAll();
+  pplRefreshPersonSelects();
+ }
+ function pplExportLedger(){
+  var p=pplById(pplCurrentId);if(!p)return;
+  var rows=[['تاریخ','شرح','نوع','مبلغ ('+currencyUnit()+')','جهت','مانده ('+currencyUnit()+')']];
+  pplRows(p).forEach(function(r){rows.push([r.date||'',r.desc||ROW_LABEL[r.t]||'',ROW_LABEL[r.t]||'',money(Math.abs(r.delta)),r.delta>0?'بدهکار':(r.delta<0?'بستانکار':'—'),money(Math.abs(r.run))])});
+  var csv='\uFEFF'+rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"'}).join(',')}).join('\n');
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='ledger-'+String(p.name||'person').replace(/\s+/g,'-')+'.csv';document.body.appendChild(a);a.click();a.remove();
+ }
+
+ /* ---------- هم‌سیم‌کشی با اپ ---------- */
+ var _pplOrigGo=go;
+ go=function(page){
+  if(page==='people'&&!pplCanSee())page='home';
+  var pp=$('pagePeople');
+  if(page!=='people'&&pp)pp.classList.remove('active');
+  if(page==='people'){
+   ['home','add','ledger','pricing','procurement','warehouse','manage'].forEach(function(pg){var el=$('page'+pg.charAt(0).toUpperCase()+pg.slice(1));if(el)el.classList.remove('active')});
+   if(pp)pp.classList.add('active');
+   Array.prototype.forEach.call(document.querySelectorAll('.nav button'),function(b){b.classList.toggle('active',b.dataset.go==='people')});
+   pplRenderAll();
+   try{window.scrollTo(0,0)}catch(_){}
+   return;
+  }
+  return _pplOrigGo.call(this,page);
+ };
+ var _pplOrigApply=applyPermissions;
+ applyPermissions=function(){var r=_pplOrigApply.apply(this,arguments);try{var b=document.querySelector('.nav button[data-go="people"]');if(b)b.classList.toggle('hidden',!pplCanSee())}catch(_){}return r};
+ var _pplOrigRenderAll=renderAll;
+ renderAll=function(){var r=_pplOrigRenderAll.apply(this,arguments);try{if($('pagePeople')&&$('pagePeople').classList.contains('active'))pplRenderAll()}catch(_){}return r};
+ /* مانده فقط با بخش تنخواه تغییر می‌کند: واریزی به حساب شخص و برداشت‌های غیرتنخواهی روی مانده اثر ندارند. */
+ var _pplOrigBalanceDelta=balanceDeltaOf;
+ balanceDeltaOf=function(x){
+  try{
+   if(x&&x.depositType==='person')return 0;
+   if(x&&isWithdrawTx(x))return -withdrawPartsOf(x).cashbox;
+  }catch(_){}
+  return _pplOrigBalanceDelta.apply(this,arguments);
+ };
+ var _pplOrigDashStats=renderDashboardStats;
+ renderDashboardStats=function(){
+  try{
+   var d=0,p=0,f=0;txs.filter(txInDashboardPeriod).forEach(function(x){if(x.depositType!=='person')d+=Number(x.deposit)||0;if(!x.officialInvoice){p+=Number(x.purchase)||0;f+=Number(x.freight)||0}});
+   if($('sumDeposit'))$('sumDeposit').textContent=money(d);
+   if($('sumPurchase'))$('sumPurchase').textContent=money(p);
+   if($('sumFreight'))$('sumFreight').textContent=money(f);
+   return;
+  }catch(_){}
+  return _pplOrigDashStats.apply(this,arguments);
+ };
+ var _pplOrigEditTx=editTx;
+ editTx=function(id){
+  var r=_pplOrigEditTx.apply(this,arguments);
+  try{
+   var x=txs.find(function(t){return String(t.id)===String(id)});
+   var isDep=!!(x&&Number(x.deposit)>0);
+   if(isDep){
+    pplDepDest=x.personId?'person':'cashbox';
+    var dp=$('pplDepPerson');if(dp)dp.value=x.personId?String(x.personId):'';
+    pplSyncDepDest();
+   }
+   var s=$('pplTxPerson');
+   if(s)s.value=(!isDep&&x&&x.personId)?String(x.personId):'';
+  }catch(_){}
+  return r;
+ };
+
+ /* ---------- انتخابگر شخص در فرم‌های خرید/برداشت/واریزی ---------- */
+ (function(){
+  var box=$('commonTxFields');if(!box||$('pplTxPerson'))return;
+  var wrap=document.createElement('div');wrap.className='pplTxPersonWrap';
+  wrap.innerHTML='<label class="flabel" for="pplTxPerson">شخص / تأمین‌کننده (اختیاری)</label><select id="pplTxPerson" class="pplTxPersonSel"></select>';
+  box.appendChild(wrap);
+ })();
+
+ /* ---------- مقصد واریزی + پرداخت به شخص در تب واریزی ---------- */
+ (function(){
+  var box=$('depositBox');if(!box||$('pplDepDest'))return;
+  var head=document.createElement('div');head.id='pplDepHead';
+  head.innerHTML='<label class="flabel">مقصد واریزی</label>'
+   +'<div class="pplDepDest" id="pplDepDest">'
+   +'<button type="button" data-ppl-dest="cashbox" class="on">واریزی به تنخواه</button>'
+   +'<button type="button" data-ppl-dest="person">واریزی به حساب شخص</button>'
+   +'</div>'
+   +'<div id="pplDepPersonWrap" class="hidden"><label class="flabel" for="pplDepPerson">شخص</label><select id="pplDepPerson" class="pplDepPersonSel"></select></div>';
+  box.insertBefore(head,box.firstChild);
+  var pay=document.createElement('button');pay.type='button';pay.id='pplDepPayBtn';pay.className='pplDepPayBtn';
+  pay.textContent='پرداخت به شخص (مازاد)';box.appendChild(pay);
+ })();
+ function pplSyncDepDest(){
+  var wrap=$('pplDepPersonWrap');if(wrap)wrap.classList.toggle('hidden',pplDepDest!=='person');
+  var dt=$('depositType');var lbl=dt?dt.previousElementSibling:null;
+  if(lbl&&lbl.classList&&lbl.classList.contains('flabel'))lbl.classList.toggle('hidden',pplDepDest==='person');
+  if(dt)dt.classList.toggle('hidden',pplDepDest==='person');
+  var d=$('pplDepDest');if(d)Array.prototype.forEach.call(d.querySelectorAll('[data-ppl-dest]'),function(b){b.classList.toggle('on',b.getAttribute('data-ppl-dest')===pplDepDest)});
+ }
+ function pplStartPersonPayment(){
+  if(typeof canWithdraw==='function'&&!canWithdraw()){alert('دسترسی ثبت برداشت برای این سمت فعال نیست.');return}
+  setMode('withdraw');
+  var dt=$('depositTab'),wt=$('withdrawTab');
+  if(dt)dt.classList.add('active');if(wt)wt.classList.remove('active');
+  var sb=$('saveBtn');if(sb)sb.textContent=editingId?'حفظ تغییرات':'ثبت پرداخت به شخص';
+  var ps=$('pplTxPerson');if(ps)try{ps.focus()}catch(_){}
+  try{window.scrollTo(0,0)}catch(_){}
+ }
+ var _pplOrigSetMode=setMode;
+ setMode=function(m){
+  var r=_pplOrigSetMode.apply(this,arguments);
+  try{
+   if(mode==='deposit'){
+    var f=$('txEntryForm');if(f)f.classList.remove('hidden');
+    var db=$('depositBox');if(db)db.classList.remove('hidden');
+    var sb=$('saveBtn');if(sb)sb.classList.remove('hidden');
+    var tw=document.querySelector('.pplTxPersonWrap');if(tw)tw.classList.add('hidden');
+    pplSyncDepDest();
+   }else{
+    var tw2=document.querySelector('.pplTxPersonWrap');if(tw2)tw2.classList.remove('hidden');
+   }
+  }catch(_){}
+  return r;
+ };
+ if($('pplDepDest'))$('pplDepDest').addEventListener('click',function(e){var b=e.target.closest('[data-ppl-dest]');if(!b)return;pplDepDest=b.getAttribute('data-ppl-dest');pplSyncDepDest();if(pplDepDest==='person'){var p=$('pplDepPerson');if(p)try{p.focus()}catch(_){}}});
+ if($('pplDepPayBtn'))$('pplDepPayBtn').addEventListener('click',pplStartPersonPayment);
+ var _pplPrevSaveBtn=$('saveBtn')?$('saveBtn').onclick:null;
+ if($('saveBtn'))$('saveBtn').onclick=function(){
+  var sel=$('pplTxPerson'),pid='',wasDeposit=(mode==='deposit');
+  if(wasDeposit){if(pplDepDest==='person'){var dp=$('pplDepPerson');pid=dp?String(dp.value||''):''}}
+  else{pid=sel?String(sel.value||''):''}
+  var beforeLen=txs.length,editId=editingId;
+  var beforeRef=(editId!=null)?txs.find(function(t){return String(t.id)===String(editId)}):null;
+  var r=_pplPrevSaveBtn?_pplPrevSaveBtn.apply(this,arguments):undefined;
+  try{
+   var target=null;
+   if(editId!=null){var t1=txs.find(function(t){return String(t.id)===String(editId)});if(t1&&t1!==beforeRef)target=t1}
+   else if(txs.length>beforeLen)target=txs[txs.length-1];
+   if(target){
+    if(pid)target.personId=pid;else delete target.personId;
+    if(wasDeposit&&pplDepDest==='person'&&pid)target.depositType='person';
+    try{save(TXK,txs)}catch(_){}try{renderAll()}catch(_){}
+   }
+  }catch(_){}
+  try{if(sel)sel.value='';var s2=$('pplDepPerson');if(s2)s2.value=''}catch(_){}
+  return r;
+ };
+
+ /* ---------- شخص در مرجوعی ---------- */
+ var _pplOrigOpenReturn=openReturnAmountModal;
+ openReturnAmountModal=function(info){
+  _pplOrigOpenReturn.apply(this,arguments);
+  try{
+   var overlay=$('returnAmountModal');if(!overlay||overlay.querySelector('#pplReturnPerson'))return;
+   var actions=overlay.querySelector('.fundPickerActions');if(!actions)return;
+   var wrap=document.createElement('div');wrap.style.marginTop='8px';
+   wrap.innerHTML='<label class="flabel" for="pplReturnPerson">شخص / تأمین‌کننده (اختیاری)</label><select id="pplReturnPerson" class="finput" style="width:100%">'+pplPersonOptions()+'</select>';
+   actions.parentNode.insertBefore(wrap,actions);
+   var btn=overlay.querySelector('#returnAmountConfirm');
+   if(btn){var orig=btn.onclick;btn.onclick=function(){try{pplReturnPersonId=overlay.querySelector('#pplReturnPerson').value||''}catch(_){pplReturnPersonId=''}return orig.apply(this,arguments)}}
+  }catch(_){}
+ };
+ var _pplOrigCreateReturn=v248CreateReturnTx;
+ v248CreateReturnTx=function(info){
+  var tx=_pplOrigCreateReturn.apply(this,arguments);
+  try{if(tx&&pplReturnPersonId){tx.personId=pplReturnPersonId;save(TXK,txs);try{renderAll()}catch(_){}}}catch(_){}
+  pplReturnPersonId='';
+  return tx;
+ };
+
+ /* ---------- رخدادهای صفحه ---------- */
+ if($('pplAddBtn'))$('pplAddBtn').addEventListener('click',function(){pplOpenPersonSheet()});
+ if($('pplSearchBtn'))$('pplSearchBtn').addEventListener('click',function(){var inp=$('pplSearch');if(!inp)return;inp.classList.toggle('hidden');if(!inp.classList.contains('hidden')){try{inp.focus()}catch(_){}}else{inp.value='';pplSearchText='';pplRenderGrid()}});
+ if($('pplSearch'))$('pplSearch').addEventListener('input',function(){pplSearchText=this.value||'';pplRenderGrid()});
+ if($('pplSortBtn'))$('pplSortBtn').addEventListener('click',function(){pplOpenPop=pplOpenPop==='sort'?'':'sort';pplRenderPops()});
+ if($('pplFilterBtn'))$('pplFilterBtn').addEventListener('click',function(){pplOpenPop=pplOpenPop==='filter'?'':'filter';pplRenderPops()});
+ if($('pplThemeBtn'))$('pplThemeBtn').addEventListener('click',function(){pplOpenPop=pplOpenPop==='theme'?'':'theme';pplRenderPops()});
+ if($('pplPops'))$('pplPops').addEventListener('click',function(e){
+  var s=e.target.closest('[data-ppl-sort]');if(s){pplSort=s.getAttribute('data-ppl-sort');pplRenderPops();pplRenderGrid();return}
+  var f=e.target.closest('[data-ppl-filter]');if(f){var t=f.getAttribute('data-ppl-filter');if(pplFilter[t])delete pplFilter[t];else pplFilter[t]=true;pplRenderPops();pplRenderGrid();return}
+  if(e.target.closest('[data-ppl-filter-clear]')){pplFilter={};pplRenderPops();pplRenderGrid();return}
+  var pt=e.target.closest('[data-ppl-pat]');if(pt){peoplePattern=pt.getAttribute('data-ppl-pat');try{localStorage.setItem('bazargani_people_pattern_v1',peoplePattern)}catch(_){}pplRenderPops();pplRenderGrid();return}
+ });
+ if($('pplGrid'))$('pplGrid').addEventListener('click',function(e){var c=e.target.closest('[data-ppl-card]');if(!c)return;pplOpenLedger(c.getAttribute('data-ppl-card'))});
+ Array.prototype.forEach.call(document.querySelectorAll('[data-ppl-close]'),function(el){el.addEventListener('click',function(){pplCloseSheets()})});
+ if($('pplSubmit'))$('pplSubmit').addEventListener('click',pplSubmitPerson);
+ if($('pplNewTypeBtn'))$('pplNewTypeBtn').addEventListener('click',function(){var w=$('pplNewTypeWrap');if(!w)return;w.classList.toggle('hidden');if(!w.classList.contains('hidden')&&$('pplNewTypeInput'))$('pplNewTypeInput').focus()});
+ if($('pplNewTypeSave'))$('pplNewTypeSave').addEventListener('click',function(){var v=String($('pplNewTypeInput')?$('pplNewTypeInput').value:'').trim();if(!v)return;if(personTypes.indexOf(v)<0){personTypes=personTypes.concat([v]);pplSaveTypes()}pplFillTypeSelect(v);if($('pplNewTypeInput'))$('pplNewTypeInput').value='';if($('pplNewTypeWrap'))$('pplNewTypeWrap').classList.add('hidden')});
+ if($('pplLedgerSearchBtn'))$('pplLedgerSearchBtn').addEventListener('click',function(){var w=$('pplLedgerSearch');if(!w)return;w.classList.toggle('hidden');if(!w.classList.contains('hidden')){if($('pplLedgerSearchInput'))try{$('pplLedgerSearchInput').focus()}catch(_){}}else{if($('pplLedgerSearchInput'))$('pplLedgerSearchInput').value='';pplRenderLedgerRows()}});
+ if($('pplLedgerSearchInput'))$('pplLedgerSearchInput').addEventListener('input',pplRenderLedgerRows);
+ if($('pplLedgerExcelBtn'))$('pplLedgerExcelBtn').addEventListener('click',pplExportLedger);
+ document.addEventListener('keydown',function(e){if(e.key==='Escape')pplCloseSheets()});
+
+ try{var st=document.createElement('style');st.textContent='.pplTxPersonWrap{margin-top:10px}.pplTxPersonSel{width:100%;height:44px;border:1px solid var(--line);border-radius:12px;padding:0 12px;font-family:inherit;font-size:14px;background:var(--card);color:var(--text)}'
+   +'.pplDepDest{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:4px 0 12px}'
+   +'.pplDepDest button{height:40px;border:1px solid var(--line);border-radius:11px;background:var(--card);color:var(--muted);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:.15s;padding:0 6px}'
+   +'.pplDepDest button.on{background:linear-gradient(135deg,#0f4c75,#1976b9);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(15,76,117,.18)}'
+   +'.pplDepPersonSel{width:100%;height:44px;border:1px solid var(--line);border-radius:12px;padding:0 12px;font-family:inherit;font-size:14px;background:var(--card);color:var(--text);margin-bottom:6px}'
+   +'.pplDepPayBtn{width:100%;height:44px;margin-top:12px;border:1px dashed var(--line);border-radius:12px;background:transparent;color:#0f4c75;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}'
+   +'.pplDepPayBtn:active{transform:scale(.99)}'
+   ;document.head.appendChild(st)}catch(_){}
+
+ /* ---------- راه‌اندازی ---------- */
+ if(!Array.isArray(personTypes)||!personTypes.length)personTypes=DEFAULT_TYPES.slice();
+ pplRefreshPersonSelects();
+ try{pplRenderAll()}catch(_){}
+})();
 
 boot();
 })();
