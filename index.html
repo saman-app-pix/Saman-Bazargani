@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#ffffff" name="theme-color"/>
-<meta name="saman-build" content="v255"/>
+<meta name="saman-build" content="v256"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; manifest-src 'self'; connect-src 'self' https://eiobajtihwxdlfxufmbg.supabase.co wss://eiobajtihwxdlfxufmbg.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
@@ -530,7 +530,7 @@ textarea{min-height:64px}
 #pageWarehouse .warehouseBatchTools>button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:34px!important;height:auto!important;margin:0!important;padding:5px 3px!important;border-radius:8px!important;font-family:inherit!important;font-size:clamp(9px,2.45vw,11px)!important;font-weight:600!important;line-height:1.3!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;box-sizing:border-box!important}
 @media(max-width:360px){#pageWarehouse .warehouseSection>.listTabs>button{font-size:11px!important;padding:5px 3px!important}#pageWarehouse .warehouseBatchTools{gap:4px!important;padding:4px!important}#pageWarehouse .warehouseBatchTools>button{font-size:9px!important;padding:4px 2px!important;min-height:34px!important}}
 </style>
-<meta name="saman-build" content="v255">
+<meta name="saman-build" content="v256">
 
 <style id="v213-fund-transfer-split">
 .fundActOverlay,.fundPickerOverlay{position:fixed;inset:0;z-index:100520;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;background:rgba(15,28,45,.48);backdrop-filter:blur(2px)}
@@ -944,78 +944,226 @@ button.supplyLinkTag{border:0;font-family:inherit;text-align:right;cursor:pointe
 </div>
 </section>
 <section class="page" id="pagePeople">
-<div class="content">
- <div class="title">اشخاص</div>
- <div class="pplSum" id="pplSum">
-  <div class="pplSumCard"><span class="pplSumLabel">اشخاص</span><b class="pplSumVal" id="pplSumCount">0</b></div>
-  <div class="pplSumCard"><span class="pplSumLabel">بدهی ما</span><b class="pplSumVal" id="pplSumDebt">0</b></div>
-  <div class="pplSumCard"><span class="pplSumLabel">طلب ما</span><b class="pplSumVal" id="pplSumCredit">0</b></div>
+ <div class="sumGrid" id="pplSumGrid"></div>
+ <div class="toolRow" id="pplToolRow">
+  <button type="button" class="ibtn" id="pplSearchBtn" title="جست‌وجو" aria-label="جست‌وجو"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg></button>
+  <div class="searchWrap" id="pplSearchWrap"><input type="search" id="pplSearch" placeholder="جست‌وجو در نام و نوع…" autocomplete="off"/></div>
+  <div class="toolSpacer"></div>
+  <button type="button" class="ibtn" id="pplSortBtn" title="مرتب‌سازی" aria-label="مرتب‌سازی"><svg viewBox="0 0 24 24"><path d="M7 4v16"/><path d="m3.5 7.5 3.5-3.5 3.5 3.5"/><path d="M17 20V4"/><path d="m13.5 16.5 3.5 3.5 3.5-3.5"/></svg></button>
+  <button type="button" class="ibtn" id="pplFilterBtn" title="فیلتر نوع" aria-label="فیلتر نوع"><svg viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4-2v-4z"/></svg></button>
+  <button type="button" class="ibtn" id="pplThemeBtn" title="طرح کارت‌ها" aria-label="طرح کارت‌ها"><svg viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h4A1.5 1.5 0 0 1 11 5.5v13A1.5 1.5 0 0 1 9.5 20h-4A1.5 1.5 0 0 1 4 18.5z"/><path d="M13.5 5.5A1.5 1.5 0 0 1 15 4h3.5A1.5 1.5 0 0 1 20 5.5v5A1.5 1.5 0 0 1 18.5 12H15a1.5 1.5 0 0 1-1.5-1.5z"/><path d="M13.5 16.5A1.5 1.5 0 0 1 15 15h3.5A1.5 1.5 0 0 1 20 16.5v2A1.5 1.5 0 0 1 18.5 20H15a1.5 1.5 0 0 1-1.5-1.5z"/></svg></button>
+  <button type="button" class="ibtn accent" id="pplAddBtn" title="افزودن شخص" aria-label="افزودن شخص"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+  <div class="pop hidden" id="pplSortPop" data-for="sort"></div>
+  <div class="pop hidden" id="pplFilterPop" data-for="filter"></div>
+  <div class="pop hidden" id="pplThemePop" data-for="theme"></div>
  </div>
- <div class="pplBar">
-  <div class="pplSearchWrap" id="pplSearchWrap">
-   <button type="button" class="pplIconBtn" id="pplSearchBtn" title="جست‌وجو" aria-label="جست‌وجو"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></svg></button>
-   <input type="search" class="pplSearch hidden" id="pplSearch" placeholder="جست‌وجو در نام و نوع…" autocomplete="off"/>
-  </div>
-  <span class="pplBarSpacer"></span>
-  <button type="button" class="pplIconBtn" id="pplSortBtn" title="مرتب‌سازی" aria-label="مرتب‌سازی"><svg viewBox="0 0 24 24"><path d="M7 4v15"/><path d="m3.5 15.5 3.5 3.5 3.5-3.5"/><path d="M17 20V5"/><path d="m13.5 8.5 3.5-3.5 3.5 3.5"/></svg></button>
-  <button type="button" class="pplIconBtn" id="pplFilterBtn" title="فیلتر نوع" aria-label="فیلتر نوع"><svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M7 12h10"/><path d="M10 18h4"/></svg></button>
-  <button type="button" class="pplIconBtn" id="pplThemeBtn" title="طرح کارت‌ها" aria-label="طرح کارت‌ها"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="3"/><path d="M7 9h10"/><path d="M7 13h6"/></svg></button>
-  <button type="button" class="pplIconBtn pplAccent" id="pplAddBtn" title="افزودن شخص" aria-label="افزودن شخص"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
- </div>
- <div class="pplPops" id="pplPops"></div>
- <div class="pplGrid" id="pplGrid"></div>
-</div>
+ <div class="pgrid" id="pplGrid"></div>
 </section>
-<div class="pplSheet hidden" id="pplLedgerSheet" role="dialog" aria-modal="true">
- <div class="pplShade" data-ppl-close="1"></div>
- <div class="pplSheetPanel">
-  <div class="pplBalBox" id="pplBalBox">
-   <div class="pplBalTop">
-    <div class="pplBalIdCol">
-     <div class="pplBalName" id="pplBalName"></div>
-     <div class="pplBalType" id="pplBalType"></div>
-    </div>
-    <div class="pplBalAmtCol">
-     <b class="pplBalAmt" id="pplBalAmt"></b>
-     <span class="pplBalLbl" id="pplBalLbl"></span>
+<div class="hidden" id="pplLedgerSheet" role="dialog" aria-modal="true">
+ <div class="sheetShade" data-ppl-close="1"></div>
+ <div class="sheetPanel">
+  <div class="sheetHead">
+   <span class="shAvatarless" id="pplBalAv"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5.5a3.4 3.4 0 0 1 0 6.6"/></svg></span>
+   <div class="shTitle"><b id="pplBalName">—</b><small id="pplBalPhone">—</small></div>
+   <button type="button" class="xbtn" data-ppl-close="1" aria-label="بستن">×</button>
+  </div>
+  <div class="sheetBody">
+   <div class="balBox" id="pplBalBox">
+    <small>ماندهٔ حساب شخص</small>
+    <div class="bbRow"><b id="pplBalAmt">۰</b><span>ریال</span><span class="balTag zero" id="pplBalLbl">تسویه</span></div>
+    <div class="bbStats"><span>جمع خرید: <b id="pplBalBuy">۰</b></span><span>جمع فروش/تسویه: <b id="pplBalPay">۰</b></span></div>
+    <div class="bbTools">
+     <button type="button" class="ibtn" id="pplLedgerSearchBtn" title="جست‌وجو در گردش" aria-label="جست‌وجو در گردش"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg></button>
+     <button type="button" class="ibtn" id="pplLedgerExcelBtn" title="خروجی اکسل" aria-label="خروجی اکسل"><svg viewBox="0 0 24 24"><path d="M14 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V8z"/><path d="M14 3v5h5"/><path d="m9 12 5 5M14 12l-5 5"/></svg></button>
     </div>
    </div>
-   <div class="pplBalPhone" id="pplBalPhone"></div>
-   <div class="pplBalTools">
-    <button type="button" class="pplBalTool" id="pplLedgerSearchBtn" aria-label="جست‌وجو در گردش"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></svg></button>
-    <button type="button" class="pplBalTool" id="pplLedgerExcelBtn" aria-label="خروجی اکسل"><svg viewBox="0 0 24 24"><path d="M12 3v11"/><path d="m8 10.5 4 4 4-4"/><path d="M5 19.5h14"/></svg></button>
-   </div>
-  </div>
-  <div class="pplLedgerSearch hidden" id="pplLedgerSearch"><input type="search" id="pplLedgerSearchInput" placeholder="جست‌وجو در این گردش…" autocomplete="off"/></div>
-  <div class="pplLedgerList" id="pplLedgerList"></div>
-  <div class="pplSheetCloseRow"><button type="button" class="pplSheetCloseBtn" data-ppl-close="1">بستن</button></div>
- </div>
-</div>
-<div class="pplSheet hidden" id="pplPersonSheet" role="dialog" aria-modal="true">
- <div class="pplShade" data-ppl-close="1"></div>
- <div class="pplSheetPanel">
-  <div class="pplFormHead"><b id="pplFormTitle">شخص جدید</b><button type="button" class="pplX" data-ppl-close="1" aria-label="بستن">×</button></div>
-  <label class="pplLabel">نام شخص <span class="pplReq">*</span></label>
-  <input type="text" class="pplInput" id="pplName" placeholder="نام شخص یا شرکت"/>
-  <label class="pplLabel">نوع</label>
-  <div class="pplTypeRow">
-   <select class="pplInput" id="pplType"></select>
-   <button type="button" class="pplMiniBtn" id="pplNewTypeBtn">نوع جدید</button>
-  </div>
-  <div class="pplNewType hidden" id="pplNewTypeWrap">
-   <input type="text" class="pplInput" id="pplNewTypeInput" placeholder="نام نوع جدید"/>
-   <button type="button" class="pplMiniBtn" id="pplNewTypeSave">افزودن</button>
-  </div>
-  <label class="pplLabel">شماره تماس (اختیاری)</label>
-  <input type="text" class="pplInput" id="pplPhone" inputmode="tel" placeholder="۰۹…"/>
-  <label class="pplLabel">ماندهٔ اولیه (اختیاری)</label>
-  <input type="text" class="pplInput" id="pplOpening" inputmode="numeric" placeholder="0"/>
-  <div class="pplFormActions">
-   <button type="button" class="pplPrimary" id="pplSubmit">ثبت شخص جدید</button>
-   <button type="button" class="pplGhost" data-ppl-close="1">انصراف</button>
+   <div class="searchWrap" id="pplLedgerSearch"><input type="search" id="pplLedgerSearchInput" placeholder="جست‌وجو در شرح و تاریخ…" autocomplete="off"/></div>
+   <div class="noteLine">این گردش خودکار است و از ثبت‌های داخل اپ ساخته می‌شود: خرید، فروش و مرجوعیِ دارای «شخص»، به‌همراه برداشت/واریزیِ دارای «شخص» و تخفیف خرید.</div>
+   <div id="pplLedgerList"></div>
   </div>
  </div>
 </div>
+<div class="hidden" id="pplPersonSheet" role="dialog" aria-modal="true">
+ <div class="sheetShade" data-ppl-close="1"></div>
+ <div class="sheetPanel">
+  <div class="sheetHead">
+   <span class="shAvatarless"><svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M5 21a7 7 0 0 1 14 0"/></svg></span>
+   <div class="shTitle"><b id="pplFormTitle">تعریف شخص جدید</b><small>نام، نوع، تماس و ماندهٔ اولیه</small></div>
+   <button type="button" class="xbtn" data-ppl-close="1" aria-label="بستن">×</button>
+  </div>
+  <div class="sheetBody">
+   <div class="fRow"><label>نام شخص / شرکت</label><input type="text" id="pplName" placeholder="مثلاً شرکت پخش البرز"/></div>
+   <div class="fRow"><label>نوع شخص</label>
+    <div class="typeRow"><select id="pplType"></select><button type="button" class="addType" id="pplNewTypeBtn" title="ساخت نوع جدید" aria-label="ساخت نوع جدید">＋</button></div>
+    <div class="newType hidden" id="pplNewTypeWrap"><input type="text" id="pplNewTypeInput" placeholder="نام نوع جدید (مثلاً تولیدکننده)"/><button type="button" id="pplNewTypeSave">افزودن</button></div>
+   </div>
+   <div class="fRow"><label>شمارهٔ تماس (اختیاری)</label><input type="text" id="pplPhone" inputmode="tel" placeholder="0912..."/></div>
+   <div class="fRow"><label>ماندهٔ اولیه (اختیاری)</label>
+    <div class="two" style="grid-template-columns:1fr auto">
+     <input type="text" id="pplOpening" inputmode="numeric" placeholder="0"/>
+     <div class="seg" id="pplDir" style="grid-template-columns:1fr 1fr;width:180px"><button type="button" class="active" data-ppl-dir="debt">بدهکار</button><button type="button" data-ppl-dir="credit">بستانکار</button></div>
+    </div>
+   </div>
+   <div class="fRow"><label>یادداشت (اختیاری)</label><textarea id="pplNote" rows="2" placeholder="توضیح کوتاه..."></textarea></div>
+  </div>
+  <div class="sheetFoot">
+   <button type="button" class="btnGhost" data-ppl-close="1">انصراف</button>
+   <button type="button" class="btnPrimary" id="pplSubmit">ثبت شخص جدید</button>
+  </div>
+ </div>
+</div>
+<style id="ppl-view-styles">
+/* ===== ظاهر صفحهٔ اشخاص — برگرفته از پیش‌نمایش تأییدشده ===== */
+:is(#pagePeople,#pplLedgerSheet,#pplPersonSheet){--c1:#0f4c75;--c2:#1976b9}
+main.content:has(#pagePeople.active){padding:14px 12px}
+@media(max-width:430px){main.content:has(#pagePeople.active){padding:14px 12px}}
+#pagePeople .sumGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:13px}
+#pagePeople .sumCard{background:#fff;border:1px solid var(--line);border-radius:15px;padding:12px 9px;box-shadow:var(--shadow);text-align:center}
+#pagePeople .sumCard small{color:var(--muted);font-size:9px;display:block;width:100%}
+#pagePeople .sumCard b{display:block;font-size:13px;font-weight:700;margin-top:7px;width:100%}
+#pagePeople .sumCard.debt b{color:var(--red)}
+#pagePeople .sumCard.credit b{color:var(--green)}
+@media(max-width:430px){#pagePeople .sumGrid{gap:6px}#pagePeople .sumCard{padding:11px 7px}}
+#pagePeople .toolRow{display:flex;align-items:center;gap:8px;margin-bottom:12px;position:relative}
+:is(#pagePeople,#pplLedgerSheet,#pplPersonSheet) .ibtn{width:40px;height:40px;flex:none;border:1px solid var(--line);background:#fff;border-radius:13px;display:grid;place-items:center;color:var(--blue);box-shadow:var(--shadow);transition:transform .15s,background .15s;cursor:pointer;padding:0;font-family:inherit}
+:is(#pagePeople,#pplLedgerSheet,#pplPersonSheet) .ibtn:active{transform:scale(.94)}
+:is(#pagePeople,#pplLedgerSheet,#pplPersonSheet) .ibtn svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+#pagePeople .ibtn.accent{background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border-color:transparent}
+#pagePeople .ibtn.active{background:#e8f1f8;border-color:#cfe2ef}
+#pagePeople .toolSpacer{flex:1}
+:is(#pagePeople,#pplLedgerSheet,#pplPersonSheet) .searchWrap{display:block;max-height:0;overflow:hidden;transition:max-height .22s ease;flex:1;min-width:0}
+:is(#pagePeople,#pplLedgerSheet,#pplPersonSheet) .searchWrap.open{max-height:60px}
+:is(#pagePeople,#pplLedgerSheet,#pplPersonSheet) .searchWrap input{width:100%;height:40px;border:1px solid var(--line);border-radius:13px;padding:0 14px;background:#fff;box-shadow:var(--shadow);outline:0;font-size:13px;font-family:inherit;color:var(--text);box-sizing:border-box}
+:is(#pagePeople,#pplLedgerSheet,#pplPersonSheet) .searchWrap input:focus{border-color:#bcd6e8}
+#pplLedgerSearch{margin-bottom:8px}
+#pagePeople .pop{position:absolute;top:48px;z-index:40;background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:0 14px 40px #0d2b411f;padding:8px;min-width:190px;animation:pplPopIn .14s ease-out}
+@keyframes pplPopIn{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+#pagePeople .pop.hidden{display:none!important}
+#pagePeople .pop[data-for="sort"]{inset-inline-start:0}
+#pagePeople .pop[data-for="filter"]{inset-inline-end:0}
+#pagePeople .pop[data-for="theme"]{inset-inline-end:0}
+#pagePeople .pop .popTitle{font-size:10px;color:var(--muted);font-weight:800;padding:4px 8px 6px}
+#pagePeople .pop button.popItem{display:flex;align-items:center;gap:9px;width:100%;border:0;background:transparent;text-align:right;padding:9px;border-radius:10px;font-size:12.5px;color:var(--text);font-family:inherit;cursor:pointer}
+#pagePeople .pop button.popItem:hover{background:#f3f8fb}
+#pagePeople .pop button.popItem .tick{margin-inline-start:auto;color:var(--blue2);opacity:0;display:inline-flex}
+#pagePeople .pop button.popItem.sel .tick{opacity:1}
+#pagePeople .pop button.popItem .tick svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+#pagePeople .pop .chk{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:10px;font-size:12.5px;cursor:pointer}
+#pagePeople .pop .chk:hover{background:#f3f8fb}
+#pagePeople .pop .chk input{accent-color:var(--blue2);width:auto;height:auto}
+#pagePeople .themeRow{display:flex;gap:10px;padding:6px 8px 4px}
+#pagePeople .themeDot{width:40px;height:40px;border-radius:12px;border:2px solid #e2e8ee;box-shadow:0 3px 10px #0d2b4122;position:relative;transition:transform .14s;background-color:#2b3a4a;background-image:var(--pat),linear-gradient(135deg,#31506e,#5c7c9c);background-size:var(--patSize),cover;background-repeat:repeat,no-repeat;cursor:pointer;padding:0}
+#pagePeople .themeDot:active{transform:scale(.92)}
+#pagePeople .themeDot.sel{border-color:#fff;outline:2px solid var(--blue2)}
+#pagePeople .themeDot .tick2{position:absolute;inset:0;margin:auto;width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;opacity:0;filter:drop-shadow(0 1px 2px #0006)}
+#pagePeople .themeDot.sel .tick2{opacity:1}
+#pagePeople .pgrid{display:grid;grid-template-columns:1fr;gap:12px;padding-bottom:8px}
+@media(min-width:560px){#pagePeople .pgrid{grid-template-columns:1fr 1fr}}
+#pagePeople .pcard{position:relative;border-radius:20px;padding:15px 16px;min-height:138px;color:#fff;overflow:hidden;box-shadow:0 14px 28px #0f3f6226;display:flex;flex-direction:column;justify-content:space-between;background-color:var(--c1);background-image:var(--pat),linear-gradient(135deg,var(--c1),var(--c2));background-size:var(--patSize),cover;background-repeat:repeat,no-repeat;transition:transform .16s;cursor:pointer}
+#pagePeople .pcard:active{transform:translateY(-1px)}
+#pagePeople .pcard .sheen{position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,0) 38%);pointer-events:none}
+#pagePeople .pcardTop{display:flex;align-items:flex-start;justify-content:space-between;position:relative;z-index:2}
+#pagePeople .ptype{font-size:8.5px;font-weight:700;background:#ffffff24;border:1px solid #ffffff2b;border-radius:999px;padding:3px 8px;letter-spacing:.2px}
+#pagePeople .pcardName{position:relative;z-index:2;font-size:15.5px;font-weight:700;margin-top:2px;padding-inline-end:66px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 6px #001b3b33}
+#pagePeople .pcardBottom{position:relative;z-index:2;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-top:10px}
+#pagePeople .pbal small{display:block;font-size:9.5px;color:#ffffffa8;margin-bottom:4px}
+#pagePeople .pbalRow{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+#pagePeople .pbalRow b{font-size:19px;font-weight:700;letter-spacing:.3px;text-shadow:0 1px 8px #001b3b3d}
+#pagePeople .pbalRow .unit{font-size:10px;color:#ffffffc0}
+:is(#pagePeople,#pplLedgerSheet) .balTag{font-size:10px;font-weight:700;display:inline-flex;align-items:center;gap:5px}
+:is(#pagePeople,#pplLedgerSheet) .balTag:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 0 3px #ffffff1f}
+:is(#pagePeople,#pplLedgerSheet) .balTag.debt{color:#ffbfa3}
+:is(#pagePeople,#pplLedgerSheet) .balTag.credit{color:#a9edc6}
+:is(#pagePeople,#pplLedgerSheet) .balTag.zero{color:#e6eef4}
+#pagePeople .chipBtn{position:absolute;inset-inline-end:18px;top:50%;transform:translateY(-50%);z-index:3;display:flex;align-items:center;gap:4px;background:transparent;border:0;padding:4px;border-radius:12px;transition:transform .15s,background .15s;cursor:pointer}
+#pagePeople .chipBtn:active{transform:translateY(-50%) scale(.93)}
+#pagePeople .chipBtn:hover{background:#ffffff14}
+#pagePeople .chipShape{width:36px;height:27px;border-radius:6px;background:linear-gradient(135deg,#f8e7ab,#d6ab52);position:relative;box-shadow:inset 0 0 0 1px #ffffff66,0 2px 6px #0000002e;flex:none}
+#pagePeople .chipShape:before{content:"";position:absolute;inset:5px 6px;border-inline-start:1px solid #00000024;border-inline-end:1px solid #00000024}
+#pagePeople .chipShape:after{content:"";position:absolute;left:50%;top:6px;bottom:6px;width:1px;background:#00000024;transform:translateX(-50%)}
+#pagePeople .waves{width:16px;height:18px;stroke:#ffffffd9;fill:none;stroke-width:1.9;stroke-linecap:round}
+#pagePeople .chipBtn:hover .waves{stroke:#fff}
+#pagePeople .empty,#pplLedgerSheet .empty{text-align:center;color:var(--muted);font-size:12px;padding:40px 20px}
+#pagePeople .empty svg,#pplLedgerSheet .empty svg{width:46px;height:46px;margin:0 auto 12px;stroke:#b9c6cf;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+#pplLedgerSheet,#pplPersonSheet{position:fixed;inset:0;z-index:1400;display:flex;align-items:flex-end;justify-content:center}
+#pplLedgerSheet.hidden,#pplPersonSheet.hidden{display:none!important}
+#pplLedgerSheet .sheetShade,#pplPersonSheet .sheetShade{position:absolute;inset:0;background:#071521b8;animation:pplFade .18s ease-out}
+@keyframes pplFade{from{opacity:0}to{opacity:1}}
+#pplLedgerSheet .sheetPanel,#pplPersonSheet .sheetPanel{position:relative;width:min(560px,100%);max-height:88dvh;background:#fff;border-radius:22px 22px 0 0;box-shadow:0 -10px 50px #0000004d;display:flex;flex-direction:column;animation:pplRise .24s cubic-bezier(.2,.8,.2,1)}
+@keyframes pplRise{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}
+@media(min-width:600px){#pplLedgerSheet,#pplPersonSheet{align-items:center}#pplLedgerSheet .sheetPanel,#pplPersonSheet .sheetPanel{border-radius:20px}}
+#pplLedgerSheet .sheetHead,#pplPersonSheet .sheetHead{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid #eef1f3}
+#pplLedgerSheet .shAvatarless,#pplPersonSheet .shAvatarless{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--c1),var(--c2));color:#fff;display:grid;place-items:center;flex:none}
+#pplLedgerSheet .shAvatarless svg,#pplPersonSheet .shAvatarless svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+#pplLedgerSheet .shTitle,#pplPersonSheet .shTitle{flex:1;min-width:0}
+#pplLedgerSheet .shTitle b,#pplPersonSheet .shTitle b{display:block;font-size:14px}
+#pplLedgerSheet .shTitle small,#pplPersonSheet .shTitle small{display:block;font-size:10.5px;color:var(--muted);margin-top:2px;direction:ltr;text-align:right;unicode-bidi:embed}
+:is(#pplLedgerSheet,#pplPersonSheet) .xbtn{width:32px;height:32px;flex:none;border:0;border-radius:10px;background:#f0f3f5;color:#4a5963;font-size:21px;line-height:1;cursor:pointer;padding:0;font-family:inherit}
+:is(#pplLedgerSheet,#pplPersonSheet) .sheetBody{padding:14px 16px 18px;overflow:auto}
+#pplLedgerSheet .balBox{border-radius:16px;padding:14px;color:#fff;background-color:var(--c1);background-image:var(--pat),linear-gradient(135deg,var(--c1),var(--c2));background-size:var(--patSize),cover;background-repeat:repeat,no-repeat;position:relative;overflow:hidden;margin-bottom:13px}
+#pplLedgerSheet .balBox small{font-size:10.5px;color:#ffffffb8;position:relative;z-index:2}
+#pplLedgerSheet .balBox .bbRow{display:flex;align-items:baseline;gap:9px;margin-top:6px;position:relative;z-index:2}
+#pplLedgerSheet .balBox .bbRow b{font-size:26px;font-weight:700}
+#pplLedgerSheet .balBox .bbRow span{font-size:11px;color:#ffffffcc}
+#pplLedgerSheet .bbStats{display:flex;gap:14px;margin-top:12px;position:relative;z-index:2;font-size:10.5px;color:#ffffffc4;padding-inline-end:92px}
+#pplLedgerSheet .bbStats b{color:#fff}
+#pplLedgerSheet .bbTools{position:absolute;inset-inline-end:13px;bottom:12px;z-index:3;display:flex;gap:8px}
+#pplLedgerSheet .bbTools .ibtn{width:36px;height:36px;border-radius:11px;background:#ffffff26;border:1px solid #ffffff40;color:#fff;box-shadow:none}
+#pplLedgerSheet .bbTools .ibtn:hover{background:#ffffff3d}
+#pplLedgerSheet .bbTools .ibtn svg{stroke:#fff}
+#pplLedgerSheet .noteLine{font-size:10.5px;color:var(--muted);margin:0 2px 12px;line-height:1.8}
+#pplLedgerSheet .lrow{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:8px;flex-wrap:wrap}
+#pplLedgerSheet .lrow.purchase{border-inline-end:4px solid #d96a60;background:#fff7f6}
+#pplLedgerSheet .lrow.deposit{border-inline-end:4px solid #36a66a;background:#f4fbf6}
+#pplLedgerSheet .lrow.withdraw{border-inline-end:4px solid #e58a2b;background:#fff7ed}
+#pplLedgerSheet .lrow.return{border-inline-end:4px solid #7a6cc4;background:#f8f7fe}
+#pplLedgerSheet .lrow.adjust{border-inline-end:4px solid #7f8b95;background:#f8fafb}
+#pplLedgerSheet .lrow .lIco{width:34px;height:34px;flex:none;border-radius:11px;display:grid;place-items:center;background:#f2f6f9;color:var(--blue)}
+#pplLedgerSheet .lrow .lIco svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#pplLedgerSheet .lrow.purchase .lIco{background:#fde7e4;color:#bd463b}
+#pplLedgerSheet .lrow.deposit .lIco{background:#e0f5e8;color:#16834e}
+#pplLedgerSheet .lrow.withdraw .lIco{background:#ffedd5;color:#b45309}
+#pplLedgerSheet .lrow.return .lIco{background:#ece9fb;color:#6a5bc0}
+#pplLedgerSheet .lrow .lMain{flex:1;min-width:0}
+#pplLedgerSheet .lrow .lMain b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pplLedgerSheet .lrow .lMain small{display:block;font-size:10px;color:var(--muted);margin-top:3px}
+#pplLedgerSheet .lrow .lAmt{text-align:left;font-size:12.5px;font-weight:700;white-space:nowrap}
+#pplLedgerSheet .lrow .lAmt small{display:block;font-size:9px;color:var(--muted);font-weight:400;margin-top:3px}
+#pplLedgerSheet .pos{color:var(--red)!important}
+#pplLedgerSheet .neg{color:var(--green)!important}
+#pplLedgerSheet .tapRow{width:100%;border:0;background:transparent;display:flex;align-items:center;gap:5px;color:var(--blue2);font-size:10.5px;font-weight:700;padding:2px;margin-top:6px;border-radius:8px;font-family:inherit;cursor:pointer}
+#pplLedgerSheet .tapRow:hover{background:#f2f8fc}
+#pplLedgerSheet .tapRow .chev{transition:transform .18s}
+#pplLedgerSheet .lrow.open .tapRow .chev{transform:rotate(180deg)}
+#pplLedgerSheet .remainBox{margin-top:9px;padding:10px;border-radius:12px;background:#fffdf6;border:1px dashed #e6d5a8;flex-basis:100%}
+#pplLedgerSheet .remainBox.hidden{display:none}
+#pplLedgerSheet .remainBox .rbTop{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#7a5a2e;font-weight:700;gap:8px}
+#pplLedgerSheet .bar{height:7px;background:#efe6d2;border-radius:99px;overflow:hidden;margin:8px 0 2px}
+#pplLedgerSheet .bar i{display:block;height:100%;background:linear-gradient(90deg,#e0a838,#d98a3a);border-radius:99px}
+#pplLedgerSheet .remainBox .rbMeta{font-size:10px;color:#8a6a3a;margin-top:6px;line-height:1.7}
+#pplPersonSheet .sheetBody{padding:14px 16px 0}
+#pplPersonSheet .fRow{margin-bottom:11px}
+#pplPersonSheet .fRow label{display:block;font-size:11.5px;color:#53616c;font-weight:700;margin-bottom:5px}
+#pplPersonSheet .fRow input,#pplPersonSheet .fRow select,#pplPersonSheet .fRow textarea{width:100%;height:42px;border:1px solid #d5dee5;border-radius:12px;padding:0 12px;background:#fff;font-family:inherit;font-size:13px;outline:0;color:var(--text);box-sizing:border-box}
+#pplPersonSheet .fRow input:focus,#pplPersonSheet .fRow select:focus{border-color:#bcd6e8}
+#pplPersonSheet .fRow textarea{height:auto;padding:10px 12px;resize:vertical;line-height:1.8}
+#pplPersonSheet .typeRow{display:flex;gap:8px}
+#pplPersonSheet .typeRow select{flex:1}
+#pplPersonSheet .typeRow .addType{width:44px;height:42px;flex:none;border:1px solid var(--line);background:#f4f8fb;border-radius:12px;color:var(--blue);font-size:20px;line-height:1;cursor:pointer}
+#pplPersonSheet .seg{display:grid;grid-template-columns:1fr 1fr;background:#eaf0f4;padding:4px;border-radius:12px;gap:4px}
+#pplPersonSheet .seg button{border:0;background:transparent;border-radius:9px;padding:9px;font-size:12px;color:#65727c;font-weight:700;font-family:inherit;cursor:pointer}
+#pplPersonSheet .seg button.active{background:#fff;color:var(--blue);box-shadow:0 2px 8px #0000000b}
+#pplPersonSheet .two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+#pplPersonSheet .newType{display:flex;gap:8px;margin-top:8px}
+#pplPersonSheet .newType.hidden{display:none}
+#pplPersonSheet .newType input{flex:1}
+#pplPersonSheet .newType button{border:1px solid var(--line);background:#fff;color:var(--blue);border-radius:12px;padding:0 13px;font-family:inherit;font-size:12.5px;cursor:pointer;white-space:nowrap}
+#pplPersonSheet .sheetFoot{display:flex;gap:8px;padding:12px 16px;border-top:1px solid #eef1f3;justify-content:flex-end;background:#fff;border-radius:0 0 22px 22px}
+#pplPersonSheet .sheetFoot button{flex:0 0 auto;min-width:104px;height:38px;border-radius:10px;font-weight:700;font-size:12.5px;padding:0 16px;font-family:inherit;cursor:pointer}
+#pplPersonSheet .btnPrimary{border:0;background:linear-gradient(135deg,#0f4c75,#1976b9);color:#fff}
+#pplPersonSheet .btnGhost{border:1px solid #d5dee4;background:#fff;color:#69757f}
+#pplPersonSheet .req{color:var(--red)}
+</style>
 <style id="ppl-styles">
 #pagePeople .title{margin-bottom:10px}
 .pplSum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
@@ -4592,8 +4740,8 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
  var ROW_LABEL={purchase:'خرید',deposit:'واریزی',withdraw:'برداشت',return:'مرجوعی',adjust:'ماندهٔ اولیه'};
  var DEFAULT_TYPES=['تأمین‌کننده','مشتری','همکار','سایر'];
 
- var pplFilter={}, pplSort='type', pplSearchText='', pplOpenPop='';
- var pplCurrentId=null, pplReturnPersonId='', pplDepDest='cashbox';
+ var pplFilter={}, pplSort='debt', pplSearchText='', pplOpenPop='';
+ var pplCurrentId=null, pplReturnPersonId='', pplDepDest='cashbox', pplDir='debt';
 
  function $(id){return document.getElementById(id)}
  function pplTypeIdx(t){var i=personTypes.indexOf(t);return i<0?0:i}
@@ -4636,22 +4784,23 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
 
  function pplCardHTML(p){
   var bal=pplBalance(p);
-  var debt=bal>0, credit=bal<0;
-  var lbl=debt?'بدهکار':(credit?'بستانکار':'تسویه');
-  var cls=debt?'debt':(credit?'credit':'');
-  var dot=debt?'#ffbfa3':(credit?'#a9edc6':'rgba(255,255,255,.75)');
-  return '<div class="pplCard" data-ppl-card="'+esc(String(p.id))+'">'
-   +'<div class="pplCardTop"><div class="pplCardName">'+esc(p.name||'بدون نام')+'</div><span class="pplCardType">'+esc(p.type||'—')+'</span></div>'
-   +'<div class="pplCardMid"><span class="pplChip"></span><span class="pplWaves"><i></i><i></i><i></i></span></div>'
-   +'<div class="pplCardBalRow"><div><b class="pplCardBal">'+money(Math.abs(bal))+' '+esc(currencyUnit())+'</b><span class="pplCardBalLbl '+cls+'"><i class="pplDot" style="background:'+dot+'"></i>'+lbl+'</span></div></div>'
+  var tag=bal>0?'<span class="balTag debt">بدهکار</span>':(bal<0?'<span class="balTag credit">بستانکار</span>':'<span class="balTag zero">تسویه</span>');
+  return '<div class="pcard" data-ppl-card="'+esc(String(p.id))+'">'
+   +'<span class="sheen"></span>'
+   +'<div class="pcardTop"><span class="ptype">'+esc(p.type||'—')+'</span></div>'
+   +'<div class="pcardName">'+esc(p.name||'بدون نام')+'</div>'
+   +'<div class="pcardBottom"><div class="pbal"><small>مانده</small><div class="pbalRow"><b>'+money(Math.abs(bal))+'</b><span class="unit">'+esc(currencyUnit())+'</span>'+tag+'</div></div></div>'
+   +'<button type="button" class="chipBtn" title="گردش حساب" aria-label="گردش حساب"><span class="chipShape"></span><svg class="waves" viewBox="0 0 24 24"><path d="M6 9a7 7 0 0 0 0 6"/><path d="M9.5 6.2a11 11 0 0 0 0 11.6"/><path d="M13 3.6a15 15 0 0 0 0 16.8"/></svg></button>'
    +'</div>';
  }
  function pplRenderSummary(){
   var arr=pplArr(),debt=0,credit=0;
-  arr.forEach(function(p){var b=pplBalance(p);if(b>0)debt+=b;else if(b<0)credit+=-b});
-  if($('pplSumCount'))$('pplSumCount').textContent=fa(arr.length);
-  if($('pplSumDebt'))$('pplSumDebt').textContent=money(debt);
-  if($('pplSumCredit'))$('pplSumCredit').textContent=money(credit);
+  arr.forEach(function(p){var b=pplBalance(p);if(b>0)debt+=b;else credit+=-b});
+  var box=$('pplSumGrid');if(!box)return;
+  box.innerHTML=''
+   +'<div class="sumCard"><small>تعداد اشخاص</small><b>'+fa(arr.length)+' نفر</b></div>'
+   +'<div class="sumCard debt"><small>جمع بدهی ما</small><b>'+money(debt)+' ریال</b></div>'
+   +'<div class="sumCard credit"><small>جمع طلب ما</small><b>'+money(credit)+' ریال</b></div>';
  }
  function pplRenderGrid(){
   var grid=$('pplGrid');if(!grid)return;
@@ -4661,13 +4810,14 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
    if(q){var hay=((p.name||'')+' '+(p.type||'')+' '+(p.phone||'')).toLowerCase();if(hay.indexOf(q)<0)return false}
    return true;
   });
-  list.sort(function(a,b){
+  if(pplSort==='newest'){list.reverse()}
+  else list.sort(function(a,b){
    if(pplSort==='name')return String(a.name||'').localeCompare(String(b.name||''),'fa');
    if(pplSort==='debt')return pplBalance(b)-pplBalance(a);
    if(pplSort==='credit')return pplBalance(a)-pplBalance(b);
    var ta=pplTypeIdx(a.type),tb=pplTypeIdx(b.type);if(ta!==tb)return ta-tb;return String(a.name||'').localeCompare(String(b.name||''),'fa');
   });
-  if(!list.length){grid.innerHTML='<div class="pplEmpty">هنوز شخصی ثبت نشده است. با دکمهٔ + یک شخص اضافه کن.</div>';return}
+  if(!list.length){grid.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.4"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5.5a3.4 3.4 0 0 1 0 6.6"/></svg>شخصی با این مشخصات پیدا نشد.</div>';return}
   grid.innerHTML=list.map(pplCardHTML).join('');
   Array.prototype.forEach.call(grid.querySelectorAll('[data-ppl-card]'),function(el){
    var p=pplById(el.getAttribute('data-ppl-card'));if(!p)return;
@@ -4675,20 +4825,17 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
   });
  }
  function pplRenderPops(){
-  var box=$('pplPops');if(!box)return;
-  ['pplSortBtn','pplFilterBtn','pplThemeBtn'].forEach(function(id){var b=$(id);if(b)b.classList.remove('on')});
-  if(!pplOpenPop){box.innerHTML='';return}
-  if(pplOpenPop==='sort'){
-   if($('pplSortBtn'))$('pplSortBtn').classList.add('on');
-   var opts=[['type','نوع'],['debt','بدهی ما'],['credit','طلب ما'],['name','نام']];
-   box.innerHTML='<div class="pplPop"><div class="pplPopTitle">مرتب‌سازی</div><div class="pplPopRow">'+opts.map(function(o){return '<button type="button" class="pplPopChip'+(pplSort===o[0]?' on':'')+'" data-ppl-sort="'+o[0]+'">'+o[1]+'</button>'}).join('')+'</div></div>';
-  }else if(pplOpenPop==='filter'){
-   if($('pplFilterBtn'))$('pplFilterBtn').classList.add('on');
-   box.innerHTML='<div class="pplPop"><div class="pplPopTitle">فیلتر نوع</div><div class="pplPopRow">'+personTypes.map(function(t){return '<button type="button" class="pplPopChip'+(pplFilter[t]?' on':'')+'" data-ppl-filter="'+esc(t)+'">'+esc(t)+'</button>'}).join('')+(Object.keys(pplFilter).length?'<button type="button" class="pplPopChip" data-ppl-filter-clear="1">پاک‌کردن</button>':'')+'</div></div>';
-  }else if(pplOpenPop==='theme'){
-   if($('pplThemeBtn'))$('pplThemeBtn').classList.add('on');
-   box.innerHTML='<div class="pplPop"><div class="pplPopTitle">طرح پس‌زمینهٔ کارت‌ها</div><div class="pplPopRow">'+PAT_ORDER.map(function(k){var p=PATTERNS[k];return '<button type="button" class="pplPatSwatch'+(peoplePattern===k?' on':'')+'" data-ppl-pat="'+k+'"><i style="--pat:'+p.pat+';--patSize:'+p.size+'"></i>'+PAT_LABEL[k]+'</button>'}).join('')+'</div></div>';
-  }
+  var sortPop=$('pplSortPop'),filterPop=$('pplFilterPop'),themePop=$('pplThemePop');
+  if(!sortPop||!filterPop||!themePop)return;
+  sortPop.innerHTML='<div class="popTitle">مرتب‌سازی</div>'+[['debt','بیشترین بدهی ما'],['credit','بیشترین طلب ما'],['name','نام (الفبا)'],['newest','جدیدترین']].map(function(o){return '<button type="button" class="popItem'+(pplSort===o[0]?' sel':'')+'" data-ppl-sort="'+o[0]+'">'+o[1]+'<span class="tick"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.2 4.2L19 7"/></svg></span></button>'}).join('');
+  filterPop.innerHTML='<div class="popTitle">فیلتر بر اساس نوع</div>'+personTypes.map(function(t){return '<label class="chk"><input type="checkbox" data-ppl-filter="'+esc(t)+'"'+(pplFilter[t]?' checked':'')+'>'+esc(t)+'</label>'}).join('');
+  themePop.innerHTML='<div class="popTitle">طرح پس‌زمینهٔ کارت‌ها</div><div class="themeRow">'+PAT_ORDER.map(function(k){var p=PATTERNS[k];return '<button type="button" class="themeDot'+(peoplePattern===k?' sel':'')+'" data-ppl-pat="'+k+'" title="'+PAT_LABEL[k]+'" aria-label="'+PAT_LABEL[k]+'" style="--pat:'+p.pat+';--patSize:'+p.size+'"><svg class="tick2" viewBox="0 0 24 24"><path d="m5 12.5 4.2 4.2L19 7"/></svg></button>'}).join('')+'</div>';
+  sortPop.classList.toggle('hidden',pplOpenPop!=='sort');
+  filterPop.classList.toggle('hidden',pplOpenPop!=='filter');
+  themePop.classList.toggle('hidden',pplOpenPop!=='theme');
+  if($('pplSortBtn'))$('pplSortBtn').classList.toggle('active',pplOpenPop==='sort');
+  if($('pplFilterBtn'))$('pplFilterBtn').classList.toggle('active',pplOpenPop==='filter');
+  if($('pplThemeBtn'))$('pplThemeBtn').classList.toggle('active',pplOpenPop==='theme');
  }
  function pplRenderAll(){pplRenderSummary();pplRenderGrid();pplRenderPops()}
 
@@ -4703,28 +4850,39 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
   return s[t]||s.purchase;
  }
  function pplRowHTML(r){
-  var sign=r.delta>0?'debt':(r.delta<0?'credit':'');
-  var arrow=r.delta>0?'+':(r.delta<0?'−':'');
-  var meta='';
-  if(r.row){
-   meta=esc(r.date||'');
+  var pos=r.delta>0;
+  var tag=pos?'pos':'neg';
+  var arrow=pos?'+':'−';
+  var isBuy=(r.t==='purchase'&&r.row);
+  var sub='';
+  if(!r.row){sub='ماندهٔ اولیه';}
+  else{
+   sub=esc(r.date||'—')+' · '+esc(ROW_LABEL[r.t]||'');
    if(r.t==='purchase'){
-    var gross=Number(r.row.purchase)||0,disc=Number(r.row.poolUsed)||0,paid=(Number(r.row.purchaseCash)||0)+(Number(r.row.purchaseDriver)||0);
-    var settle=pplSettlements(r.row).reduce(function(a,s){return a+(Number(s&&s.amount)||0)},0);
-    var remain=Math.max(0,gross-disc-paid-settle);
-    if(disc>0)meta+=' · تخفیف '+money(disc);
-    if(paid>0)meta+=' · پرداخت '+money(paid);
-    if(r.row.officialInvoice)meta+=' · پرداخت از حساب شرکت';
-    if(!r.row.officialInvoice&&remain>0)meta+='<div class="pplRemain">مانده این خرید: '+money(remain)+' '+esc(currencyUnit())+'</div>';
+    var disc=Number(r.row.poolUsed)||0;
+    var paid=(Number(r.row.purchaseCash)||0)+(Number(r.row.purchaseDriver)||0);
+    if(disc>0)sub+=' · تخفیف '+money(disc);
+    if(paid>0)sub+=' · پرداخت '+money(paid);
+    if(r.row.officialInvoice)sub+=' · پرداخت از حساب شرکت';
    }else if(r.t==='return'){
-    meta+=' · '+(r.row.returnDestination==='credit'?'قابل استفاده در خرید دیگر':'بازگشت به تنخواه');
+    sub+=' · '+(r.row.returnDestination==='credit'?'قابل استفاده در خرید دیگر':'بازگشت به تنخواه');
    }else if(r.t==='withdraw'){
-    meta+=' · منبع: '+esc(sourceText(r.row.withdrawSource||'cashbox'));
+    sub+=' · منبع: '+esc(sourceText(r.row.withdrawSource||'cashbox'));
    }else if(r.t==='deposit'){
-    meta+=' · '+esc(sourceText(r.row.depositType||'cashbox'));
+    sub+=' · '+esc(sourceText(r.row.depositType||'cashbox'));
    }
-  }else{meta='مانده آغازین';}
-  return '<div class="pplRow"><span class="pplRowIco t-'+r.t+'">'+pplIcon(r.t)+'</span><div class="pplRowMain"><div class="pplRowTitle">'+esc(r.desc||ROW_LABEL[r.t]||'')+'</div><div class="pplRowMeta">'+meta+'</div></div><div><div class="pplRowAmt '+sign+'">'+arrow+' '+money(Math.abs(r.delta))+'</div><span class="pplRowRun">مانده: '+money(Math.abs(r.run))+' '+(r.run>0?'بدهکار':(r.run<0?'بستانکار':'تسویه'))+'</span></div></div>';
+  }
+  var gross=isBuy?(Number(r.row.purchase)||0):0;
+  var remain=isBuy?Math.max(0,Number(r.delta)||0):0;
+  var settled=isBuy?Math.max(0,gross-remain):0;
+  var h='<div class="lrow '+esc(r.t)+'">'
+   +'<span class="lIco">'+pplIcon(r.t)+'</span>'
+   +'<div class="lMain"><b>'+esc(r.desc||ROW_LABEL[r.t]||'')+'</b><small>'+sub+'</small>';
+  if(isBuy)h+='<button type="button" class="tapRow" data-ppl-expand="1">'+(remain>0?('ماندهٔ این خرید: '+money(remain)+' '+esc(currencyUnit())):'تسویه‌شده')+' <span class="chev">▾</span></button>';
+  h+='</div><div class="lAmt '+tag+'">'+arrow+money(Math.abs(r.delta))+'<small>مانده '+money(Math.abs(r.run))+'</small></div>';
+  if(isBuy)h+='<div class="remainBox hidden"><div class="rbTop"><span>ماندهٔ تعهد این خرید</span><b>'+money(remain)+' از '+money(gross)+' '+esc(currencyUnit())+'</b></div><div class="bar"><i style="width:'+(gross?Math.round(settled/gross*100):100)+'%"></i></div><div class="rbMeta">'+(settled?('تسویه‌شده: '+money(settled)+' '+esc(currencyUnit())):'هنوز تسویه‌ای ثبت نشده است.')+'</div>'+(remain>0?'<div class="rbMeta" style="color:#b8802f">این خرید از تنخواه/واریزی‌های دارای شخص قابل تسویه است.</div>':'<div class="rbMeta" style="color:#1d6b43;font-weight:700">✓ کاملاً تسویه شده است</div>')+'</div>';
+  h+='</div>';
+  return h;
  }
  function pplRenderLedgerRows(){
   var list=$('pplLedgerList');if(!list)return;
@@ -4732,20 +4890,23 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
   var q=String($('pplLedgerSearchInput')?$('pplLedgerSearchInput').value:'').trim().toLowerCase();
   var rows=pplRows(p);
   if(q)rows=rows.filter(function(r){return (String(r.desc||'')+' '+String(r.date||'')).toLowerCase().indexOf(q)>=0});
-  if(!rows.length){list.innerHTML='<div class="pplEmptyLedger">گردشی برای این شخص ثبت نشده است.</div>';return}
-  list.innerHTML=rows.slice().reverse().map(pplRowHTML).join('');
+  if(!rows.length){list.innerHTML='<div class="empty" style="padding:26px">ردیفی ثبت نشده است.</div>';return}
+  list.innerHTML=rows.map(pplRowHTML).join('');
  }
  function pplOpenLedger(id){
   var p=pplById(id);if(!p)return;
   pplCurrentId=id;
   var bal=pplBalance(p),debt=bal>0,credit=bal<0;
   if($('pplBalName'))$('pplBalName').textContent=p.name||'بدون نام';
-  if($('pplBalType'))$('pplBalType').textContent=p.type||'';
-  if($('pplBalAmt'))$('pplBalAmt').textContent=money(Math.abs(bal))+' '+currencyUnit();
-  if($('pplBalLbl')){$('pplBalLbl').textContent=debt?'بدهکار':(credit?'بستانکار':'تسویه');$('pplBalLbl').className='pplBalLbl '+(debt?'debt':(credit?'credit':''))}
-  if($('pplBalPhone')){$('pplBalPhone').textContent=p.phone?('☎ '+p.phone):'';$('pplBalPhone').className='pplBalPhone'+(p.phone?'':' empty')}
+  if($('pplBalPhone'))$('pplBalPhone').textContent=(p.phone||'بدون شمارهٔ تماس')+' · '+(p.type||'');
+  if($('pplBalAmt'))$('pplBalAmt').textContent=money(Math.abs(bal));
+  if($('pplBalLbl')){$('pplBalLbl').textContent=debt?'بدهکار':(credit?'بستانکار':'تسویه');$('pplBalLbl').className='balTag '+(debt?'debt':(credit?'credit':'zero'))}
+  var buy=0,pay=0;pplRows(p).forEach(function(r){if(r.t==='purchase'&&r.row)buy+=Number(r.row.purchase)||0;else pay+=Math.abs(Number(r.delta)||0)});
+  if($('pplBalBuy'))$('pplBalBuy').textContent=money(buy);
+  if($('pplBalPay'))$('pplBalPay').textContent=money(pay);
   var box=$('pplBalBox');if(box){pplApplyPat(box);pplApplyColor(box,p.type)}
-  if($('pplLedgerSearch'))$('pplLedgerSearch').classList.add('hidden');
+  var av=$('pplBalAv');if(av)pplApplyColor(av,p.type);
+  if($('pplLedgerSearch'))$('pplLedgerSearch').classList.remove('open');
   if($('pplLedgerSearchInput'))$('pplLedgerSearchInput').value='';
   pplRenderLedgerRows();
   if($('pplLedgerSheet'))$('pplLedgerSheet').classList.remove('hidden');
@@ -4770,30 +4931,36 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
  }
  function pplOpenPersonSheet(id){
   var p=id?pplById(id):null;
-  if($('pplFormTitle'))$('pplFormTitle').textContent=p?('ویرایش '+(p.name||'شخص')):'شخص جدید';
+  if($('pplFormTitle'))$('pplFormTitle').textContent=p?('ویرایش '+(p.name||'شخص')):'تعریف شخص جدید';
   if($('pplName'))$('pplName').value=p?(p.name||''):'';
   if($('pplPhone'))$('pplPhone').value=p?(p.phone||''):'';
-  if($('pplOpening'))$('pplOpening').value=p?(p.opening?moneyInputValue(p.opening):''):'';
+  if($('pplNote'))$('pplNote').value=p?(p.note||''):'';
+  if($('pplOpening'))$('pplOpening').value=(p&&p.opening)?money(Math.abs(Number(p.opening)||0)):'';
+  pplDir=(p&&Number(p.opening)<0)?'credit':'debt';
+  if($('pplDir'))Array.prototype.forEach.call($('pplDir').querySelectorAll('[data-ppl-dir]'),function(b){b.classList.toggle('active',b.getAttribute('data-ppl-dir')===pplDir)});
   if($('pplNewTypeWrap'))$('pplNewTypeWrap').classList.add('hidden');
   if($('pplNewTypeInput'))$('pplNewTypeInput').value='';
   pplFillTypeSelect(p?(p.type||''):(personTypes[0]||''));
   if($('pplPersonSheet'))$('pplPersonSheet').setAttribute('data-edit-id',p?String(p.id):'');
   if($('pplPersonSheet'))$('pplPersonSheet').classList.remove('hidden');
   document.body.style.overflow='hidden';
-  setTimeout(function(){if($('pplName'))$('pplName').focus()},60);
+  setTimeout(function(){if($('pplName'))try{$('pplName').focus()}catch(_){}},60);
  }
  function pplSubmitPerson(){
   var name=String($('pplName')?$('pplName').value:'').trim();
   if(!name){alert('نام شخص را وارد کن.');return}
   var type=String($('pplType')?$('pplType').value:(personTypes[0]||'سایر'));
+  var nt=String($('pplNewTypeInput')?$('pplNewTypeInput').value:'').trim();
+  if(nt&&$('pplNewTypeWrap')&&!$('pplNewTypeWrap').classList.contains('hidden')){if(personTypes.indexOf(nt)<0){personTypes=personTypes.concat([nt]);pplSaveTypes()}type=nt}
   var phone=String($('pplPhone')?$('pplPhone').value:'').trim();
-  var opening=Math.round(toRial($('pplOpening')?$('pplOpening').value:'')||0);
+  var note=String($('pplNote')?$('pplNote').value:'').trim();
+  var opening=Math.round((Number(String($('pplOpening')?$('pplOpening').value:'').replace(/[^\d]/g,''))||0)*(pplDir==='debt'?1:-1));
   var editId=$('pplPersonSheet')?$('pplPersonSheet').getAttribute('data-edit-id'):'';
   if(editId){
    var p=pplById(editId);
-   if(p){p.name=name;p.type=type;p.phone=phone;p.opening=opening;pplSavePersons()}
+   if(p){p.name=name;p.type=type;p.phone=phone;p.note=note;p.opening=opening;pplSavePersons()}
   }else{
-   persons=pplArr().concat([{id:String(Date.now())+String(Math.floor(Math.random()*9999)),name:name,type:type,phone:phone,opening:opening,createdDate:today(),by:(current&&current.name)||''}]);
+   persons=pplArr().concat([{id:String(Date.now())+String(Math.floor(Math.random()*9999)),name:name,type:type,phone:phone,note:note,opening:opening,createdDate:today(),by:(current&&current.name)||''}]);
    pplSavePersons();
   }
   pplCloseSheets();
@@ -4966,26 +5133,27 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
  };
 
  /* ---------- رخدادهای صفحه ---------- */
- if($('pplAddBtn'))$('pplAddBtn').addEventListener('click',function(){pplOpenPersonSheet()});
- if($('pplSearchBtn'))$('pplSearchBtn').addEventListener('click',function(){var inp=$('pplSearch');if(!inp)return;inp.classList.toggle('hidden');if(!inp.classList.contains('hidden')){try{inp.focus()}catch(_){}}else{inp.value='';pplSearchText='';pplRenderGrid()}});
+ if($('pplAddBtn'))$('pplAddBtn').addEventListener('click',function(e){if(e&&e.stopPropagation)e.stopPropagation();pplOpenPersonSheet()});
+ if($('pplSearchBtn'))$('pplSearchBtn').addEventListener('click',function(e){if(e&&e.stopPropagation)e.stopPropagation();var w=$('pplSearchWrap');if(!w)return;w.classList.toggle('open');if(w.classList.contains('open')&&$('pplSearch'))try{$('pplSearch').focus()}catch(_){}});
  if($('pplSearch'))$('pplSearch').addEventListener('input',function(){pplSearchText=this.value||'';pplRenderGrid()});
- if($('pplSortBtn'))$('pplSortBtn').addEventListener('click',function(){pplOpenPop=pplOpenPop==='sort'?'':'sort';pplRenderPops()});
- if($('pplFilterBtn'))$('pplFilterBtn').addEventListener('click',function(){pplOpenPop=pplOpenPop==='filter'?'':'filter';pplRenderPops()});
- if($('pplThemeBtn'))$('pplThemeBtn').addEventListener('click',function(){pplOpenPop=pplOpenPop==='theme'?'':'theme';pplRenderPops()});
- if($('pplPops'))$('pplPops').addEventListener('click',function(e){
-  var s=e.target.closest('[data-ppl-sort]');if(s){pplSort=s.getAttribute('data-ppl-sort');pplRenderPops();pplRenderGrid();return}
-  var f=e.target.closest('[data-ppl-filter]');if(f){var t=f.getAttribute('data-ppl-filter');if(pplFilter[t])delete pplFilter[t];else pplFilter[t]=true;pplRenderPops();pplRenderGrid();return}
-  if(e.target.closest('[data-ppl-filter-clear]')){pplFilter={};pplRenderPops();pplRenderGrid();return}
-  var pt=e.target.closest('[data-ppl-pat]');if(pt){peoplePattern=pt.getAttribute('data-ppl-pat');try{localStorage.setItem('bazargani_people_pattern_v1',peoplePattern)}catch(_){}pplRenderPops();pplRenderGrid();return}
- });
+ if($('pplSortBtn'))$('pplSortBtn').addEventListener('click',function(e){e.stopPropagation();pplOpenPop=pplOpenPop==='sort'?'':'sort';pplRenderPops()});
+ if($('pplFilterBtn'))$('pplFilterBtn').addEventListener('click',function(e){e.stopPropagation();pplOpenPop=pplOpenPop==='filter'?'':'filter';pplRenderPops()});
+ if($('pplThemeBtn'))$('pplThemeBtn').addEventListener('click',function(e){e.stopPropagation();pplOpenPop=pplOpenPop==='theme'?'':'theme';pplRenderPops()});
+ document.addEventListener('click',function(e){if(!pplOpenPop)return;if(e.target.closest&&(e.target.closest('#pplSortPop')||e.target.closest('#pplFilterPop')||e.target.closest('#pplThemePop')||e.target.closest('#pplSortBtn')||e.target.closest('#pplFilterBtn')||e.target.closest('#pplThemeBtn')))return;pplOpenPop='';pplRenderPops()});
+ if($('pplSortPop'))$('pplSortPop').addEventListener('click',function(e){var b=e.target.closest('[data-ppl-sort]');if(!b)return;pplSort=b.getAttribute('data-ppl-sort');pplOpenPop='';pplRenderPops();pplRenderGrid()});
+ if($('pplFilterPop'))$('pplFilterPop').addEventListener('change',function(e){var c=e.target.closest('[data-ppl-filter]');if(!c)return;var t=c.getAttribute('data-ppl-filter');if(c.checked)pplFilter[t]=true;else delete pplFilter[t];pplRenderGrid()});
+ if($('pplThemePop'))$('pplThemePop').addEventListener('click',function(e){var b=e.target.closest('[data-ppl-pat]');if(!b)return;peoplePattern=b.getAttribute('data-ppl-pat');try{localStorage.setItem('bazargani_people_pattern_v1',peoplePattern)}catch(_){}pplRenderPops();pplRenderGrid()});
  if($('pplGrid'))$('pplGrid').addEventListener('click',function(e){var c=e.target.closest('[data-ppl-card]');if(!c)return;pplOpenLedger(c.getAttribute('data-ppl-card'))});
  Array.prototype.forEach.call(document.querySelectorAll('[data-ppl-close]'),function(el){el.addEventListener('click',function(){pplCloseSheets()})});
  if($('pplSubmit'))$('pplSubmit').addEventListener('click',pplSubmitPerson);
- if($('pplNewTypeBtn'))$('pplNewTypeBtn').addEventListener('click',function(){var w=$('pplNewTypeWrap');if(!w)return;w.classList.toggle('hidden');if(!w.classList.contains('hidden')&&$('pplNewTypeInput'))$('pplNewTypeInput').focus()});
+ if($('pplNewTypeBtn'))$('pplNewTypeBtn').addEventListener('click',function(){var w=$('pplNewTypeWrap');if(!w)return;w.classList.toggle('hidden');if(!w.classList.contains('hidden')&&$('pplNewTypeInput'))try{$('pplNewTypeInput').focus()}catch(_){}});
  if($('pplNewTypeSave'))$('pplNewTypeSave').addEventListener('click',function(){var v=String($('pplNewTypeInput')?$('pplNewTypeInput').value:'').trim();if(!v)return;if(personTypes.indexOf(v)<0){personTypes=personTypes.concat([v]);pplSaveTypes()}pplFillTypeSelect(v);if($('pplNewTypeInput'))$('pplNewTypeInput').value='';if($('pplNewTypeWrap'))$('pplNewTypeWrap').classList.add('hidden')});
- if($('pplLedgerSearchBtn'))$('pplLedgerSearchBtn').addEventListener('click',function(){var w=$('pplLedgerSearch');if(!w)return;w.classList.toggle('hidden');if(!w.classList.contains('hidden')){if($('pplLedgerSearchInput'))try{$('pplLedgerSearchInput').focus()}catch(_){}}else{if($('pplLedgerSearchInput'))$('pplLedgerSearchInput').value='';pplRenderLedgerRows()}});
+ if($('pplDir'))$('pplDir').addEventListener('click',function(e){var b=e.target.closest('[data-ppl-dir]');if(!b)return;pplDir=b.getAttribute('data-ppl-dir');Array.prototype.forEach.call($('pplDir').querySelectorAll('[data-ppl-dir]'),function(x){x.classList.toggle('active',x===b)})});
+ if($('pplOpening'))$('pplOpening').addEventListener('input',function(){var v=String(this.value||'').replace(/[^\d]/g,'');this.value=v?money(v):''});
+ if($('pplLedgerSearchBtn'))$('pplLedgerSearchBtn').addEventListener('click',function(){var w=$('pplLedgerSearch');if(!w)return;w.classList.toggle('open');if(w.classList.contains('open')&&$('pplLedgerSearchInput'))try{$('pplLedgerSearchInput').focus()}catch(_){}});
  if($('pplLedgerSearchInput'))$('pplLedgerSearchInput').addEventListener('input',pplRenderLedgerRows);
  if($('pplLedgerExcelBtn'))$('pplLedgerExcelBtn').addEventListener('click',pplExportLedger);
+ if($('pplLedgerList'))$('pplLedgerList').addEventListener('click',function(e){var ex=e.target.closest('[data-ppl-expand]');if(!ex)return;var row=ex.closest('.lrow');if(!row)return;row.classList.toggle('open');var d=row.querySelector('.remainBox');if(d)d.classList.toggle('hidden')});
  document.addEventListener('keydown',function(e){if(e.key==='Escape')pplCloseSheets()});
 
  try{var st=document.createElement('style');st.textContent='.pplTxPersonWrap{margin-top:10px}.pplTxPersonSel{width:100%;height:44px;border:1px solid var(--line);border-radius:12px;padding:0 12px;font-family:inherit;font-size:14px;background:var(--card);color:var(--text)}'
@@ -5000,6 +5168,7 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
  /* ---------- راه‌اندازی ---------- */
  if(!Array.isArray(personTypes)||!personTypes.length)personTypes=DEFAULT_TYPES.slice();
  pplRefreshPersonSelects();
+ try{var __np=document.querySelector('.nav button[data-go="people"]'),__nm=document.querySelector('.nav button[data-go="manage"]');if(__np&&__nm)__nm.parentNode.insertBefore(__np,__nm);}catch(_){}
  try{pplRenderAll()}catch(_){}
 })();
 
