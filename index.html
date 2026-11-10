@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#ffffff" name="theme-color"/>
-<meta name="saman-build" content="v256"/>
+<meta name="saman-build" content="v257"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; manifest-src 'self'; connect-src 'self' https://eiobajtihwxdlfxufmbg.supabase.co wss://eiobajtihwxdlfxufmbg.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
@@ -530,7 +530,7 @@ textarea{min-height:64px}
 #pageWarehouse .warehouseBatchTools>button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:34px!important;height:auto!important;margin:0!important;padding:5px 3px!important;border-radius:8px!important;font-family:inherit!important;font-size:clamp(9px,2.45vw,11px)!important;font-weight:600!important;line-height:1.3!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;box-sizing:border-box!important}
 @media(max-width:360px){#pageWarehouse .warehouseSection>.listTabs>button{font-size:11px!important;padding:5px 3px!important}#pageWarehouse .warehouseBatchTools{gap:4px!important;padding:4px!important}#pageWarehouse .warehouseBatchTools>button{font-size:9px!important;padding:4px 2px!important;min-height:34px!important}}
 </style>
-<meta name="saman-build" content="v256">
+<meta name="saman-build" content="v257">
 
 <style id="v213-fund-transfer-split">
 .fundActOverlay,.fundPickerOverlay{position:fixed;inset:0;z-index:100520;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;background:rgba(15,28,45,.48);backdrop-filter:blur(2px)}
@@ -788,14 +788,16 @@ button.supplyLinkTag{border:0;font-family:inherit;text-align:right;cursor:pointe
  <select class="select" id="withdrawSource">
   <option value="cashbox">تنخواه</option>
   <option value="driver">واریزی کارت رانندگان</option>
-  <option value="basket">تعهد فردا</option>
   <option value="pool">سبد تخفیفات</option>
   <option value="mixed">ترکیبی</option>
  </select>
  <div class="withdrawMixed hidden" id="withdrawMixed">
   <label>تنخواه<input class="finput moneyInput" id="withdrawCash" inputmode="numeric" placeholder="مبلغ"/></label>
   <label>کارت رانندگان<input class="finput moneyInput" id="withdrawDriver" inputmode="numeric" placeholder="مبلغ" readonly></label>
-  <label>تعهد فردا<input class="finput moneyInput" id="withdrawBasket" inputmode="numeric" placeholder="مبلغ"/></label>
+ </div>
+ <div class="basketFields" id="withdrawBasketFields">
+  <label class="basketToggle"><input type="checkbox" id="withdrawBasketToggle"><span><b>ماندهٔ برداشت به «تعهد فردا» برود</b><small>مبلغ باقی‌ماندهٔ برداشت به‌صورت خودکار به تعهد فردا منتقل می‌شود و از تنخواه یا واریزی‌های همان روز تسویه می‌شود.</small></span></label>
+  <div class="basketAmountRow hidden" id="withdrawBasketAmountRow"><input class="finput moneyInput" id="withdrawBasket" inputmode="numeric" placeholder="مبلغ تعهد فردا (ریال)" aria-label="مبلغ تعهد فردا"><span class="basketMax" id="withdrawBasketMax"></span></div>
  </div>
  <div class="v249PoolUse hidden" id="withdrawPoolUse">
   <div class="v249PoolRow" id="withdrawPoolRow" style="margin-top:0"><input class="finput moneyInput" id="withdrawPoolAmount" inputmode="numeric" placeholder="مبلغ استفاده از سبد تخفیفات (ریال)" aria-label="مبلغ استفاده از سبد تخفیفات"><span class="v249PoolMax" id="withdrawPoolMax"></span></div>
@@ -846,8 +848,8 @@ button.supplyLinkTag{border:0;font-family:inherit;text-align:right;cursor:pointe
  <div class="card v249PoolCard hidden" id="v249PoolStrip" style="margin:14px 0 0">
   <div class="v249PoolCardRow"><span class="v249PoolLabel">سبد تخفیفات</span><b id="v249PoolStripAmount">۰ ریال</b><small id="v249PoolStripHint">خرید، برداشت و شارژ تنخواه</small></div>
  </div>
- <div class="ctitle" style="font-size:14px;margin-top:16px">تعهد روزهای بعد (سبد خرید)</div>
- <p style="color:var(--muted);font-size:12px;line-height:1.9;margin:0 0 8px">ماندهٔ خریدهایی که هنگام ثبت، از واریزی‌های همان روز کامل تأمین نشده‌اند. هر خرید یک خط جدا دارد و به‌تدریج از تنخواه (مانده حساب) یا واریزی‌های روزهای بعد تسویه می‌شود تا حساب خرید به صفر برسد.</p>
+ <div class="ctitle" style="font-size:14px;margin-top:16px">تعهد روزهای بعد (سبد خرید و برداشت)</div>
+ <p style="color:var(--muted);font-size:12px;line-height:1.9;margin:0 0 8px">ماندهٔ خریدها و برداشت‌هایی که هنگام ثبت، از واریزی‌های همان روز کامل تأمین نشده‌اند. هر مورد یک خط جدا دارد و به‌تدریج از تنخواه (مانده حساب) یا واریزی‌های روزهای بعد تسویه می‌شود تا حساب به صفر برسد.</p>
  <div id="purchaseBasketList"></div>
 </div>
 </section>
@@ -1957,7 +1959,8 @@ function balanceDeltaOf(x){
  if(!x)return 0;
  // v243: واریزی تجمیعی کارت رانندگان در برداشت هم مانند خرید باید داخل مانده حساب بیاید.
  const driverCredit=(Array.isArray(x.driverFundUses)?x.driverFundUses:[]).reduce((sum,u)=>sum+Math.max(0,Number(u.amount)||0),0);
- if(isWithdrawTx(x))return -Math.max(0,Number(x.withdraw)||0)+driverCredit;
+ // v257: بخش «تعهد فردا»ی برداشت تا زمان تسویه از ماندهٔ تنخواه کسر نمی‌شود (سیمتریک با خرید).
+ if(isWithdrawTx(x))return -Math.max(0,Number(x.withdraw)||0)+driverCredit+basketRemainingOf(x);
  return (Number(x.deposit)||0)+driverCredit-(x.officialInvoice?0:effectivePurchaseOf(x))+(x.officialInvoice?0:basketRemainingOf(x))-(x.officialInvoice?0:(Number(x.freight)||0));
 }
 function driverFundUsesForAmount(amount){
@@ -2452,15 +2455,23 @@ function saveTx(){
   const src=$('withdrawSource').value||'cashbox';
   const picks=(src==='driver'||src==='mixed')?selectedWithdrawFundUses():[];
   const picksTotal=picks.reduce((a,u)=>a+u.amount,0);
-  let parts={cashbox:0,driver:0,basket:0};
+  // v257: بخش «تعهد فردا» مستقل از منبع برداشت و به‌صورت یک چک‌باکس (مانند فرم خرید) تعیین می‌شود.
+  const basketOn=!!($('withdrawBasketToggle')&&$('withdrawBasketToggle').checked);
+  let basketAmt=basketOn?Math.max(0,toRial($('withdrawBasket')?.value||'')||0):0;
+  if(basketAmt>total+0.001){alert('مبلغ تعهد فردا نمی‌تواند از مبلغ برداشت بیشتر باشد.');return}
+  const rest=Math.max(0,total-basketAmt);
+  const parts={cashbox:0,driver:0,basket:basketAmt,pool:0};
   if(src==='mixed'){
-   parts={cashbox:toRial($('withdrawCash').value),driver:picksTotal>0?picksTotal:toRial($('withdrawDriver').value),basket:toRial($('withdrawBasket').value)};
-   const sum=parts.cashbox+parts.driver+parts.basket;
-   if(sum!==total){alert('مجموع بخش‌های منبع برداشت باید دقیقاً برابر مبلغ برداشت باشد.');return}
+   parts.cashbox=Math.max(0,toRial($('withdrawCash').value)||0);
+   parts.driver=picksTotal>0?picksTotal:Math.max(0,toRial($('withdrawDriver').value)||0);
+   if(parts.cashbox+parts.driver!==rest){alert('مجموع بخش‌های منبع برداشت (بدون تعهد فردا) باید دقیقاً برابر باقی‌ماندهٔ مبلغ برداشت باشد.');return}
   }else if(src==='driver'){
-   parts.driver=picksTotal>0?picksTotal:total;
-   if(picksTotal>0&&picksTotal!==total){alert('جمع انتخاب از واریزی‌های کارت رانندگان باید دقیقاً برابر مبلغ برداشت باشد.');return}
-  }else parts[src]=total;
+   parts.driver=picksTotal>0?picksTotal:rest;
+   if(picksTotal>0&&picksTotal!==rest){alert('جمع انتخاب از واریزی‌های کارت رانندگان باید دقیقاً برابر باقی‌ماندهٔ مبلغ برداشت (بدون تعهد فردا) باشد.');return}
+  }else if(src==='pool'){
+   parts.pool=Math.max(0,toRial($('withdrawPoolAmount')?.value||'')||0);
+   if(parts.pool!==rest){alert('مبلغ استفاده از سبد تخفیفات باید دقیقاً برابر باقی‌ماندهٔ مبلغ برداشت (بدون تعهد فردا) باشد. برای انتقال کل مبلغ به تعهد فردا، مبلغ تعهد را کم کن.');return}
+  }else parts.cashbox=rest;
   const oldTx=editingId?txs.find(t=>t.id===editingId):null;
   if(editingId&&(!oldTx||!canEditLedgerRow(oldTx)||txDriverLocked(oldTx))){alert('ویرایش این برداشت مجاز نیست یا مهلت ۳ روزهٔ ویرایش آن گذشته است.');return}
   const releasedAllocs=[];
@@ -2480,11 +2491,26 @@ function saveTx(){
    }
    item.driverFundUses=uses.map(u=>({...u,kind:'withdraw'}));
   }
+  // v257: ساخت سبد «تعهد فردا» برای برداشت و حفظ تسویه‌های قبلی هنگام ویرایش (سیمتریک با خرید).
+  let basketCleared=false;
+  if(editingId){
+   const _ob=oldTx&&oldTx.purchaseBasket;
+   if(parts.basket>0.000001){
+    const _settled=_ob?Math.max(0,(Number(_ob.amount)||0)-(Number(_ob.remaining)||0)):0;
+    item.purchaseBasket={amount:parts.basket,remaining:Math.max(0,parts.basket-_settled),createdDate:(_ob&&_ob.createdDate)||today(),createdBy:(_ob&&_ob.createdBy)||(current&&current.name)||'',settlements:(_ob&&Array.isArray(_ob.settlements))?_ob.settlements.map(s=>({...s})):[]};
+    const oldBasketUses=(Array.isArray(oldTx&&oldTx.driverFundUses)?oldTx.driverFundUses:[]).filter(u=>u&&u.basket);
+    if(oldBasketUses.length)item.driverFundUses=(Array.isArray(item.driverFundUses)?item.driverFundUses:[]).concat(oldBasketUses.map(u=>({...u})));
+   }else if(_ob){basketCleared=true}
+  }else if(parts.basket>0.000001){
+   item.purchaseBasket={amount:parts.basket,remaining:parts.basket,createdDate:today(),createdBy:current?.name||'',settlements:[]};
+  }
+  if(editingId&&basketCleared)driverFunds.forEach(f=>{if(Array.isArray(f.allocations))f.allocations=f.allocations.filter(a=>!(a&&a.basket&&a.txId!==undefined&&a.txId!==null&&String(a.txId)===String(editingId)))});
   if(editingId)txs=txs.map(x=>x.id===editingId?item:x);else txs.push(item);
-  if(item.driverFundUses?.length){
-   item.driverFundUses.forEach(u=>{const fund=driverFunds.find(f=>String(f.id)===String(u.fundId));if(!fund)return;fund.allocations=fund.allocations||[];fund.allocations.push({id:'fa_'+item.id+'_'+u.fundId,date:item.date,amount:u.amount,kind:'withdraw',desc:'برداشت: '+item.desc,by:current?.name||'',txId:item.id})});
+  const newDriverUses=(Array.isArray(item.driverFundUses)?item.driverFundUses:[]).filter(u=>u&&!u.basket&&Number(u.amount)>0);
+  if(newDriverUses.length){
+   newDriverUses.forEach(u=>{const fund=driverFunds.find(f=>String(f.id)===String(u.fundId));if(!fund)return;fund.allocations=fund.allocations||[];fund.allocations.push({id:'fa_'+item.id+'_'+u.fundId,date:item.date,amount:u.amount,kind:'withdraw',desc:'برداشت: '+item.desc,by:current?.name||'',txId:item.id})});
    save(FUND_K,driverFunds);
-  }else if(releasedAllocs.length){save(FUND_K,driverFunds)}
+  }else if(releasedAllocs.length||basketCleared){save(FUND_K,driverFunds)}
   save(TXK,txs);resetForm();renderAll();go('ledger');return;
  }
  if(mode==='deposit'&&!can('depositCreate')){alert('دسترسی ثبت واریزی برای این سمت فعال نیست.');return}if(mode==='deposit'&&!isAdmin()){if(isPurchasingRole()&&!isFundManagerRole()&&$('depositType').value!=='cashbox'){alert('مسئول خرید فقط مجاز به ثبت واریزی شارژ تنخواه است.');return}if(isFundManagerRole()&&!isPurchasingRole()&&$('depositType').value!=='driver'){alert('مدیر صندوق فقط مجاز به ثبت واریزی کارت رانندگان است.');return}}if(mode==='purchase'&&!can('purchaseCreate')){alert('دسترسی ثبت خرید برای این سمت فعال نیست.');return}const desc=$('txDesc').value.trim();if(!desc){alert('شرح / توضیحات را وارد کنید.');return}const d=mode==='deposit'?toRial($('txDeposit').value):0,p=mode==='purchase'?toRial($('txPurchase').value):0,f=0;const official=mode==='purchase'&&!!$('txOfficialInvoice')?.checked;if(!(d||p||f)){alert('مبلغ را وارد کنید.');return}if(mode==='purchase'&&!official&&!driverEditLock&&!purchaseBasketToggleOn()&&availableDriverFundBalance()<=0.000001){const usesDriver=sel=>sel.value==='driver'||(sel.value==='mixed'&&((num($(sel.id.replace('Source','Cash')).value)>0&&$(sel.id.replace('Source','Part1Source')).value==='driver')||(num($(sel.id.replace('Source','Driver')).value)>0&&$(sel.id.replace('Source','Part2Source')).value==='driver')));if(usesDriver($('purchaseSource'))||usesDriver($('freightSource'))){alert('ماندهٔ قابل استفاده‌ای از کارت رانندگان وجود ندارد؛ منبع خرید و کرایه را روی تنخواه بگذارید.');return}}let item;if(mode==='deposit')item={id:editingId||Date.now(),date:$('txDate').value.trim()||today(),desc,deposit:d,depositType:$('depositType').value,purchase:0,freight:0,purchaseSource:'',freightSource:'',purchaseCash:0,purchaseDriver:0,freightCash:0,freightDriver:0};else{const uses=(official||driverEditLock)?[]:selectedPurchaseFundUses();if(uses.length&&!canUseFunds()){alert('دسترسی استفاده از واریزی‌های صندوق برای این نقش فعال نیست.');return}const poolAmt=(official||driverEditLock)?0:v253ActivePurchasePoolAmount();if(poolAmt>p+0.5){alert('مبلغ سبد تخفیفات نمی‌تواند از اصل مبلغ خرید بیشتر باشد.');return}const pT=Math.max(0,p-poolAmt);let fundTotal=0;for(const u of uses){const fund=driverFunds.find(x=>String(x.id)===u.fundId);if(!fund||!fundSelectableForPurchase(fund)||u.amount>fundAvailableForEdit(fund)+0.000001){alert('این واریزی برگشت‌خورده یا تسویه‌شده است، یا ماندهٔ قابل استفادهٔ کافی ندارد.');renderPurchaseFundOptions();return}fundTotal+=u.amount}if(fundTotal>pT){alert('جمع مصرف از واریزی‌های صندوق و سبد تخفیفات نمی‌تواند از اصل مبلغ خرید بیشتر باشد.');return}const basketOn=!official&&!driverEditLock&&purchaseBasketToggleOn();let basketAmount=0;let ps;if(official){ps={cash:0,driver:0}}else if(driverEditLock){const _locked=Number(driverEditLockDriverAmount)||0;if(pT<_locked-0.000001){alert('مبلغ اصل خرید نمی‌تواند از بخش تأمین‌شده با کارت رانندگان و سبد تخفیفات کمتر باشد.');return}const _basketMax=Math.max(0,pT-_locked);let _basket=0;if(purchaseBasketToggleOn()){const _raw=$('purchaseBasketAmount')?String($('purchaseBasketAmount').value||'').trim():'';_basket=_raw!==''?Math.max(0,Math.min(toRial(_raw),_basketMax)):_basketMax}basketAmount=_basket;const _cash=Math.max(0,pT-_locked-_basket);ps={cash:_cash,driver:Math.min(_locked,pT)}}else if(basketOn){const _src=$('purchaseSource').value;let _cash=_src==='cashbox'?pT:(_src==='mixed'?toRial($('purchaseCash').value):0);if(_src==='driver')_cash=0;if(!(_cash>=0))_cash=0;if(_src!=='cashbox'&&_cash+fundTotal+poolAmt>p+0.5){alert('جمع مبلغ تنخواه و واریزی‌های صندوق و سبد تخفیفات نمی‌تواند از اصل مبلغ خرید بیشتر باشد.');return}const _remainder=Math.max(0,pT-_cash-fundTotal);const _raw=$('purchaseBasketAmount')?String($('purchaseBasketAmount').value||'').trim():'';if(_raw!==''&&$('purchaseBasketAmount')&&$('purchaseBasketAmount').dataset.userEdited&&toRial(_raw)>_remainder+0.5){alert('مبلغ تعهد روزهای بعد نمی‌تواند از ماندهٔ تأمین‌نشده ('+money(_remainder)+' '+currencyUnit()+') بیشتر باشد.');return}basketAmount=_raw!==''?Math.max(0,Math.min(toRial(_raw),_remainder)):_remainder;_cash+=(_remainder-basketAmount);ps={cash:_cash,driver:fundTotal};$('purchaseSource').value=_cash<=0?'driver':(fundTotal<=0?'cashbox':'mixed');$('purchaseCash').value=_cash?fa(_cash):'';$('purchaseDriver').value=fundTotal?fa(fundTotal):''}
@@ -3415,7 +3441,7 @@ function basketSettledTotal(t){return (Array.isArray(t&&t.purchaseBasket&&t.purc
 function canSettleBaskets(){return isAdmin()||canUseFunds()||canManageFunds()}
 function renderPurchaseBaskets(){const box=$('purchaseBasketList');if(!box)return;const arr=openPurchaseBaskets();if(!arr.length){box.innerHTML='<div class="fundMeta">در حال حاضر تعهد بازی وجود ندارد.</div>';return}const canSettle=canSettleBaskets();box.innerHTML=arr.map(t=>{const b=t.purchaseBasket,remaining=Math.max(0,Number(b.remaining)||0),settled=basketSettledTotal(t);return `<div class="basketCard"><div class="basketTop"><div><b>${esc(t.desc||'خرید')}</b><div class="fundMeta">تاریخ خرید: ${esc(t.date||'')} · مبلغ خرید: ${money(t.purchase||0)} ${currencyUnit()}</div></div><span class="statusPill pending">مانده تعهد: ${money(remaining)} ${currencyUnit()}</span></div><div class="fundNums"><div><small>کل تعهد</small><b>${money(b.amount||0)} ${currencyUnit()}</b></div><div><small>تسویه‌شده</small><b>${money(settled)} ${currencyUnit()}</b></div><div><small>مانده</small><b>${money(remaining)} ${currencyUnit()}</b></div></div>${(b.settlements||[]).length?`<div class="fundMeta">${b.settlements.map(s=>`• ${esc(s.date||'')} — ${esc(s.desc||'کارت رانندگان')}: ${money(s.amount)} ${currencyUnit()}`).join('<br>')}</div>`:''}${canSettle?`<div class="fundActions"><button class="primary" type="button" data-basket-settle="${esc(t.id)}">تسویه تعهد (تنخواه / واریزی‌های امروز)</button></div>`:''}</div>`}).join('')}
 function openBasketSettlePicker(txId){const t=txs.find(x=>String(x.id)===String(txId));if(!t||!t.purchaseBasket)return;if(!canSettleBaskets()){alert('دسترسی تسویهٔ تعهد برای این نقش فعال نیست.');return}const remaining=Math.max(0,Number(t.purchaseBasket.remaining)||0);if(remaining<=0.000001){alert('این تعهد قبلاً تسویه شده است.');return}const funds=eligibleFundsToday();const cashAvail=Math.max(0,cashboxAvailableBalance());const cashMax=Math.min(remaining,cashAvail);closeFundActModal('basketSettleModal');const overlay=document.createElement('div');overlay.id='basketSettleModal';overlay.className='fundPickerOverlay';overlay.innerHTML=`<div class="fundPickerCard" role="dialog" aria-modal="true" aria-labelledby="basketSettleTitle"><div class="fundPickerHead"><b id="basketSettleTitle">تسویهٔ تعهد روزهای بعد</b><button type="button" class="fundPickerClose" aria-label="بستن">×</button></div><p class="fundPickerHint">مبلغی که از تنخواه یا هر واریزی امروز برای تسویهٔ این تعهد برداشت می‌شود را وارد کن. ماندهٔ تعهد: ${money(remaining)} ${currencyUnit()}</p><div class="fundPickerList"><label class="fundPickRow"><span class="fundPickInfo"><b>تنخواه</b><small>مانده قابل استفاده: ${money(cashAvail)} ${currencyUnit()}</small></span><input class="finput moneyInput" inputmode="numeric" data-basket-cashbox data-pick-max="${cashMax}" placeholder="مبلغ"${cashMax>0.000001?'':' disabled'}></label>${funds.length?funds.map(f=>`<label class="fundPickRow"><span class="fundPickInfo"><b>${esc(f.desc||'واریزی کارت رانندگان')}</b><small>مانده: ${money(fundAvailable(f))} ${currencyUnit()}</small></span><input class="finput moneyInput" inputmode="numeric" data-basket-pick="${esc(f.id)}" data-pick-max="${fundAvailable(f)}" placeholder="مبلغ"></label>`).join(''):'<div class="fundPickerEmpty">واریزی قابل استفاده‌ای برای امروز وجود ندارد.</div>'}</div><div class="fundPickerTotal">جمع انتخاب: <b data-basket-total>۰ ${currencyUnit()}</b></div><div class="fundPickerActions"><button type="button" class="outline fundPickCancel">انصراف</button><button type="button" class="primary fundPickConfirm"${(funds.length||cashMax>0.000001)?'':' disabled'}>ثبت تسویه</button></div></div>`;document.body.appendChild(overlay);document.body.style.overflow='hidden';const close=()=>closeFundActModal('basketSettleModal');overlay.querySelector('.fundPickerClose').onclick=close;overlay.querySelector('.fundPickCancel').onclick=close;overlay.addEventListener('click',e=>{if(e.target===overlay)close()});const totalEl=overlay.querySelector('[data-basket-total]');const recalc=()=>{let sum=0;overlay.querySelectorAll('[data-pick-max]').forEach(inp=>{const mx=Number(inp.dataset.pickMax)||0;let v=toRial(inp.value);if(v>mx){v=mx;inp.value=fa(moneyInputValue(mx))}sum+=Math.max(0,v)});totalEl.textContent=money(sum)+' '+currencyUnit();totalEl.style.color=sum>remaining+0.000001?'#c0392b':''};overlay.querySelectorAll('[data-pick-max]').forEach(inp=>{inp.addEventListener('input',()=>{inp.value=inp.value?fa(num(inp.value)):'';recalc()})});recalc();overlay.querySelector('.fundPickConfirm').onclick=()=>{const uses=[];let bad=false;let cash=0;overlay.querySelectorAll('[data-basket-pick]').forEach(inp=>{const v=Math.round(toRial(inp.value)||0);if(v>0){const mx=Number(inp.dataset.pickMax)||0;if(v>mx+0.000001){bad=true;return}uses.push({fundId:String(inp.dataset.basketPick),amount:v})}});const cashInp=overlay.querySelector('[data-basket-cashbox]');if(cashInp){cash=Math.round(toRial(cashInp.value)||0);if(cash>0){const mx=Number(cashInp.dataset.pickMax)||0;if(cash>mx+0.000001)bad=true}}if(bad){alert('مبلغ یکی از منابع بیشتر از ماندهٔ قابل استفادهٔ آن است.');return}const sum=uses.reduce((a,x)=>a+x.amount,0)+cash;if(sum<=0){alert('مبلغی برای تسویه انتخاب کن.');return}if(sum>remaining+0.000001){alert('جمع تسویه نمی‌تواند از ماندهٔ تعهد بیشتر باشد.');return}close();settlePurchaseBasket(txId,uses,cash)}}
-function settlePurchaseBasket(txId,uses,cashboxAmount){const t=txs.find(x=>String(x.id)===String(txId));if(!t||!t.purchaseBasket)return;const b=t.purchaseBasket;let remaining=Math.max(0,Number(b.remaining)||0);const stamp=Date.now();let total=0;let count=0;let cashTotal=0;(Array.isArray(uses)?uses:[]).forEach((u,i)=>{const fund=driverFunds.find(x=>String(x.id)===String(u.fundId));if(!fund||!fundEligibleForPurchase(fund)||u.amount>fundAvailable(fund)+0.000001)return;const allocId='fa_'+t.id+'_basket_'+stamp+'_'+i;fund.allocations=fund.allocations||[];fund.allocations.push({id:allocId,date:today(),amount:u.amount,kind:'purchase',desc:(t.desc||'خرید')+' · تسویه تعهد روزهای بعد',by:current?.name||'',txId:t.id,basket:true});t.driverFundUses=Array.isArray(t.driverFundUses)?t.driverFundUses:[];t.driverFundUses.push({fundId:fund.id,amount:u.amount,desc:fund.desc||'کارت رانندگان',date:today(),basket:true});b.settlements=Array.isArray(b.settlements)?b.settlements:[];b.settlements.push({fundId:fund.id,allocationId:allocId,amount:u.amount,date:today(),desc:fund.desc||'کارت رانندگان',fundDate:fund.date||'',by:current?.name||''});total+=u.amount;count++});const cash=Math.max(0,Math.round(Number(cashboxAmount)||0));if(cash>0&&cash<=remaining-total+0.000001){b.settlements=Array.isArray(b.settlements)?b.settlements:[];b.settlements.push({source:'cashbox',amount:cash,date:today(),desc:'تنخواه',by:current?.name||''});total+=cash;cashTotal+=cash}if(!count&&!(cashTotal>0)){alert('تسویه انجام نشد؛ دوباره تلاش کن.');return}const driverTotal=total-cashTotal;remaining=Math.max(0,remaining-total);b.remaining=remaining;if(driverTotal>0)t.purchaseDriver=(Number(t.purchaseDriver)||0)+driverTotal;if(remaining<=0.000001){b.remaining=0;b.settledDate=today();b.settledBy=current?.name||'';if(!/از سبد استفاده شده/.test(String(t.desc||'')))t.desc=(t.desc||'')+' · از سبد استفاده شده'}save(FUND_K,driverFunds);save(TXK,txs);try{renderAll()}catch(_e){}try{renderDriverFunds()}catch(_e2){}alert(remaining<=0.000001?'تعهد کامل تسویه شد و حساب این خرید به صفر رسید.':'بخشی از تعهد تسویه شد. مانده تعهد: '+money(remaining)+' '+currencyUnit())}
+function settlePurchaseBasket(txId,uses,cashboxAmount){const t=txs.find(x=>String(x.id)===String(txId));if(!t||!t.purchaseBasket)return;const b=t.purchaseBasket;let remaining=Math.max(0,Number(b.remaining)||0);const stamp=Date.now();let total=0;let count=0;let cashTotal=0;(Array.isArray(uses)?uses:[]).forEach((u,i)=>{const fund=driverFunds.find(x=>String(x.id)===String(u.fundId));if(!fund||!fundEligibleForPurchase(fund)||u.amount>fundAvailable(fund)+0.000001)return;const allocId='fa_'+t.id+'_basket_'+stamp+'_'+i;fund.allocations=fund.allocations||[];fund.allocations.push({id:allocId,date:today(),amount:u.amount,kind:'purchase',desc:(t.desc||'خرید')+' · تسویه تعهد روزهای بعد',by:current?.name||'',txId:t.id,basket:true});t.driverFundUses=Array.isArray(t.driverFundUses)?t.driverFundUses:[];t.driverFundUses.push({fundId:fund.id,amount:u.amount,desc:fund.desc||'کارت رانندگان',date:today(),basket:true});b.settlements=Array.isArray(b.settlements)?b.settlements:[];b.settlements.push({fundId:fund.id,allocationId:allocId,amount:u.amount,date:today(),desc:fund.desc||'کارت رانندگان',fundDate:fund.date||'',by:current?.name||''});total+=u.amount;count++});const cash=Math.max(0,Math.round(Number(cashboxAmount)||0));if(cash>0&&cash<=remaining-total+0.000001){b.settlements=Array.isArray(b.settlements)?b.settlements:[];b.settlements.push({source:'cashbox',amount:cash,date:today(),desc:'تنخواه',by:current?.name||''});total+=cash;cashTotal+=cash}if(!count&&!(cashTotal>0)){alert('تسویه انجام نشد؛ دوباره تلاش کن.');return}const driverTotal=total-cashTotal;remaining=Math.max(0,remaining-total);b.remaining=remaining;if(driverTotal>0&&!isWithdrawTx(t))t.purchaseDriver=(Number(t.purchaseDriver)||0)+driverTotal;if(remaining<=0.000001){b.remaining=0;b.settledDate=today();b.settledBy=current?.name||'';if(!/از سبد استفاده شده/.test(String(t.desc||'')))t.desc=(t.desc||'')+' · از سبد استفاده شده'}save(FUND_K,driverFunds);save(TXK,txs);try{renderAll()}catch(_e){}try{renderDriverFunds()}catch(_e2){}alert(remaining<=0.000001?'تعهد کامل تسویه شد و حساب این خرید به صفر رسید.':'بخشی از تعهد تسویه شد. مانده تعهد: '+money(remaining)+' '+currencyUnit())}
 $('purchaseBasketList')?.addEventListener('click',e=>{const b=e.target.closest('[data-basket-settle]');if(b)openBasketSettlePicker(b.dataset.basketSettle)});
 /* ================= v219: ورود فقط با اتصال واقعی + قفل همهٔ تراکنش‌های کارت رانندگان + دریافت جزئی انبار ================= */
 
@@ -3901,7 +3927,7 @@ async function editBasketSettlement(txId,index){
  if(found)found.alloc.amount=val;
  const uses=Array.isArray(t.driverFundUses)?t.driverFundUses:[];
  for(let i=uses.length-1;i>=0;i--){const u=uses[i];if(u&&u.basket&&String(u.fundId)===String(s.fundId)&&Number(u.amount)===old&&String(u.date||'')===String(s.date)){u.amount=val;break}}
- if(s.source!=='cashbox')t.purchaseDriver=Math.max(0,(Number(t.purchaseDriver)||0)-old+val);
+ if(s.source!=='cashbox'&&!isWithdrawTx(t))t.purchaseDriver=Math.max(0,(Number(t.purchaseDriver)||0)-old+val);
  t.purchaseBasket.remaining=Math.max(0,newRemaining);
  if(newRemaining>0.000001){t.purchaseBasket.settledDate='';t.purchaseBasket.settledBy=''}
  save(FUND_K,driverFunds);save(TXK,txs);
@@ -3919,7 +3945,7 @@ async function deleteBasketSettlement(txId,index){
  if(found)found.fund.allocations=(found.fund.allocations||[]).filter(z=>String(z.id)!==String(s.allocationId));
  const uses=Array.isArray(t.driverFundUses)?t.driverFundUses:[];
  for(let i=uses.length-1;i>=0;i--){const u=uses[i];if(u&&u.basket&&String(u.fundId)===String(s.fundId)&&Number(u.amount)===amount&&String(u.date||'')===String(s.date)){uses.splice(i,1);break}}
- if(s.source!=='cashbox')t.purchaseDriver=Math.max(0,(Number(t.purchaseDriver)||0)-amount);
+ if(s.source!=='cashbox'&&!isWithdrawTx(t))t.purchaseDriver=Math.max(0,(Number(t.purchaseDriver)||0)-amount);
  t.purchaseBasket.remaining=Math.max(0,(Number(t.purchaseBasket.remaining)||0)+amount);
  t.purchaseBasket.settledDate='';t.purchaseBasket.settledBy='';
  arr.splice(Number(index),1);
@@ -3939,7 +3965,9 @@ renderPurchaseBaskets=function(){
    if(!canEditBasketSettlement(s))return base;
    return '<span class="basketSettleLine">'+base+'<button type="button" class="miniIcon edit" data-basket-settle-edit="'+esc(t.id)+'" data-basket-settle-index="'+idx+'" title="ویرایش مبلغ" aria-label="ویرایش">✎</button><button type="button" class="miniIcon del" data-basket-settle-del="'+esc(t.id)+'" data-basket-settle-index="'+idx+'" title="حذف" aria-label="حذف">✕</button></span>';
   }).join('<br>')}</div>`:'';
-  return `<div class="basketCard"><div class="basketTop"><div><b>${esc(t.desc||'خرید')}</b><div class="fundMeta">تاریخ خرید: ${esc(t.date||'')} · مبلغ خرید: ${money(t.purchase||0)} ${currencyUnit()}</div></div><span class="statusPill pending">مانده تعهد: ${money(remaining)} ${currencyUnit()}</span></div><div class="fundNums"><div><small>کل تعهد</small><b>${money(b.amount||0)} ${currencyUnit()}</b></div><div><small>تسویه‌شده</small><b>${money(settled)} ${currencyUnit()}</b></div><div><small>مانده</small><b>${money(remaining)} ${currencyUnit()}</b></div></div>${sHtml}${canSettle?`<div class="fundActions"><button class="primary" type="button" data-basket-settle="${esc(t.id)}">تسویه تعهد (تنخواه / واریزی‌های امروز)</button></div>`:''}</div>`;
+  const _isWd=isWithdrawTx(t);
+  const _meta=_isWd?('تاریخ برداشت: '+esc(t.date||'')+' · مبلغ برداشت: '+money(t.withdraw||0)+' '+currencyUnit()):('تاریخ خرید: '+esc(t.date||'')+' · مبلغ خرید: '+money(t.purchase||0)+' '+currencyUnit());
+  return `<div class="basketCard"><div class="basketTop"><div><b>${esc(t.desc||(_isWd?'برداشت':'خرید'))}</b><div class="fundMeta">${_meta}</div></div><span class="statusPill pending">مانده تعهد: ${money(remaining)} ${currencyUnit()}</span></div><div class="fundNums"><div><small>کل تعهد</small><b>${money(b.amount||0)} ${currencyUnit()}</b></div><div><small>تسویه‌شده</small><b>${money(settled)} ${currencyUnit()}</b></div><div><small>مانده</small><b>${money(remaining)} ${currencyUnit()}</b></div></div>${sHtml}${canSettle?`<div class="fundActions"><button class="primary" type="button" data-basket-settle="${esc(t.id)}">تسویه تعهد (تنخواه / واریزی‌های امروز)</button></div>`:''}</div>`;
  }).join('');
 };
 
@@ -5170,6 +5198,130 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
  pplRefreshPersonSelects();
  try{var __np=document.querySelector('.nav button[data-go="people"]'),__nm=document.querySelector('.nav button[data-go="manage"]');if(__np&&__nm)__nm.parentNode.insertBefore(__np,__nm);}catch(_){}
  try{pplRenderAll()}catch(_){}
+})();
+
+/* ================= v257: «تعهد فردا» در ثبت برداشت (مانند خرید) + بازطراحی کارت درخواست برگشتی به بازرگانی ================= */
+(function(){
+ var W=$('withdrawBox');
+
+ /* ---------- ۱) پیش‌نمایش و خودکارسازی مبلغ تعهد فردا در فرم برداشت ---------- */
+ function v257SrcPortion(){
+  var src=($('withdrawSource')&&$('withdrawSource').value)||'cashbox';
+  if(src==='mixed')return Math.max(0,toRial(($('withdrawCash')&&$('withdrawCash').value)||'')||0)+Math.max(0,toRial(($('withdrawDriver')&&$('withdrawDriver').value)||'')||0);
+  if(src==='driver')return Math.max(0,toRial(($('withdrawDriver')&&$('withdrawDriver').value)||'')||0);
+  if(src==='pool')return Math.max(0,toRial(($('withdrawPoolAmount')&&$('withdrawPoolAmount').value)||'')||0);
+  return 0;
+ }
+ function v257UpdateWithdrawBasketPreview(){
+  var toggle=$('withdrawBasketToggle'),row=$('withdrawBasketAmountRow'),inp=$('withdrawBasket'),maxEl=$('withdrawBasketMax');
+  if(!toggle||!row||!inp)return;
+  var on=!!toggle.checked;
+  row.classList.toggle('hidden',!on);
+  if(!on){if(maxEl)maxEl.textContent='';return}
+  var total=Math.max(0,toRial(($('txWithdraw')&&$('txWithdraw').value)||'')||0);
+  var max=Math.max(0,total-v257SrcPortion());
+  if(maxEl)maxEl.textContent='حداکثر: '+money(max)+' '+currencyUnit();
+  if(!inp.dataset.userEdited)inp.value=max?money(max):'';
+ }
+
+ var _v257OrigSyncWithdrawUI=syncWithdrawUI;
+ syncWithdrawUI=function(){var r=_v257OrigSyncWithdrawUI.apply(this,arguments);try{v257UpdateWithdrawBasketPreview()}catch(_){}return r};
+
+ var _v257OrigResetForm=resetForm;
+ resetForm=function(){
+  try{var t=$('withdrawBasketToggle');if(t)t.checked=false;var a=$('withdrawBasket');if(a)delete a.dataset.userEdited;}catch(_){}
+  var r=_v257OrigResetForm.apply(this,arguments);
+  try{v257UpdateWithdrawBasketPreview()}catch(_){}
+  return r;
+ };
+
+ var _v257OrigEditTx=editTx;
+ editTx=function(id){
+  var r=_v257OrigEditTx.apply(this,arguments);
+  try{
+   var x=(Array.isArray(txs)?txs:[]).find(function(t){return String(t.id)===String(id)});
+   if(x&&isWithdrawTx(x)){
+    var p=withdrawPartsOf(x),t=$('withdrawBasketToggle'),a=$('withdrawBasket'),b=Math.max(0,Number(p.basket)||0);
+    if(t)t.checked=b>0.000001;
+    if(a){if(b>0.000001){a.value=fa(moneyInputValue(b));a.dataset.userEdited='1'}else{a.value='';delete a.dataset.userEdited}}
+    v257UpdateWithdrawBasketPreview();
+   }
+  }catch(_){}
+  return r;
+ };
+
+ var _v257OrigSetMode=setMode;
+ setMode=function(){var r=_v257OrigSetMode.apply(this,arguments);try{v257UpdateWithdrawBasketPreview()}catch(_){}return r};
+
+ if(W){
+  W.addEventListener('input',function(e){
+   var t=e.target;
+   if(t&&t.id==='withdrawBasket'){t.dataset.userEdited='1';try{formatMoneyInput(t)}catch(_){}}
+   try{v257UpdateWithdrawBasketPreview()}catch(_){}
+  });
+  W.addEventListener('change',function(e){
+   var t=e.target;
+   if(t&&t.id==='withdrawBasketToggle'){var a=$('withdrawBasket');if(a)delete a.dataset.userEdited}
+   try{v257UpdateWithdrawBasketPreview()}catch(_){}
+  });
+ }
+
+ /* ---------- ۲) بازطراحی کارت «درخواست برگشتی به بازرگانی» با زبان طراحی اپ ---------- */
+ v249RenderProcReturns=function(){
+  var sec=$('procReturnedSection'),box=$('procReturnedList');if(!sec||!box)return;
+  var arr=(typeof v249CanResolveReturn==='function'&&v249CanResolveReturn())?(typeof v249PendingReturns==='function'?v249PendingReturns():[]):[];
+  var __tab=document.querySelector('[data-proc-tab].active');
+  var __act=__tab?__tab.getAttribute('data-proc-tab'):'supply';
+  var __show=arr.length>0&&__act==='supply';
+  if(!__show){sec.classList.add('hidden');sec.hidden=true;box.innerHTML='';return}
+  sec.classList.remove('hidden');sec.hidden=false;
+  box.innerHTML=arr.map(function(r){
+   var bought=(r.items||[]).map(function(it,index){return {it:it,index:index}}).filter(function(x){return x.it&&x.it.status==='bought'});
+   var head='<div class="procReturnHead"><div class="procReturnHeadMain"><span class="procReturnBadge">برگشتی</span><b>درخواست #'+esc(r.id)+'</b></div><span class="procReturnMeta">'+fa(bought.length)+' قلم خریداری‌شده</span></div>'
+    +'<div class="procReturnSub">برگشت کل درخواست توسط '+esc((r.procReturn&&r.procReturn.by)||'—')+' در '+esc((r.procReturn&&r.procReturn.date)||'')+'</div>'
+    +((r.procReturn&&r.procReturn.reason)?'<div class="procReturnReason">دلیل: '+esc(r.procReturn.reason)+'</div>':'');
+   var rows=bought.length?bought.map(function(o){
+    var it=o.it,index=o.index;
+    var cur=Number((it.boughtQty!=null?it.boughtQty:it.qty)||0);
+    var amount=v249ItemShareAmount(r,index);
+    var key=esc(String(r.id))+'|'+index;
+    return '<div class="procReturnRow"><div class="procReturnRowInfo"><b>'+esc(it.name||'کالا')+'</b><small>تعداد فعلی: <b>'+fa(cur)+'</b> '+esc(it.unit||'')+(amount>0?' · سهم مبلغ: '+money(amount)+' '+currencyUnit():'')+'</small></div><div class="procReturnRowActions"><input class="finput" inputmode="decimal" value="'+esc(String(cur))+'" data-v249-qty="'+key+'" aria-label="تعداد جدید"><button class="primary" type="button" data-v249-qty-save="'+key+'">اصلاح تعداد</button><button class="outline" type="button" data-v249-notbuy="'+key+'">ثبت عدم خرید</button></div></div>';
+   }).join(''):'<div class="procReturnEmpty">قلم خریداری‌شده‌ای باقی نمانده است؛ برای ارسال به انبار تأیید کن.</div>';
+   return '<div class="procReturnCard">'+head+rows+'<div class="procReturnFooter"><button class="primary" type="button" data-v250-resolve="'+esc(String(r.id))+'">تأیید نهایی و ارسال کل درخواست به انبار</button></div></div>';
+  }).join('');
+ };
+
+ /* ---------- ۳) استایل ---------- */
+ try{
+  var st=document.createElement('style');st.id='v257-withdraw-basket-proc-return';
+  st.textContent=[
+   '#withdrawMixed{grid-template-columns:repeat(2,minmax(0,1fr))}',
+   '#withdrawBasketFields{margin-top:8px}',
+   '.procReturnCard{display:flex;flex-direction:column;gap:10px;border:1px solid #ecd9b8;border-radius:15px;padding:13px 13px 12px;background:linear-gradient(180deg,#fffdf7,#fff8ec)}',
+   '.procReturnHead{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}',
+   '.procReturnHeadMain{display:flex;align-items:center;gap:8px;min-width:0}',
+   '.procReturnHeadMain b{font-size:13px}',
+   '.procReturnBadge{display:inline-flex;align-items:center;border-radius:999px;padding:3px 9px;font-size:9px;font-weight:900;background:#fff1d6;color:#a97915;border:1px solid #f0dcae}',
+   '.procReturnMeta{font-size:10px;color:var(--muted);white-space:nowrap}',
+   '.procReturnSub{font-size:10px;color:var(--muted);line-height:1.9}',
+   '.procReturnReason{font-size:11px;color:#8a6320;background:#fff7e6;border:1px dashed #ead9b6;border-radius:9px;padding:6px 9px;line-height:1.9}',
+   '.procReturnRow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px dashed #eee2cb;padding-top:10px}',
+   '.procReturnRow:first-child{border-top:0;padding-top:0}',
+   '.procReturnRowInfo{min-width:0;flex:1 1 190px}',
+   '.procReturnRowInfo b{font-size:12px;display:block}',
+   '.procReturnRowInfo small{color:var(--muted);font-size:10px;line-height:1.9}',
+   '.procReturnRowActions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}',
+   '.procReturnRowActions input{width:76px;height:38px;text-align:center}',
+   '.procReturnRowActions button{height:38px;padding:0 12px;font-size:11px;border-radius:10px;white-space:nowrap}',
+   '.procReturnEmpty{font-size:11px;color:var(--muted);line-height:1.9}',
+   '.procReturnFooter{margin-top:2px}',
+   '.procReturnFooter button{width:100%;height:42px;border-radius:11px}',
+   '@media(max-width:520px){.procReturnRowActions{width:100%}.procReturnRowActions input{flex:1}.procReturnRowActions button{flex:1}}'
+  ].join('\n');
+  document.head.appendChild(st);
+ }catch(_){}
+
+ try{v257UpdateWithdrawBasketPreview()}catch(_){}
 })();
 
 boot();
