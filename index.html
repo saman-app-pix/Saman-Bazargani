@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 
 <html dir="rtl" lang="fa" class="loginOpen">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#ffffff" name="theme-color"/>
-<meta name="saman-build" content="v258"/>
+<meta name="saman-build" content="v259"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; manifest-src 'self'; connect-src 'self' https://eiobajtihwxdlfxufmbg.supabase.co wss://eiobajtihwxdlfxufmbg.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
@@ -530,7 +530,7 @@ textarea{min-height:64px}
 #pageWarehouse .warehouseBatchTools>button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:34px!important;height:auto!important;margin:0!important;padding:5px 3px!important;border-radius:8px!important;font-family:inherit!important;font-size:clamp(9px,2.45vw,11px)!important;font-weight:600!important;line-height:1.3!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;box-sizing:border-box!important}
 @media(max-width:360px){#pageWarehouse .warehouseSection>.listTabs>button{font-size:11px!important;padding:5px 3px!important}#pageWarehouse .warehouseBatchTools{gap:4px!important;padding:4px!important}#pageWarehouse .warehouseBatchTools>button{font-size:9px!important;padding:4px 2px!important;min-height:34px!important}}
 </style>
-<meta name="saman-build" content="v258">
+<meta name="saman-build" content="v259">
 
 <style id="v213-fund-transfer-split">
 .fundActOverlay,.fundPickerOverlay{position:fixed;inset:0;z-index:100520;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;background:rgba(15,28,45,.48);backdrop-filter:blur(2px)}
@@ -3079,7 +3079,7 @@ async function subscribePush(){
  }catch(e){console.warn('subscribePush failed',e);return false}
 }
 window.__sbFundsApi={list:()=>driverFunds,homeOf:(f)=>fundHomeDay(f),target:(f)=>fundCarriedTarget(f),pending:(f)=>fundIsPendingCarry(f),arrived:(f)=>fundIsArrivedCarry(f),avail:(f)=>fundAvailable(f),closed:(f)=>{const d=f&&f.date||'';return !!(driverFundDayClosures[String(d)]||driverFundDayClosures[dateKey(d)])},untouched:(f)=>!(Array.isArray(f&&f.allocations)&&f.allocations.length)&&fundUsed(f)<=0&&fundReturned(f)<=0,marked:(f)=>fundReturnMarked(f),canManage:()=>canManageFunds(),tomorrow:()=>addJalaliDays(today(),1),toggle:(id)=>{const f=driverFunds.find(x=>String(x.id)===String(id));if(!f)return false;if(fundReturnMarked(f))return false;if(fundIsArrivedCarry(f))return false;if(!fundIsPendingCarry(f)){const d=f.date||'';if(driverFundDayClosures[String(d)]||driverFundDayClosures[dateKey(d)])return false}if(!(Array.isArray(f.allocations)&&f.allocations.length)&&fundUsed(f)<=0&&fundReturned(f)<=0){}else return false;if(fundIsPendingCarry(f)){delete f.carriedTo;delete f.carriedFrom;delete f.carriedAt;delete f.carriedBy;f.editedBy=current?.name||'';f.editedAt=new Date().toISOString()}else{f.carriedFrom=f.carriedFrom||dateKey(f.date||'');f.carriedTo=addJalaliDays(today(),1);f.carriedAt=new Date().toISOString();f.carriedBy=current?.name||''}saveFunds();if(supabase&&cloudUser)pushCloudState().catch(()=>{});return true}};
-function renderDriverFunds(){const cashboxPanel=$('cashboxRechargePanel');if(cashboxPanel)cashboxPanel.classList.toggle('hidden',mode!=='deposit'||!(canChargeCashbox()));const panel=$('driverFundsPanel');if(!panel)return;panel.classList.toggle('hidden',mode!=='deposit'||!(canManageFunds()||canUseFunds()||can('fundView')));if($('fundDraftList')&&!$('fundDraftList').children.length)renderFundDraft();panel.classList.toggle('hidden',mode!=='deposit'||!(canManageFunds()||canUseFunds()||can('fundView')));$('cashboxFundTools').classList.toggle('hidden',!canManageFunds());const box=$('driverFundsList');if(!box)return;renderFundDaily();renderPurchaseBaskets();const todayKey=dateKey(today());const arr=driverFunds.filter(f=>fundHomeDayOf(f,today())===todayKey).slice().sort((a,b)=>{const aa=fundAvailable(a)>0?1:0,bb=fundAvailable(b)>0?1:0;return bb-aa||String(b.date||'').localeCompare(String(a.date||''))||Number(b.id||0)-Number(a.id||0)});box.innerHTML=arr.length?arr.map(f=>{const used=fundUsed(f),ret=fundReturned(f),avail=fundAvailable(f);return `<div class="fundCard" data-fund-id="${esc(f.id)}"><div class="fundTop"><div><b>${esc(f.desc||'واریزی کارت رانندگان')}</b><div class="fundMeta">${esc(f.date||'')} · ${esc(f.ref||'بدون شماره پیگیری')}<br>ثبت‌کننده: ${esc(f.createdBy||'')}${f.editedBy?`<br><span class="fundEditMeta">ویرایش‌کننده: ${esc(f.editedBy)}</span>`:''}</div></div><span class="statusPill ${fundReturnMarked(f)?'returned':avail?'pending':'done'}">${fundReturnMarked(f)?'برگشت به صندوق':avail?'قابل استفاده':'تسویه‌شده'}</span></div><div class="fundNums"><div><small>مبلغ اولیه</small><b>${money(f.amount)} ریال</b></div><div><small>مصرف‌شده</small><b>${money(used)} ریال</b></div><div><small>مانده</small><b>${money(avail)} ریال</b></div></div>${(f.allocations||[]).length?`<div class="fundMeta">${f.allocations.map(a=>a.kind==='purchase'?`• مصرف در خرید — ${money(a.amount)} ریال${a.desc?' · '+esc(String(a.desc).replace(/^مصرف در خرید[:：]?\s*/,'')):''}`:a.kind==='withdraw'?`• برداشت — ${money(a.amount)} ریال${a.desc?' · '+esc(String(a.desc).replace(/^برداشت[:：]?\s*/,'')):''}`:`• ${esc(a.date||'')} — ${esc('انتقال به تنخواه')}: ${money(a.amount)} ریال${a.desc?' · '+esc(a.desc):''}`).join('<br>')}</div>`:''}${ret?`<div class="fundMeta fundReturnedNote">برگشت به صندوق: ${money(ret)} ریال</div>`:''}<div class="fundActions fundCardActions">${fundReturnMarked(f)?(canReturnDriverFunds()&&!driverFundDayClosures[String(f.date||'')]&&!driverFundDayClosures[dateKey(f.date||'')]?`<button class="fundIconAction fundUndoReturnAction" type="button" data-fund-undo-return="${esc(f.id)}" aria-label="برگرداندن واریزی به حالت قابل استفاده" title="لغو برگشت به صندوق"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11a9 9 0 1 1 2.6 6.4"/><path d="M3 4v7h7"/></svg></button>`:''):(canManageFunds()&&!(f.allocations||[]).length&&used<=0&&ret<=0?`<button class="fundIconAction fundEditAction" type="button" data-fund-edit="${esc(f.id)}" aria-label="ویرایش واریزی ${esc(f.desc||'')}" title="ویرایش"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg></button><button class="fundIconAction fundDeleteAction" type="button" data-fund-delete="${esc(f.id)}" aria-label="حذف واریزی ${esc(f.desc||'')}" title="حذف"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/><path d="M10 10v6M14 10v6"/></svg></button>`:'')}${canReturnDriverFunds()&&!driverFundDayClosures[String(f.date||'')]&&!driverFundDayClosures[dateKey(f.date||'')]&&avail>0&&!(f.allocations||[]).length&&!ret&&avail===Number(f.amount||0)?`<button class="outline" type="button" data-fund-return="${esc(f.id)}">برگشت مانده به صندوق</button>`:''}${(!fundReturnMarked(f)&&!driverFundDayClosures[String(f.date||'')]&&!driverFundDayClosures[dateKey(f.date||'')])?`${(avail>0&&canUseFunds())?`<button class="fundIconAction fundTransferAction" type="button" data-fund-transfer="${esc(f.id)}" aria-label="انتقال به تنخواه" title="انتقال به تنخواه"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v9"/><path d="m8 8 4 4 4-4"/><path d="M5 15v4a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4"/></svg></button>`:''}${(avail>0&&can('fundSplit'))?`<button class="fundIconAction fundSplitAction" type="button" data-fund-split="${esc(f.id)}" aria-label="تفکیک واریزی" title="تفکیک واریزی"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88"/><path d="M14.47 14.48 20 20"/><path d="M8.12 8.12 12 12"/></svg></button>`:''}`:''}</div></div>`}).join(''):'<div class="empty">امروز هنوز واریزی کارت رانندگان ثبت نشده است.</div>'}
+function renderDriverFunds(){const cashboxPanel=$('cashboxRechargePanel');if(cashboxPanel)cashboxPanel.classList.toggle('hidden',mode!=='deposit'||!(canChargeCashbox()));const panel=$('driverFundsPanel');if(!panel)return;panel.classList.toggle('hidden',mode!=='deposit'||!(canManageFunds()||canUseFunds()||can('fundView')));if($('fundDraftList')&&!$('fundDraftList').children.length)renderFundDraft();panel.classList.toggle('hidden',mode!=='deposit'||!(canManageFunds()||canUseFunds()||can('fundView')));$('cashboxFundTools').classList.toggle('hidden',!canManageFunds());const box=$('driverFundsList');if(!box)return;renderFundDaily();renderPurchaseBaskets();const todayKey=dateKey(today());const arr=driverFunds.filter(f=>fundHomeDayOf(f,today())===todayKey).slice().sort((a,b)=>{const aa=fundAvailable(a)>0?1:0,bb=fundAvailable(b)>0?1:0;return bb-aa||String(b.date||'').localeCompare(String(a.date||''))||Number(b.id||0)-Number(a.id||0)});box.innerHTML=arr.length?arr.map(f=>{const used=fundUsed(f),ret=fundReturned(f),avail=fundAvailable(f);return `<div class="fundCard" data-fund-id="${esc(f.id)}"><div class="fundTop"><div><b>${esc(f.desc||'واریزی کارت رانندگان')}</b><div class="fundMeta">${esc(f.date||'')} · ${esc(f.ref||'بدون شماره پیگیری')}<br>ثبت‌کننده: ${esc(f.createdBy||'')}${f.editedBy?`<br><span class="fundEditMeta">ویرایش‌کننده: ${esc(f.editedBy)}</span>`:''}</div></div><span class="statusPill ${fundReturnMarked(f)?'returned':avail?'pending':'done'}">${fundReturnMarked(f)?'برگشت به صندوق':avail?'قابل استفاده':'تسویه‌شده'}</span></div><div class="fundNums"><div><small>مبلغ اولیه</small><b>${money(f.amount)} ریال</b></div><div><small>مصرف‌شده</small><b>${money(used)} ریال</b></div><div><small>مانده</small><b>${money(avail)} ریال</b></div></div>${(f.allocations||[]).length?`<div class="fundMeta">${f.allocations.map(a=>a.kind==='purchase'?`• مصرف در خرید — ${money(a.amount)} ریال${a.desc?' · '+esc(String(a.desc).replace(/^مصرف در خرید[:：]?\s*/,'')):''}`:a.kind==='withdraw'?`• برداشت — ${money(a.amount)} ریال${a.desc?' · '+esc(String(a.desc).replace(/^برداشت[:：]?\s*/,'')):''}`:`• ${esc(a.date||'')} — ${esc('انتقال به تنخواه')}: ${money(a.amount)} ریال${a.desc?' · '+esc(a.desc):''}`).join('<br>')}</div>`:''}${ret?`<div class="fundMeta fundReturnedNote">برگشت به صندوق: ${money(ret)} ریال</div>`:''}<div class="fundActions fundCardActions">${fundReturnMarked(f)?(canReturnDriverFunds()&&!driverFundDayClosures[String(f.date||'')]&&!driverFundDayClosures[dateKey(f.date||'')]?`<button class="fundIconAction fundUndoReturnAction" type="button" data-fund-undo-return="${esc(f.id)}" aria-label="برگرداندن واریزی به حالت قابل استفاده" title="لغو برگشت به صندوق"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11a9 9 0 1 1 2.6 6.4"/><path d="M3 4v7h7"/></svg></button>`:''):(canManageFunds()&&!fundCarriedTarget(f)&&!(f.allocations||[]).length&&used<=0&&ret<=0?`<button class="fundIconAction fundEditAction" type="button" data-fund-edit="${esc(f.id)}" aria-label="ویرایش واریزی ${esc(f.desc||'')}" title="ویرایش"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg></button><button class="fundIconAction fundDeleteAction" type="button" data-fund-delete="${esc(f.id)}" aria-label="حذف واریزی ${esc(f.desc||'')}" title="حذف"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/><path d="M10 10v6M14 10v6"/></svg></button>`:'')}${canReturnDriverFunds()&&!driverFundDayClosures[String(f.date||'')]&&!driverFundDayClosures[dateKey(f.date||'')]&&avail>0&&!(f.allocations||[]).length&&!ret&&avail===Number(f.amount||0)?`<button class="outline" type="button" data-fund-return="${esc(f.id)}">برگشت مانده به صندوق</button>`:''}${(!fundReturnMarked(f)&&!driverFundDayClosures[String(f.date||'')]&&!driverFundDayClosures[dateKey(f.date||'')])?`${(avail>0&&canUseFunds())?`<button class="fundIconAction fundTransferAction" type="button" data-fund-transfer="${esc(f.id)}" aria-label="انتقال به تنخواه" title="انتقال به تنخواه"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v9"/><path d="m8 8 4 4 4-4"/><path d="M5 15v4a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4"/></svg></button>`:''}${(avail>0&&can('fundSplit'))?`<button class="fundIconAction fundSplitAction" type="button" data-fund-split="${esc(f.id)}" aria-label="تفکیک واریزی" title="تفکیک واریزی"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88"/><path d="M14.47 14.48 20 20"/><path d="M8.12 8.12 12 12"/></svg></button>`:''}`:''}</div></div>`}).join(''):'<div class="empty">امروز هنوز واریزی کارت رانندگان ثبت نشده است.</div>'}
 function cashboxDraftHtml(item,i){const src=item.source==='driver'?'driver':'cashbox';const uses=Array.isArray(item.fundUses)?item.fundUses:[];const usesTotal=uses.reduce((a,u)=>a+Math.max(0,Number(u.amount)||0),0);const picks=uses.map(u=>{const f=driverFunds.find(x=>String(x.id)===String(u.fundId));return (f?(f.desc||'واریزی کارت رانندگان'):'واریزی حذف‌شده')}).join(' ، ');return `<div class="requestItem" data-cashbox-draft="${i}"><div class="requestItemTop"><span class="requestItemNo">شارژ تنخواه ${i+1}</span></div><div class="twocol"><div><label class="flabel">تاریخ شمسی</label><div class="datePickWrap"><input class="finput jalaliInput" data-cashbox-prop="date" value="${esc(item.date||today())}" readonly><button class="calendarBtn" type="button" data-open-cashbox-date="1">▣</button></div></div><div><label class="flabel">منبع شارژ</label><select class="select" data-cashbox-prop="source" aria-label="منبع شارژ تنخواه"><option value="cashbox"${src==='cashbox'?' selected':''}>نقد / تنخواه</option><option value="driver"${src==='driver'?' selected':''}>از واریزی کارت رانندگان</option></select></div></div>${src==='driver'?`<div class="cashboxDriverPick"><div class="cashboxDriverPickTop">${uses.length?`<span class="cashboxPickNames">انتخاب‌شده: ${esc(picks)}</span>`:'<span class="cashboxPickNames cashboxPickEmpty">هنوز واریزی‌ای انتخاب نشده است</span>'}<button type="button" class="outline cashboxPickBtn" data-cashbox-pick="${i}">انتخاب واریزی‌ها</button></div><div class="cashboxPickTotal">مبلغ شارژ: <b>${money(usesTotal)} ${currencyUnit()}</b></div></div>`:`<label class="flabel">مبلغ (ریال)</label><input class="finput moneyInput" data-cashbox-prop="amount" inputmode="numeric" value="${esc(item.amount||'')}" placeholder="50,000,000">`}<label class="flabel">شرح شارژ تنخواه</label><input class="finput" data-cashbox-prop="desc" value="${esc(item.desc||'')}" placeholder="شارژ تنخواه"></div>`}
 let cashboxDraft=[{date:today(),amount:'',desc:'شارژ تنخواه'}];
 function renderCashboxDraft(){const box=$('cashboxDraftList');if(!box)return;box.innerHTML=cashboxDraft.map(cashboxDraftHtml).join('');box.querySelectorAll('.moneyInput').forEach(el=>{el.value=el.value?fa(num(el.value)):''})}
@@ -3395,7 +3395,7 @@ async function boot(){try{const __build=(document.querySelector('meta[name="sama
     if(found){
      current=found;showApp();
      connectCloudRealtime().catch(()=>{});
-     pullCloudState(false).then(()=>{const fresh=users.find(x=>String(x.username).toLowerCase()===uname);if(fresh){current=fresh;showApp()}}).catch(e=>{console.warn('Background session refresh failed',e);showCloudNotice('برنامه با اطلاعات ذخیره‌شدهٔ همین دستگاه باز شد؛ اتصال به سرور برقرار نشد.')});
+     pullCloudState(false).then(()=>{const fresh=users.find(x=>String(x.username).toLowerCase()===uname);if(fresh){current=fresh;showApp()}}).catch(e=>{console.warn('Background session refresh failed',e);try{if(typeof showConnLock==='function')showConnLock()}catch(_){}showCloudNotice('برنامه با اطلاعات ذخیره‌شدهٔ همین دستگاه باز شد؛ اتصال به سرور برقرار نشد.')});
      return;
     }
    }
@@ -3459,15 +3459,31 @@ $('purchaseBasketList')?.addEventListener('click',e=>{const b=e.target.closest('
 let __serverOnline=false,__entryGateActive=false,__connWatchTimer=null,__connWatchTick=null;
 function serverReachable(timeoutMs){
  return new Promise(resolve=>{
-  let settled=false;
+  let settled=false,timer=null;
   const done=v=>{if(!settled){settled=true;resolve(v)}};
+  const finish=v=>{try{if(timer)clearTimeout(timer)}catch(_){}done(v)};
+  const isJsonBody=res=>{
+   if(!res)return Promise.resolve(false);
+   const ct=String((res.headers&&res.headers.get&&res.headers.get('content-type'))||'').toLowerCase();
+   if(ct.indexOf('json')>-1)return Promise.resolve(true);
+   return res.text().then(b=>{try{const j=JSON.parse(b);return !!(j&&typeof j==='object')}catch(_){return false}}).catch(()=>false);
+  };
   try{
    const ctl=new AbortController();
-   const timer=setTimeout(()=>{try{ctl.abort()}catch(_){}done(false)},Math.max(1500,Number(timeoutMs)||5000));
-   fetch(SUPABASE_URL+'/auth/v1/health',{method:'GET',cache:'no-store',headers:{apikey:SUPABASE_PUBLISHABLE_KEY},signal:ctl.signal})
-    .then(res=>{clearTimeout(timer);done(!!res&&res.ok)})
-    .catch(()=>{clearTimeout(timer);done(false)});
-  }catch(_){done(false)}
+   timer=setTimeout(()=>{try{ctl.abort()}catch(_){}done(false)},Math.max(1500,Number(timeoutMs)||5000));
+   const opts={method:'GET',cache:'no-store',headers:{apikey:SUPABASE_PUBLISHABLE_KEY},signal:ctl.signal};
+   // (۱) سرویس احراز هویت: پاسخ باید JSON واقعی باشد، نه صفحهٔ اپراتور/پروکسی با کد ۲۰۰.
+   const authProbe=fetch(SUPABASE_URL+'/auth/v1/health',opts)
+    .then(res=>{
+     if(!res||!res.ok)return false;
+     const ct=String((res.headers&&res.headers.get&&res.headers.get('content-type'))||'').toLowerCase();
+     if(ct.indexOf('json')>-1)return true;
+     return res.text().then(b=>{try{const j=JSON.parse(b);return !!(j&&typeof j==='object'&&(j.name||j.version||j.description))}catch(_){return false}}).catch(()=>false);
+    }).catch(()=>false);
+   // (۲) سرویس داده: باید واقعاً پاسخ دهد؛ هر کد HTTP با بدنهٔ JSON یعنی سرور بالاست.
+   const dataProbe=fetch(SUPABASE_URL+'/rest/v1/',opts).then(res=>isJsonBody(res)).catch(()=>false);
+   Promise.all([authProbe,dataProbe]).then(r=>finish(!!(r[0]&&r[1]))).catch(()=>finish(false));
+  }catch(_){finish(false)}
  });
 }
 function setConnStatus(state){
@@ -6253,12 +6269,19 @@ select.driverLockedField{-webkit-appearance:none;appearance:none;background-imag
 })();
 </script>
 <style id="v258-fund-carry-css">
-.v258CarryNote{color:#3b5bb5;font-weight:700}
+.v258PillCol{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.statusPill.v258CarriedPill,.statusPill.v258CarryBadge{background:#e9eefb;color:#3b5bb5}
 .fundCarryAction{color:#2f7fc4!important;background:#eef6ff!important;border-color:#cfe3f7!important}
 .fundCarryAction:hover{background:#e2eefb!important}
 </style>
 <script id="v258-fund-carry">
 (function(){
+  function directChild(parent,sel){
+    if(!parent)return null;
+    var ch=parent.children;
+    for(var i=0;i<ch.length;i++){var c=ch[i];if(c&&c.matches&&c.matches(sel))return c}
+    return null;
+  }
   function decorate(){
     var api=window.__sbFundsApi;if(!api)return;
     var box=document.getElementById('driverFundsList');if(!box)return;
@@ -6268,19 +6291,37 @@ select.driverLockedField{-webkit-appearance:none;appearance:none;background-imag
       var card=cards[i];
       var f=byId[String(card.getAttribute('data-fund-id'))];if(!f)continue;
       var pending=api.pending(f),arrived=api.arrived(f);
-      var meta=card.querySelector('.fundMeta');
-      if(meta){
-        var note=meta.querySelector('.v258CarryNote');
-        var noteTxt=pending?' · منتقل شده به فردا':(arrived?' · منتقل شده از روز گذشته':'');
-        if(noteTxt){
-          if(!note){
-            note=document.createElement('span');note.className='v258CarryNote';
-            var br=meta.querySelector('br');
-            if(br)meta.insertBefore(note,br);else meta.appendChild(note);
-          }
-          if(note.textContent!==noteTxt)note.textContent=noteTxt;
-        }else if(note){note.remove();}
+      /* وضعیت واریزی منتقل‌شده: نشان وضعیت در جای خودش و نشان «منتقل شده» دقیقاً زیر آن */
+      var top=card.querySelector('.fundTop');
+      if(top){
+        var col=directChild(top,'.v258PillCol');
+        if(!col){
+          var base=directChild(top,'.statusPill');
+          if(base){col=document.createElement('div');col.className='v258PillCol';top.appendChild(col);col.appendChild(base);}
+        }
+        if(col){
+          var pill=directChild(col,'.statusPill');
+          var badge=directChild(col,'.v258CarryBadge');
+          if(pending){
+            if(pill){
+              if(pill.textContent!=='منتقل شده به فردا')pill.textContent='منتقل شده به فردا';
+              if(pill.className!=='statusPill v258CarriedPill')pill.className='statusPill v258CarriedPill';
+            }
+            if(badge)badge.remove();
+          }else if(arrived){
+            if(!badge&&pill){
+              badge=document.createElement('span');badge.className='statusPill v258CarryBadge';col.appendChild(badge);
+            }
+            if(badge&&badge.textContent!=='منتقل شده')badge.textContent='منتقل شده';
+          }else if(badge){badge.remove();}
+        }
       }
+      /* واریزی منتقل‌شده دقیقاً مثل «برگشت به صندوق»: بدون ویرایش و بدون حذف */
+      if(pending||arrived){
+        var rm=card.querySelectorAll('.fundEditAction,.fundDeleteAction,[data-fund-edit],[data-fund-delete]');
+        for(var r=0;r<rm.length;r++){try{rm[r].remove()}catch(_){}}
+      }
+      /* دکمهٔ انتقال به فردا / لغو انتقال */
       var actions=card.querySelector('.fundCardActions');
       if(actions){
         var ex=actions.querySelector('.fundCarryAction');
