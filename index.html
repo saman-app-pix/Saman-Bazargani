@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#ffffff" name="theme-color"/>
-<meta name="saman-build" content="v268"/>
+<meta name="saman-build" content="v269"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; manifest-src 'self'; connect-src 'self' https://eiobajtihwxdlfxufmbg.supabase.co wss://eiobajtihwxdlfxufmbg.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
@@ -530,7 +530,7 @@ textarea{min-height:64px}
 #pageWarehouse .warehouseBatchTools>button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:34px!important;height:auto!important;margin:0!important;padding:5px 3px!important;border-radius:8px!important;font-family:inherit!important;font-size:clamp(9px,2.45vw,11px)!important;font-weight:600!important;line-height:1.3!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;box-sizing:border-box!important}
 @media(max-width:360px){#pageWarehouse .warehouseSection>.listTabs>button{font-size:11px!important;padding:5px 3px!important}#pageWarehouse .warehouseBatchTools{gap:4px!important;padding:4px!important}#pageWarehouse .warehouseBatchTools>button{font-size:9px!important;padding:4px 2px!important;min-height:34px!important}}
 </style>
-<meta name="saman-build" content="v268">
+<meta name="saman-build" content="v269">
 
 <style id="v213-fund-transfer-split">
 .fundActOverlay,.fundPickerOverlay{position:fixed;inset:0;z-index:100520;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;background:rgba(15,28,45,.48);backdrop-filter:blur(2px)}
@@ -1764,7 +1764,7 @@ function cloudHasKey(state,k){return !!state&&typeof state==='object'&&Object.pr
 function sameCloudTime(a,b){if(!a||!b)return false;const ta=Date.parse(a),tb=Date.parse(b);if(Number.isFinite(ta)&&Number.isFinite(tb))return ta===tb;return String(a)===String(b)}
 function localArrayLen(k){try{const v=JSON.parse(localStorage.getItem(k)||'null');return Array.isArray(v)?v.length:0}catch(_){return 0}}
 function isCloudDamaged(cloudState){if(!cloudState||typeof cloudState!=='object')return false;return CLOUD_CORE_KEYS.some(k=>localHasValue(k)&&!cloudHasKey(cloudState,k))}
-function reloadFromLocal(){txs=load(TXK,[]);users=load(UK,[]);driverFunds=load(FUND_K,[]);driverFundDayClosures=load(FUND_DAY_CLOSE_K,{});roles=load(RK,null);if(roles)roles=roles.map(r=>({...r,permissions:normalizePerms(r.permissions)}));procurement=load(PROC_K,[]);quotes=load(QUOTE_K,[]);discountPool=load(DISCOUNT_POOL_K,[])||[];recons=load(RECON_K,[])||[];try{if(pruneOrphanFundAllocations())save(FUND_K,driverFunds)}catch(_e){}}
+function reloadFromLocal(){txs=load(TXK,[]);users=load(UK,[]);driverFunds=load(FUND_K,[]);driverFundDayClosures=load(FUND_DAY_CLOSE_K,{});roles=load(RK,null);if(roles)roles=roles.map(r=>({...r,permissions:normalizePerms(r.permissions)}));procurement=load(PROC_K,[]);quotes=load(QUOTE_K,[]);discountPool=load(DISCOUNT_POOL_K,[])||[];recons=load(RECON_K,[])||[];try{if(pruneOrphanFundAllocations())save(FUND_K,driverFunds)}catch(_e){}try{if(reconcileBasketSettlements())save(TXK,txs)}catch(_e){}}
 // v232: کمکی‌های ادغام بی‌زیان بین نسخهٔ محلی و ابری.
 function readLocalArray(k){try{const v=JSON.parse(localStorage.getItem(k)||'[]');return Array.isArray(v)?v:[]}catch(_){return []}}
 function loadDeletions(){try{const d=JSON.parse(localStorage.getItem(DEL_K)||'{}');return (d&&typeof d==='object')?d:{}}catch(_){return {}}}
@@ -1790,9 +1790,43 @@ function pickNewerRecord(a,b,prefer){
  if(am!==bm)return am>bm?a:b;
  return prefer==='cloud'?b:a;
 }
+// v269: ادغام امنِ رکورد تراکنش. اگر رکورد برنده (تازه‌تر) ریزفهرست‌های سبد/مصرف کارت
+// رانندگان را از دست داده باشد (آرایهٔ خالی) و رکورد دیگر آن‌ها را داشته باشد، آن‌ها را
+// قرض می‌گیریم و ماندهٔ سبد را بازمحاسبه می‌کنیم تا دادهٔ تسویهٔ سبد با یک ویرایش
+// هم‌زمان روی دستگاه دیگر پاک نشود. اگر برنده خودش ردیفی داشته باشد دست‌نخورده می‌ماند.
+function mergeTxRecord(a,b,prefer){
+ const base=pickNewerRecord(a,b,prefer);
+ if(!base||!a||!b||a===b||typeof base!=='object')return base;
+ const other=(base===a)?b:a;if(!other||typeof other!=='object')return base;
+ const out=Object.assign({},base);
+ const clone=s=>(s&&typeof s==='object')?Object.assign({},s):s;
+ const wb=base.purchaseBasket,ob=other.purchaseBasket;
+ if(wb&&ob){
+  const ws=Array.isArray(wb.settlements)?wb.settlements:[];
+  const os=Array.isArray(ob.settlements)?ob.settlements:[];
+  if(!ws.length&&os.length){
+   const nb=Object.assign({},wb,{settlements:os.map(clone)});
+   const amt=Math.max(0,Number(nb.amount)||0);
+   const settled=nb.settlements.reduce((s,x)=>s+Math.max(0,Number(x&&x.amount)||0),0);
+   nb.remaining=Math.max(0,amt-settled);
+   if(nb.remaining<=0.000001){nb.settledDate=nb.settledDate||wb.settledDate||ob.settledDate||'';nb.settledBy=nb.settledBy||wb.settledBy||ob.settledBy||''}
+   out.purchaseBasket=nb;
+  }
+ }
+ const wu=Array.isArray(base.driverFundUses)?base.driverFundUses:[];
+ const ou=Array.isArray(other.driverFundUses)?other.driverFundUses:[];
+ const wBasket=wu.filter(u=>u&&u.basket),oBasket=ou.filter(u=>u&&u.basket);
+ if(!wBasket.length&&oBasket.length)out.driverFundUses=wu.filter(u=>!(u&&u.basket)).concat(oBasket.map(clone));
+ const uses=Array.isArray(out.driverFundUses)?out.driverFundUses:[];
+ if(uses.length){
+  const sum=uses.reduce((s,u)=>s+Math.max(0,Number(u&&u.amount)||0),0);
+  out.purchaseDriver=Math.max(Number(base.purchaseDriver)||0,Number(other.purchaseDriver)||0,sum);
+ }
+ return out;
+}
 // v232: اجتماع رکوردهای دو آرایه بر اساس id بدون حذف هیچ رکوردی؛ حذف‌های عمدی (tombstone)
 // اعمال می‌شوند. localOnly یعنی محلی رکوردهایی دارد که ابر ندارد و باید به ابر برگردند.
-function mergeCoreArray(localArr,cloudArr,tomb,prefer){
+function mergeCoreArray(localArr,cloudArr,tomb,prefer,key){
  const l=Array.isArray(localArr)?localArr:[],c=Array.isArray(cloudArr)?cloudArr:[];
  const lm=new Map(),cm=new Map();
  // v232: عناصر بدون id (اگر وجود داشته باشند) هرگز حذف نمی‌شوند؛ جداگانه نگه داشته می‌شوند.
@@ -1806,7 +1840,7 @@ function mergeCoreArray(localArr,cloudArr,tomb,prefer){
   if(tomb&&tomb[id]!=null)return;
   const a=lm.get(id),b=cm.get(id);
   if(a&&!b)localOnly=true;
-  const pick=pickNewerRecord(a,b,prefer);
+  const pick=(key===TXK)?mergeTxRecord(a,b,prefer):pickNewerRecord(a,b,prefer);
   if(pick)out.push(pick);
  });
  return {arr:out.concat(orphans),localOnly};
@@ -1844,7 +1878,7 @@ function applyCloudStateToLocal(cloudState){
     continue;
    }
    if(isEmptyCloudValue(v)&&hasLocal){cloudDamaged=true;cloudDirtyKeys.add(k);persistDirtyKeys();try{scheduleCloudSync(k)}catch(_){};continue}
-   const merged=mergeCoreArray(localArr,Array.isArray(v)?v:[],tombFor(deletions,k),'cloud');
+   const merged=mergeCoreArray(localArr,Array.isArray(v)?v:[],tombFor(deletions,k),'cloud',k);
    try{localStorage.setItem(k,JSON.stringify(merged.arr));deviceSet(k,merged.arr)}catch(e){console.warn('Apply cloud key failed',k,e)}
    if(merged.localOnly){cloudDamaged=true;cloudDirtyKeys.add(k);persistDirtyKeys();try{scheduleCloudSync(k)}catch(_){}}
    continue;
@@ -1924,7 +1958,7 @@ async function pushCloudState(mode='auto',onlyKeys=null){
      const mergedDel=mergeDeletionMaps(loadDeletions(),(cloudNow[DEL_K]&&typeof cloudNow[DEL_K]==='object')?cloudNow[DEL_K]:{});
      try{localStorage.setItem(DEL_K,JSON.stringify(mergedDel));deviceSet(DEL_K,mergedDel)}catch(_){}
      coreInState.forEach(k=>{
-      const merged=mergeCoreArray(state[k],Array.isArray(cloudNow[k])?cloudNow[k]:[],tombFor(mergedDel,k),'local');
+      const merged=mergeCoreArray(state[k],Array.isArray(cloudNow[k])?cloudNow[k]:[],tombFor(mergedDel,k),'local',k);
       state[k]=merged.arr;
      });
      state[DEL_K]=mergedDel;
@@ -3120,12 +3154,87 @@ function fundEligibleForPurchase(f){return !!f&&fundAvailable(f)>0.000001&&!fund
 function cashboxAvailableBalance(){return (Array.isArray(txs)?txs:[]).reduce((s,x)=>s+balanceDeltaOf(x||{}),0)}
 function txFundAllocationIds(x){const ids=new Set();if(!x)return ids;const add=v=>{if(v!==undefined&&v!==null&&String(v)!=='')ids.add(String(v))};add(x.driverFundAllocationId);if(Array.isArray(x.driverFundAllocationIds))x.driverFundAllocationIds.forEach(add);if(Array.isArray(x.driverFundUses))x.driverFundUses.forEach(u=>add(u&&u.allocationId));const st=(x.purchaseBasket&&Array.isArray(x.purchaseBasket.settlements))?x.purchaseBasket.settlements:[];st.forEach(s=>add(s&&s.allocationId));return ids}
 function releaseTxFundAllocations(id,opts){const onlyNonBasket=!!(opts&&opts.onlyNonBasket);const tx=(id&&typeof id==='object')?id:((Array.isArray(txs)?txs:[]).find(t=>String(t.id)===String(id)));const key=String((tx&&tx.id!==undefined&&tx.id!==null)?tx.id:id);const ids=txFundAllocationIds(tx);const removed=[];(Array.isArray(driverFunds)?driverFunds:[]).forEach(f=>{if(!Array.isArray(f.allocations))return;const keep=[];f.allocations.forEach(a=>{if(!a)return;const byTx=(a.txId!==undefined&&a.txId!==null&&String(a.txId)!==''&&String(a.txId)===key);const byId=(a.id!==undefined&&a.id!==null&&ids.has(String(a.id)));if((byTx||byId)&&!(onlyNonBasket&&a.basket)){removed.push({fund:f,alloc:a});return}keep.push(a)});f.allocations=keep});return removed}
-function pruneOrphanFundAllocations(){const all=Array.isArray(txs)?txs:[];const txIds=new Set(all.map(t=>String(t&&t.id)));const refIds=new Set();all.forEach(t=>txFundAllocationIds(t).forEach(v=>refIds.add(v)));let changed=false;(Array.isArray(driverFunds)?driverFunds:[]).forEach(f=>{if(!Array.isArray(f.allocations))return;const keep=f.allocations.filter(a=>{if(!a)return false;if(a.txId!==undefined&&a.txId!==null&&String(a.txId)!=='')return txIds.has(String(a.txId));return a.id!==undefined&&a.id!==null&&refIds.has(String(a.id))});if(keep.length!==f.allocations.length){f.allocations=keep;changed=true}});return changed}
+// v269: پاک‌سازی محافظه‌کارانهٔ تخصیص‌های بی‌صاحب. تخصیص‌های سبد هرگز حذف نمی‌شوند و
+// تخصیص یک تراکنش تنها وقتی حذف می‌شود که خودِ تراکنش صریحاً حذف (tombstone) شده باشد؛
+// پس یک دستگاه ناقص/کهنه نمی‌تواند تخصیص‌های معتبر صندوق را پاک کند.
+function pruneOrphanFundAllocations(){
+ const all=Array.isArray(txs)?txs:[];const txIds=new Set(all.map(t=>String(t&&t.id)));
+ const refIds=new Set();all.forEach(t=>txFundAllocationIds(t).forEach(v=>refIds.add(v)));
+ const txTomb=tombFor(loadDeletions(),TXK);
+ let changed=false;
+ (Array.isArray(driverFunds)?driverFunds:[]).forEach(f=>{
+  if(!Array.isArray(f.allocations))return;
+  const keep=f.allocations.filter(a=>{
+   if(!a)return false;
+   if(a.basket)return true;
+   if(a.txId!==undefined&&a.txId!==null&&String(a.txId)!==''){
+    const id=String(a.txId);
+    if(txIds.has(id))return true;
+    return !(txTomb&&txTomb[id]!=null);
+   }
+   if(a.id!==undefined&&a.id!==null&&refIds.has(String(a.id)))return true;
+   return true;
+  });
+  if(keep.length!==f.allocations.length){f.allocations=keep;changed=true}
+ });
+ return changed;
+}
+// v269: بازسازی امنِ تسویه‌های سبد از روی تخصیص‌های باقی‌ماندهٔ واریزی کارت رانندگان.
+// فقط تسویه‌هایی ساخته می‌شوند که تخصیص متناظرشان هنوز در صندوق موجود است؛ پس حذف عمدی
+// (که هم ردیف تسویه و هم تخصیص را با هم پاک می‌کند) هرگز بازسازی نمی‌شود. این تابع
+// خودتکرار (idempotent) است و اجرای دوباره‌اش تغییری ایجاد نمی‌کند.
+function reconcileBasketSettlements(){
+ if(!Array.isArray(txs)||!Array.isArray(driverFunds))return false;
+ let changed=false;
+ txs.forEach(t=>{
+  if(!t||t.deposit)return;const b=t.purchaseBasket;if(!b)return;
+  const surviving=[];
+  driverFunds.forEach(f=>{
+   if(!f||!Array.isArray(f.allocations))return;
+   f.allocations.forEach(a=>{
+    if(!a||!a.basket)return;
+    if(a.txId===undefined||a.txId===null||String(a.txId)==='')return;
+    if(String(a.txId)!==String(t.id))return;
+    surviving.push({fund:f,alloc:a});
+   });
+  });
+  if(!surviving.length)return;
+  const sArr=Array.isArray(b.settlements)?b.settlements:(b.settlements=[]);
+  const uArr=Array.isArray(t.driverFundUses)?t.driverFundUses:(t.driverFundUses=[]);
+  const haveS=new Set(sArr.map(s=>s&&s.allocationId).filter(v=>v!==undefined&&v!==null&&String(v)!=='').map(String));
+  const freeUse=uArr.map((u,i)=>i);
+  let added=false;
+  surviving.forEach(({fund,alloc})=>{
+   const amt=Math.max(0,Number(alloc.amount)||0);
+   const aid=alloc.id;
+   if(!(aid!==undefined&&aid!==null&&String(aid)!==''&&haveS.has(String(aid)))){
+    sArr.push({fundId:fund.id,allocationId:alloc.id,amount:amt,date:alloc.date||today(),desc:alloc.desc||fund.desc||'کارت رانندگان',fundDate:fund.date||'',by:alloc.by||''});
+    if(aid!==undefined&&aid!==null)haveS.add(String(aid));
+    added=true;
+   }
+   const mi=freeUse.findIndex(i=>{const u=uArr[i];return u&&u.basket&&String(u.fundId)===String(fund.id)&&Math.abs((Number(u.amount)||0)-amt)<0.000001});
+   if(mi>=0)freeUse.splice(mi,1);
+   else{uArr.push({fundId:fund.id,amount:amt,desc:alloc.desc||fund.desc||'کارت رانندگان',date:alloc.date||today(),basket:true});added=true}
+  });
+  if(added){
+   const amt=Math.max(0,Number(b.amount)||0);
+   const settled=sArr.reduce((s,x)=>s+Math.max(0,Number(x&&x.amount)||0),0);
+   b.remaining=Math.max(0,amt-settled);
+   if(b.remaining<=0.000001&&!b.settledDate)b.settledDate=today();
+   changed=true;
+  }
+  if(uArr.length){
+   const sum=uArr.reduce((s,u)=>s+Math.max(0,Number(u&&u.amount)||0),0);
+   if(sum>(Number(t.purchaseDriver)||0)+0.000001){t.purchaseDriver=sum;changed=true}
+  }
+ });
+ return changed;
+}
 function fundOwnAllocations(f){if(!f||!Array.isArray(f.allocations)||editingId===undefined||editingId===null)return 0;return f.allocations.filter(a=>a&&!a.basket&&String(a.txId)===String(editingId)).reduce((s,a)=>s+Math.max(0,Number(a.amount)||0),0)}
 function fundAvailableForEdit(f){return fundAvailable(f)+fundOwnAllocations(f)}
 function fundSelectableForPurchase(f){if(!f)return false;if(fundReturnMarked(f)||fundBlockedByAnyRecord(f))return false;return fundEligibleForPurchase(f)||fundOwnAllocations(f)>0.000001}
 function saveFunds(){save(FUND_K,driverFunds);renderDriverFunds();if(typeof renderDashboardStats==='function')renderDashboardStats();if(typeof renderPurchaseFundOptions==='function')renderPurchaseFundOptions();if(typeof renderAll==='function')renderAll()}
-function fundDayStats(day){const key=dateKey(day)||String(day||'');const arr=driverFunds.filter(f=>fundHomeDayOf(f,day)===key);const total=arr.filter(f=>!fundIsArrivedRelative(f,day)).reduce((a,f)=>a+Math.max(0,Number(f.amount)||0),0);const used=arr.reduce((a,f)=>a+fundUsed(f),0);const returned=arr.reduce((a,f)=>a+fundReturned(f),0);const remaining=arr.filter(f=>!fundIsPendingRelative(f,day)).reduce((a,f)=>a+fundRemainingRaw(f),0);return {day,arr,count:arr.length,total,used,returned,remaining,carriedIn:arr.filter(f=>fundIsArrivedRelative(f,day)).length,closed:!!driverFundDayClosures[String(day)]||!!driverFundDayClosures[key]}}
+function fundDayStats(day){const key=dateKey(day)||String(day||'');const closure=driverFundDayClosures[String(day)]||driverFundDayClosures[key]||null;const arr=driverFunds.filter(f=>fundHomeDayOf(f,day)===key);const total=arr.filter(f=>!fundIsArrivedRelative(f,day)).reduce((a,f)=>a+Math.max(0,Number(f.amount)||0),0);const used=arr.reduce((a,f)=>a+fundUsed(f),0);const returned=arr.reduce((a,f)=>a+fundReturned(f),0);const remaining=arr.filter(f=>!fundIsPendingRelative(f,day)).reduce((a,f)=>a+fundRemainingRaw(f),0);const carriedIn=arr.filter(f=>fundIsArrivedRelative(f,day)).length;/* v269: برای روزهای بسته‌شده، جمع‌بندی ذخیره‌شدهٔ همان روز مرجع است تا نمایش «ماندهٔ باز» نادرست نشود. */if(closure){const pick=(v,fb)=>{const n=Number(v);return Number.isFinite(n)?n:fb};return {day,arr,count:pick(closure.count,arr.length),total:pick(closure.total,total),used:pick(closure.used,used),returned:pick(closure.returned,returned),remaining:pick(closure.remaining,0),carriedIn,closed:true,closure}}return {day,arr,count:arr.length,total,used,returned,remaining,carriedIn,closed:false,closure:null}}
 function renderFundDaily(){const date=today(),stats=fundDayStats(date),closure=fundDayClosureOf(date),status=$('fundDailyStatus'),hint=$('fundDailyHint'),closeBtn=$('closeFundDay');$('fundDailyDate').textContent='تاریخ: '+date; $('fundDailyStats').innerHTML=`<div><small>تعداد واریزی</small><b>${fa(stats.count)}</b></div><div><small>جمع واریزی</small><b>${money(stats.total)} ریال</b></div><div><small>تعیین‌تکلیف‌شده</small><b>${money(stats.used+stats.returned)} ریال</b></div><div><small>مانده باز</small><b>${money(stats.remaining)} ریال</b></div>`;status.textContent=stats.closed?(closure?.auto?'بسته‌شده (تعطیلی جمعه)':'پرونده بسته شده'):'در انتظار تعیین تکلیف';status.classList.toggle('done',stats.closed);status.classList.toggle('pending',!stats.closed);closeBtn.disabled=stats.closed||stats.count===0||stats.remaining>0||!canCloseFundDay();closeBtn.textContent=stats.closed?'پرونده بسته شد':'بستن پرونده امروز';hint.textContent=stats.closed?(closure?.auto?'در روزهای جمعه پرونده روز بصورت خودکار بسته می شود':'جمع‌بندی این روز ثبت شده است.'):stats.count===0?'برای امروز هنوز واریزی ثبت نشده است.':stats.remaining>0?'برای بستن پرونده، ابتدا ماندهٔ تمام واریزی‌های امروز را با مصرف در خرید، انتقال به تنخواه یا برگشت کامل به صندوق تعیین تکلیف کن.':'همهٔ واریزی‌های امروز تعیین تکلیف شده‌اند؛ می‌توانی پرونده را ببندی.';renderFundHistory()}
 function renderFundHistory(){const box=$('fundDailyHistory');if(!box||box.classList.contains('hidden'))return;const input=$('fundHistoryDate'),out=$('fundHistorySelected');if(!input||!out)return;const available=[...new Set([...driverFunds.map(f=>String(f.date||'')),...Object.keys(driverFundDayClosures)])].filter(Boolean).sort((a,b)=>b.localeCompare(a));if(!input.value)input.value=available.find(d=>d!==today())||today();const d=input.value,x=fundDayStats(d);out.innerHTML=`<div class="fundHistoryRow"><div class="fundHistoryTop"><b>${esc(d)}</b><span class="statusPill ${x.closed?'done':'pending'}">${x.closed?'بسته‌شده':x.count===0?'بدون واریزی':x.remaining>0?'باز':'آماده بستن'}</span></div><div class="fundHistoryNums"><span>تعداد واریزی: <b>${fa(x.count)}</b></span><span>جمع واریزی: <b>${money(x.total)} ریال</b></span><span>تعیین‌تکلیف‌شده: <b>${money(x.used+x.returned)} ریال</b></span><span>ماندهٔ باز: <b>${money(x.remaining)} ریال</b></span></div><div class="fundMeta">${x.closed?'پرونده این روز بسته شده است.':x.count===0?'برای این تاریخ واریزی ثبت نشده است.':x.remaining>0?'هنوز همه مبالغ تعیین‌تکلیف نشده‌اند.':'همه مبالغ تعیین‌تکلیف شده‌اند.'}</div>${!x.closed&&x.count>0&&x.remaining===0?`<button type="button" class="outline fundHistoryClose" data-close-fund-day="${esc(d)}">بستن پرونده این روز</button>`:''}</div>`}
 async function closeDriverFundDay(day=today()){if(!canCloseFundDay())return;const x=fundDayStats(day);if(x.closed){alert('پرونده امروز قبلاً بسته شده است.');return}if(!x.count){alert('برای امروز واریزی ثبت نشده است.');return}if(x.remaining>0){alert('پرونده قابل بستن نیست؛ هنوز از واریزی‌های امروز '+money(x.remaining)+' '+currencyUnit()+' مانده تعیین‌تکلیف‌نشده وجود دارد.');return}if(!(await window.uiConfirm('پرونده واریزی‌های روز '+day+' با جمع '+money(x.total)+' '+currencyUnit()+' بسته شود؟ پس از بستن، این روز در سابقه روزهای گذشته ثبت می‌شود.')))return;driverFundDayClosures[day]={date:day,closedAt:nowParts().iso,closedBy:current?.name||'',count:x.count,total:x.total,used:x.used,returned:x.returned,remaining:x.remaining};save(FUND_DAY_CLOSE_K,driverFundDayClosures);renderFundDaily();alert('پرونده روزانه بسته شد.')}
