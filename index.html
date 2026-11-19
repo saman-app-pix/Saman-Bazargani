@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#ffffff" name="theme-color"/>
-<meta name="saman-build" content="v272"/>
+<meta name="saman-build" content="v273"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; manifest-src 'self'; connect-src 'self' https://eiobajtihwxdlfxufmbg.supabase.co wss://eiobajtihwxdlfxufmbg.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
@@ -530,7 +530,7 @@ textarea{min-height:64px}
 #pageWarehouse .warehouseBatchTools>button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:34px!important;height:auto!important;margin:0!important;padding:5px 3px!important;border-radius:8px!important;font-family:inherit!important;font-size:clamp(9px,2.45vw,11px)!important;font-weight:600!important;line-height:1.3!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;box-sizing:border-box!important}
 @media(max-width:360px){#pageWarehouse .warehouseSection>.listTabs>button{font-size:11px!important;padding:5px 3px!important}#pageWarehouse .warehouseBatchTools{gap:4px!important;padding:4px!important}#pageWarehouse .warehouseBatchTools>button{font-size:9px!important;padding:4px 2px!important;min-height:34px!important}}
 </style>
-<meta name="saman-build" content="v272">
+<meta name="saman-build" content="v273">
 
 <style id="v213-fund-transfer-split">
 .fundActOverlay,.fundPickerOverlay{position:fixed;inset:0;z-index:100520;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;background:rgba(15,28,45,.48);backdrop-filter:blur(2px)}
@@ -715,16 +715,20 @@ button.supplyLinkTag{border:0;font-family:inherit;text-align:right;cursor:pointe
 <div class="periodBar"><div class="periodSwitch" role="group" aria-label="بازه نمایش"><button type="button" data-period="day">روزانه</button><button type="button" data-period="week">هفتگی</button><button type="button" data-period="month">ماهانه</button><button type="button" data-period="all" class="active">همه</button></div></div><div class="stats"><div class="stat"><small>جمع واریزی</small><b id="sumDeposit">0</b><small style="display:block;margin-top:3px">ریال</small></div><div class="stat"><small>جمع اصل خرید</small><b id="sumPurchase">0</b><small style="display:block;margin-top:3px">ریال</small></div><div class="stat"><small>جمع کرایه</small><b id="sumFreight">0</b><small style="display:block;margin-top:3px">ریال</small></div></div>
 <div class="card"><div class="ctitle">آخرین تراکنش‌ها</div><div id="recent"></div></div>
 </section>
-<section class="page" id="pageAdd">
+<div id="regMenuWrap">
 <div id="regMenu">
  <div class="regMenuHead"><b>ثبت</b><small>یک بخش را انتخاب کن</small></div>
  <div class="regBento" id="regBento"></div>
 </div>
+</div>
+<section class="page" id="pageAdd">
+<div class="regVeil" id="regVeil" aria-hidden="true"></div>
 <div id="regHead">
  <div class="regHeadIn">
-  <button type="button" class="regHBack" id="regBack" aria-label="بازگشت">‹</button>
+  <button type="button" class="regHBack" id="regBack" aria-label="بازگشت"><svg viewBox="0 0 24 24"><path d="m9.4 5.2 6.8 6.8-6.8 6.8"/></svg></button>
   <span class="regHIc" id="regHIc"></span>
-  <span class="regHTx"><b id="regHTitle"></b><small id="regHSub"></small></span>
+  <span class="regHTx" id="regHTx"><b id="regHTitle"></b><small id="regHSub"></small></span>
+  <button type="button" class="regHClose" id="regClose" aria-label="بستن"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
  </div>
 </div>
 <div class="title" id="formTitle">ثبت تراکنش</div>
@@ -1495,17 +1499,18 @@ select.pplInput{appearance:none;background-image:linear-gradient(45deg,transpare
 </style>
 <style id="v267-registration-menu">
 /* ================= v267 — منوی کلیدی تب «ثبت» ================= */
-#pageAdd{--regEase:cubic-bezier(.22,.85,.2,1)}
-#pageAdd[data-tone="lilac"],#pageAdd [data-tone="lilac"]{--tbg:#e8e1fb;--tink:#523c96;--tcta:#523c96;--tcta2:#7a5cd0}
-#pageAdd[data-tone="sky"],#pageAdd [data-tone="sky"]{--tbg:#dae9fd;--tink:#1c4e8c;--tcta:#1c4e8c;--tcta2:#2f7ac9}
-#pageAdd[data-tone="rose"],#pageAdd [data-tone="rose"]{--tbg:#ffdfe6;--tink:#9e3950;--tcta:#9e3950;--tcta2:#cd5b74}
-#pageAdd[data-tone="butter"],#pageAdd [data-tone="butter"]{--tbg:#fdf1c5;--tink:#86600f;--tcta:#8a6410;--tcta2:#bd8f18}
-#pageAdd[data-tone="peach"],#pageAdd [data-tone="peach"]{--tbg:#ffe4d1;--tink:#98481c;--tcta:#9a4a1c;--tcta2:#cd6f2f}
-#pageAdd[data-tone="mint"],#pageAdd [data-tone="mint"]{--tbg:#d6f2e4;--tink:#146a48;--tcta:#14724e;--tcta2:#22a173}
+#pageAdd{--regEase:cubic-bezier(.22,.85,.2,1);--regNav:70px}
+[data-tone="lilac"]{--tbg:#e8e1fb;--tink:#523c96;--tcta:#523c96;--tcta2:#7a5cd0}
+[data-tone="sky"]{--tbg:#dae9fd;--tink:#1c4e8c;--tcta:#1c4e8c;--tcta2:#2f7ac9}
+[data-tone="rose"]{--tbg:#ffdfe6;--tink:#9e3950;--tcta:#9e3950;--tcta2:#cd5b74}
+[data-tone="butter"]{--tbg:#fdf1c5;--tink:#86600f;--tcta:#8a6410;--tcta2:#bd8f18}
+[data-tone="peach"]{--tbg:#ffe4d1;--tink:#98481c;--tcta:#9a4a1c;--tcta2:#cd6f2f}
+[data-tone="mint"]{--tbg:#d6f2e4;--tink:#146a48;--tcta:#14724e;--tcta2:#22a173}
 
-/* منوی کلیدها */
-#regMenu{display:none;padding:0 0 6px}
-#pageAdd.regMenuOn>#regMenu{display:block}
+/* منوی کلیدها — بیرون از لایهٔ بازشو می‌ماند تا هنگام بستن دیده شود */
+#regMenuWrap{display:none}
+#regMenuWrap.on{display:block}
+#regMenu{padding:0 0 6px}
 .regMenuHead{display:flex;align-items:baseline;gap:8px;margin:2px 2px 12px}
 .regMenuHead b{font-size:21px;font-weight:bold;color:var(--text)}
 .regMenuHead small{font-size:11.5px;color:var(--muted)}
@@ -1539,23 +1544,49 @@ select.pplInput{appearance:none;background-image:linear-gradient(45deg,transpare
 .regBento.flow .regTile.big{grid-column:span 6!important;min-height:104px}
 .regBento.single .regTile{grid-column:span 6!important;grid-row:auto!important}
 
-/* سربرگ بخش باز شده */
-#regHead{display:none;position:fixed;top:65px;left:0;right:0;z-index:12;justify-content:center;pointer-events:none}
-#pageAdd[data-reg]>#regHead{display:flex}
-.regHeadIn{pointer-events:auto;width:min(680px,100%);display:flex;align-items:center;gap:10px;
-  margin:0 12px;padding:9px 11px;border-radius:15px;
-  background:var(--tbg,#fff);color:var(--tink,#25313c);
-  box-shadow:0 6px 18px rgba(20,45,65,.18)}
-.regHBack{width:34px;height:34px;flex:none;border:0;border-radius:11px;display:grid;place-items:center;
-  background:rgba(255,255,255,.72);color:inherit;box-shadow:0 1px 4px rgba(20,45,65,.08)}
-.regHBack:active{transform:scale(.94)}
-.regHBack svg{width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.regHIc{width:30px;height:30px;flex:none;display:grid;place-items:center;opacity:.9}
-.regHIc svg{width:24px;height:24px;display:block;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-.regHTx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
-.regHTx b{font-size:15.5px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.regHTx small{font-size:9.5px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#pageAdd[data-reg]{padding-top:52px}
+/* ============ لایهٔ بازشوی تمام‌صفحه ============ */
+#pageAdd.regOpen{
+  position:fixed;top:0;left:0;right:0;bottom:var(--regNav);z-index:100400;
+  display:flex;flex-direction:column;
+  background:var(--tbg,#fff);overflow:hidden;border-radius:22px;
+  padding:0!important;
+  transition:transform .5s var(--regEase),border-radius .5s var(--regEase);
+  will-change:transform}
+#pageAdd.regOpen.regMorph{transition:none}
+body.regLocked{overflow:hidden}
+.regVeil{display:none;position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(125% 60% at 100% 0%,rgba(255,255,255,.72),transparent 58%),
+             linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.88) 42%,#fff 66%)}
+#pageAdd.regOpen>.regVeil{display:block}
+
+/* سربرگ شیشه‌ای بخش باز شده */
+#regHead{display:none;position:relative;z-index:2;flex:none;padding:13px 14px 9px}
+#pageAdd.regOpen>#regHead{display:flex}
+.regHeadIn{width:100%;display:flex;align-items:center;gap:11px;
+  color:var(--tink,#25313c)}
+.regHBack,.regHClose{width:34px;height:34px;flex:none;border:0;border-radius:12px;display:grid;place-items:center;
+  background:rgba(255,255,255,.68);color:inherit;box-shadow:0 2px 8px rgba(20,45,65,.06);cursor:pointer;
+  transition:transform .16s var(--regEase)}
+.regHBack:active,.regHClose:active{transform:scale(.92)}
+.regHBack svg,.regHClose svg{width:17px;height:17px;display:block;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+.regHClose{display:none}
+.regHIc{width:34px;height:34px;flex:none;display:grid;place-items:center;opacity:.92}
+.regHIc svg{width:27px;height:27px;display:block;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.regHTx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;cursor:pointer}
+.regHTx b{font-size:16.5px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.regHTx small{font-size:10px;opacity:.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.regHIc{order:1}.regHTx{order:2}.regHBack,.regHClose{order:3}
+/* بخش‌های ریشه: دکمهٔ بستن جای بازگشت */
+#pageAdd[data-reg="funds"] .regHBack,
+#pageAdd[data-reg="purchase"] .regHBack,
+#pageAdd[data-reg="withdraw"] .regHBack,
+#pageAdd[data-reg="cashbox"] .regHBack,
+#pageAdd[data-reg="basket"] .regHBack{display:none}
+#pageAdd[data-reg="funds"] .regHClose,
+#pageAdd[data-reg="purchase"] .regHClose,
+#pageAdd[data-reg="withdraw"] .regHClose,
+#pageAdd[data-reg="cashbox"] .regHClose,
+#pageAdd[data-reg="basket"] .regHClose{display:grid}
 
 /* زیرمنوی کارت رانندگان */
 #fundSubMenu{display:none}
@@ -1564,8 +1595,10 @@ select.pplInput{appearance:none;background-image:linear-gradient(45deg,transpare
   margin-bottom:9px;color:var(--text)}
 .regMini:last-child{margin-bottom:0}
 .regMini:active{transform:scale(.985)}
-.regMini .mIc{width:30px;height:30px;flex:none;display:grid;place-items:center;color:var(--tcta2,#1976b9)}
-.regMini .mIc svg{width:23px;height:23px;display:block;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.regMini .mIc{width:30px;height:30px;flex:none;display:grid;place-items:center;color:var(--tink);opacity:.92}
+.regMini .mIc svg{width:24px;height:24px;display:block;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.regSubTitle{font-size:11px;font-weight:bold;color:var(--tink);display:flex;align-items:center;gap:7px;margin:2px 2px 10px}
+.regSubTitle:before{content:'';width:3px;height:13px;border-radius:3px;background:var(--tcta2)}
 .regMini .mTx{flex:1;min-width:0}
 .regMini .mTx b{display:block;font-size:12.5px;font-weight:bold}
 .regMini .mTx small{display:block;font-size:9.5px;color:var(--muted);margin-top:2px;line-height:1.6}
@@ -1575,9 +1608,35 @@ select.pplInput{appearance:none;background-image:linear-gradient(45deg,transpare
 /* چه چیزی دیده شود */
 #pageAdd.regOn>.title,#pageAdd.regOn>.tabs{display:none!important}
 #pageAdd.regMenuOn>#txEntryForm,#pageAdd.regMenuOn>#cashboxRechargePanel,#pageAdd.regMenuOn>#driverFundsPanel{display:none!important}
-#pageAdd[data-reg-panel="form"]>#cashboxRechargePanel,#pageAdd[data-reg-panel="form"]>#driverFundsPanel,
-#pageAdd[data-reg-panel="funds"]>#txEntryForm,#pageAdd[data-reg-panel="funds"]>#cashboxRechargePanel,
-#pageAdd[data-reg-panel="cashbox"]>#txEntryForm,#pageAdd[data-reg-panel="cashbox"]>#driverFundsPanel{display:none!important}
+#pageAdd.regOpen>#txEntryForm,#pageAdd.regOpen>#cashboxRechargePanel,#pageAdd.regOpen>#driverFundsPanel{display:none!important}
+#pageAdd.regOpen[data-reg-panel="cashbox"]>#cashboxRechargePanel,
+#pageAdd.regOpen[data-reg-panel="funds"]>#driverFundsPanel{
+  display:block!important;position:relative;z-index:2;
+  flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  margin:0 14px 18px!important;padding:14px;
+  background:rgba(255,255,255,.97);
+  border:1px solid rgba(255,255,255,.9);border-radius:19px;
+  box-shadow:0 6px 20px rgba(20,45,65,.07)}
+/* فرم ثبت: چیدمان چند-کارتی شبیه پریویو */
+#pageAdd.regOpen[data-reg-panel="form"]>#txEntryForm{
+  display:flex!important;flex-direction:column;gap:12px;
+  position:relative;z-index:2;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  margin:0 14px 18px!important;padding:2px 0 6px!important;
+  background:transparent;border:0;box-shadow:none}
+#pageAdd.regOpen[data-reg-panel="form"] #commonTxFields,
+#pageAdd.regOpen[data-reg-panel="form"] #depositBox,
+#pageAdd.regOpen[data-reg-panel="form"] #withdrawBox,
+#pageAdd.regOpen[data-reg-panel="form"] .purchaseAmountGrid,
+#pageAdd.regOpen[data-reg-panel="form"] .sourceBox,
+#pageAdd.regOpen[data-reg-panel="form"] .purchaseInvoiceMini{
+  background:#fff;border:1px solid rgba(20,45,65,.06);border-radius:18px;padding:13px;
+  box-shadow:0 6px 20px rgba(20,45,65,.06)}
+#pageAdd.regOpen[data-reg-panel="form"] #purchaseBox:not(.hidden){display:flex;flex-direction:column;gap:12px}
+#pageAdd.regOpen[data-reg-panel="form"] .sourceBox{margin-top:0;border-top:1px solid rgba(20,45,65,.06)}
+#pageAdd.regOpen[data-reg-panel="form"] .purchaseInvoiceMini{margin-top:0}
+#pageAdd.regOpen[data-reg-panel="form"] .sourceTitle{font-size:11.5px;font-weight:bold;color:var(--tink);display:flex;align-items:center;gap:7px;margin:0 0 10px}
+#pageAdd.regOpen[data-reg-panel="form"] .sourceTitle:before{content:'';width:3px;height:13px;border-radius:3px;background:var(--tcta2)}
+#pageAdd.regOpen[data-reg-panel="form"] #saveBtn{position:sticky;bottom:2px;z-index:6;margin:4px 0 0!important}
 #pageAdd[data-reg-panel="funds"] #driverFundsPanel>.ctitle,
 #pageAdd[data-reg-panel="funds"] #driverFundsPanel>p{display:none!important}
 #pageAdd[data-reg-panel="funds"] #fundBlockNew,
@@ -1591,6 +1650,27 @@ select.pplInput{appearance:none;background-image:linear-gradient(45deg,transpare
 #pageAdd[data-reg-panel][data-reg="fundDaily"] #driverFundDailyPanel{display:block!important}
 #pageAdd[data-reg-panel][data-reg="fundList"] #fundBlockList{display:block!important}
 #pageAdd[data-reg-panel][data-reg="basket"] #fundBlockBasket{display:block!important}
+
+/* محتوای داخل لایه، محو-رو‌شدن هنگام باز شدن */
+#pageAdd.regOpen>#regHead,
+#pageAdd.regOpen[data-reg-panel="form"]>#txEntryForm,
+#pageAdd.regOpen[data-reg-panel="cashbox"]>#cashboxRechargePanel,
+#pageAdd.regOpen[data-reg-panel="funds"]>#driverFundsPanel{opacity:0;transform:translateY(14px)}
+#pageAdd.regOpen.regReady>#regHead,
+#pageAdd.regOpen.regReady[data-reg-panel="form"]>#txEntryForm,
+#pageAdd.regOpen.regReady[data-reg-panel="cashbox"]>#cashboxRechargePanel,
+#pageAdd.regOpen.regReady[data-reg-panel="funds"]>#driverFundsPanel{
+  opacity:1;transform:none;
+  transition:opacity .32s ease .12s,transform .36s var(--regEase) .12s}
+
+/* ظاهر ورودی‌ها داخل لایه */
+#pageAdd.regOpen .flabel{font-size:10.5px;color:var(--muted);font-weight:bold;margin:0 2px 5px}
+#pageAdd.regOpen .finput,#pageAdd.regOpen .select{padding:11px 12px;height:auto;min-height:44px;
+  border:1px solid var(--line);border-radius:13px;background:#fff;font-size:13.5px}
+#pageAdd.regOpen .finput:focus,#pageAdd.regOpen .select:focus{border-color:#9dc2e2;box-shadow:0 0 0 3px #dceafa;outline:0}
+#pageAdd.regOpen .moneyInput{direction:ltr;text-align:center;font-size:16.5px;font-weight:bold;
+  letter-spacing:.4px;padding:13px 12px}
+#pageAdd.regOpen .primary{border-radius:14px;font-size:14px}
 
 /* دکمهٔ ثبت هر بخش به رنگ همان بخش */
 #pageAdd[data-reg="purchase"] #saveBtn,
@@ -1610,8 +1690,18 @@ select.pplInput{appearance:none;background-image:linear-gradient(45deg,transpare
 #pageAdd[data-reg="fundExcel"] #fundBlockExcel>.divider,
 #pageAdd[data-reg="fundList"] #fundBlockList>.ctitle{display:none!important}
 
+/* ظاهر جدید: دکمهٔ «＋» و باز/بسته‌شدن فرم شارژ تنخواه و واریزی کارت رانندگان لازم نیست */
+#pageAdd #toggleCashboxDraft,
+#pageAdd #addFundDraft{display:none!important}
+#pageAdd #cashboxDraftForm,
+#pageAdd #fundDraftForm{display:block!important;opacity:1!important;max-height:none!important;overflow:visible!important;transform:none!important}
+#pageAdd[data-reg="fundNew"] #fundBlockNew>.procHead{display:none!important}
+
 @keyframes regPanelIn{from{opacity:0;transform:translateY(9px) scale(.992)}to{opacity:1;transform:none}}
-#pageAdd.regAnimIn>#regMenu,
+@keyframes regSlideNext{from{opacity:0;transform:translateX(-26px)}to{opacity:1;transform:none}}
+@keyframes regSlidePrev{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+@keyframes regSubIn{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:none}}
+@keyframes regMenuIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 #pageAdd.regAnimIn>#txEntryForm,
 #pageAdd.regAnimIn>#cashboxRechargePanel,
 #pageAdd.regAnimIn>#driverFundsPanel,
@@ -1621,6 +1711,7 @@ select.pplInput{appearance:none;background-image:linear-gradient(45deg,transpare
 #pageAdd[data-reg] #driverFundDailyPanel,
 #pageAdd[data-reg] #fundBlockList,
 #pageAdd[data-reg] #fundBlockBasket{animation:regPanelIn .32s var(--regEase)}
+#regMenuWrap.anim #regBento{animation:regMenuIn .3s var(--regEase)}
 </style>
 <script src="./vendor/supabase-js-2.105.4.js"></script>
 <script>
@@ -5840,13 +5931,16 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
  (function(){
   var pg=document.getElementById('pageAdd');
   var menuBox=document.getElementById('regMenu');
+  var menuWrap=document.getElementById('regMenuWrap');
   var bento=document.getElementById('regBento');
   var headBox=document.getElementById('regHead');
   var headIc=document.getElementById('regHIc');
   var headTitle=document.getElementById('regHTitle');
   var headSub=document.getElementById('regHSub');
   var backBtn=document.getElementById('regBack');
+  var closeBtn=document.getElementById('regClose');
   var subMenu=document.getElementById('fundSubMenu');
+  var closeT=null;
   if(!pg||!menuBox||!bento||!headBox)return;
 
   var IC={
@@ -5932,7 +6026,7 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
     {id:'fundDaily',icon:'daily',title:'جمع‌بندی روزانه',sub:'ماندهٔ امروز و بستن پرونده'},
     {id:'fundList',icon:'list',title:'واریزی‌ها و مانده قابل استفاده',sub:'فهرست واریزی‌ها و کلیدهای هر مورد'}
    ].filter(function(x){return x.need!=='manage'||allowed('fundNew')});
-   subMenu.innerHTML=items.map(function(x){
+   subMenu.innerHTML='<div class="regSubTitle">یکی را انتخاب کن</div>'+items.map(function(x){
     return '<button type="button" class="regMini" data-reg-go="'+x.id+'">'
       +'<span class="mIc">'+IC[x.icon]+'</span>'
       +'<span class="mTx"><b>'+esc(x.title)+'</b><small>'+esc(x.sub)+'</small></span>'
@@ -5951,18 +6045,77 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
    pg.classList.remove('regAnimIn'); void pg.offsetWidth; pg.classList.add('regAnimIn');
    setTimeout(function(){pg.classList.remove('regAnimIn')},420);
   }
+  function animMenu(){
+   if(!menuWrap)return;
+   menuWrap.classList.remove('anim'); void menuWrap.offsetWidth; menuWrap.classList.add('anim');
+   setTimeout(function(){menuWrap.classList.remove('anim')},380);
+  }
+  /* باز شدن با تغییرشکل از کاشی به تمام‌صفحه */
+  function flipOpen(tile){
+   pg.classList.remove('regReady');
+   pg.classList.add('regOpen');
+   var ov=pg.getBoundingClientRect();
+   var tr=tile?tile.getBoundingClientRect():null;
+   if(tr&&ov.width&&ov.height){
+    var ox=tr.left-ov.left, oy=tr.top-ov.top;
+    var sx=Math.max(1,tr.width)/ov.width, sy=Math.max(1,tr.height)/ov.height;
+    pg.classList.add('regMorph');
+    pg.style.transformOrigin='top left';
+    pg.style.transform='translate('+ox+'px,'+oy+'px) scale('+sx+','+sy+')';
+    pg.style.borderRadius='22px';
+    void pg.offsetHeight;
+    pg.classList.remove('regMorph');
+   }
+   pg.style.transform='translate(0,0) scale(1,1)';
+   pg.style.borderRadius='0px';
+   pg.classList.add('regReady');
+  }
+  /* بستن با جمع‌شدن به کاشی و آشکارشدن منو */
+  function closeOverlay(){
+   if(!pg.classList.contains('regOpen')){ showMenu(); return }
+   var cur=pg.getAttribute('data-reg');
+   pg.classList.remove('regReady');
+   var ok=buildMenu();
+   pg.classList.toggle('regMenuOn',ok);
+   if(menuWrap)menuWrap.classList.toggle('on',ok);
+   if(ok)animMenu();
+   var tile=cur?document.querySelector('#regBento [data-reg-go="'+cur+'"]'):null;
+   var ov=pg.getBoundingClientRect();
+   var tr=tile?tile.getBoundingClientRect():null;
+   if(tr&&ov.width&&ov.height){
+    var ox=tr.left-ov.left, oy=tr.top-ov.top;
+    var sx=Math.max(1,tr.width)/ov.width, sy=Math.max(1,tr.height)/ov.height;
+    pg.style.transformOrigin='top left';
+    pg.style.transform='translate('+ox+'px,'+oy+'px) scale('+sx+','+sy+')';
+    pg.style.borderRadius='22px';
+   }
+   clearTimeout(closeT);
+   closeT=setTimeout(function(){
+    pg.classList.remove('regOpen');
+    pg.removeAttribute('data-reg');
+    pg.removeAttribute('data-reg-panel');
+    pg.removeAttribute('data-tone');
+    pg.style.transform='';pg.style.borderRadius='';pg.style.transformOrigin='';
+    document.body.classList.remove('regLocked');
+   },520);
+  }
 
   /* نگه‌داشتن یک لایهٔ تاریخ مرورگر برای دکمهٔ برگشت گوشی (بدون هیچ back برنامه‌ای) */
   function hs(){ try{ return history.state||null }catch(e){ return null } }
   function pushSection(id){ try{ var s=hs(); if(s&&s.reg)history.replaceState({reg:id},''); else history.pushState({reg:id},'') }catch(e){} }
 
   function showMenu(){
+   pg.classList.remove('regOpen','regReady','regAnimIn');
    pg.removeAttribute('data-reg');
    pg.removeAttribute('data-reg-panel');
    pg.removeAttribute('data-tone');
+   pg.style.transform='';pg.style.borderRadius='';pg.style.transformOrigin='';
+   document.body.classList.remove('regLocked');
+   clearTimeout(closeT);
    var ok=buildMenu();
    pg.classList.toggle('regMenuOn',ok);
-   if(ok)anim();
+   if(menuWrap)menuWrap.classList.toggle('on',ok);
+   if(ok)animMenu();
   }
 
   function openSec(id,opts){
@@ -5970,6 +6123,9 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
    if(id!=='formEdit'&&!allowed(id))return;
    if(pg.getAttribute('data-reg')===id)return;
    var s=SEC[id];
+   var fromMenu=!pg.classList.contains('regOpen');
+   var tile=document.querySelector('#regBento [data-reg-go="'+id+'"]');
+   clearTimeout(closeT);
    pg.setAttribute('data-reg',id);
    pg.setAttribute('data-reg-panel',s.panel);
    pg.setAttribute('data-tone',s.tone);
@@ -5988,14 +6144,18 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
    if(id==='cashbox'){ try{ if(canChargeCashbox())setCashboxDraftOpen(true) }catch(e){} }
    if(id==='fundNew'){ try{ if(canManageFunds())setFundDraftOpen(true) }catch(e){} }
    pushSection(id);
-   if(!opts||!opts.keepScroll){ try{ window.scrollTo(0,0) }catch(e){} }
-   anim();
+   if(fromMenu){
+    document.body.classList.add('regLocked');
+    flipOpen(tile);
+   }else{
+    anim();
+   }
   }
 
   function back(){
    var cur=pg.getAttribute('data-reg');
    if(cur==='fundNew'||cur==='fundExcel'||cur==='fundDaily'||cur==='fundList'){ openSec('funds'); return }
-   showMenu();
+   closeOverlay();
   }
 
   function navBack(){
@@ -6025,10 +6185,14 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
     if(forcedSupplyLink){ openSec('purchase',{keepScroll:true}); return }
     showMenu();
    }else{
-    pg.classList.remove('regMenuOn');
+    pg.classList.remove('regMenuOn','regOn','regOpen','regReady','regAnimIn');
     pg.removeAttribute('data-reg');
     pg.removeAttribute('data-reg-panel');
     pg.removeAttribute('data-tone');
+    pg.style.transform='';pg.style.borderRadius='';pg.style.transformOrigin='';
+    document.body.classList.remove('regLocked');
+    clearTimeout(closeT);
+    if(menuWrap)menuWrap.classList.remove('on');
    }
   }
 
@@ -6041,11 +6205,12 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
   }
 
   /* ---------- رویدادها ---------- */
-  pg.addEventListener('click',function(e){
+  document.addEventListener('click',function(e){
    var t=e.target.closest('[data-reg-go]');
    if(t){ openSec(t.getAttribute('data-reg-go')); return }
   });
   if(backBtn)backBtn.addEventListener('click',function(){navBack()});
+  if(closeBtn)closeBtn.addEventListener('click',function(){closeOverlay()});
   var headTxt=document.querySelector('#regHead .regHTx');
   if(headTxt)headTxt.addEventListener('click',function(){navBack()});
 
@@ -6053,7 +6218,7 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
    if(!active())return;
    var s=hs(), id=s&&s.reg;
    if(id){ if(SEC[id]&&pg.getAttribute('data-reg')!==id)openSec(id,{keepScroll:true}); return }
-   if(pg.getAttribute('data-reg'))showMenu();
+   if(pg.getAttribute('data-reg'))closeOverlay();
   });
 
   var t0=null;
