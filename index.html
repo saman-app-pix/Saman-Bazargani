@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#ffffff" name="theme-color"/>
-<meta name="saman-build" content="v274"/>
+<meta name="saman-build" content="v275"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; manifest-src 'self'; connect-src 'self' https://eiobajtihwxdlfxufmbg.supabase.co wss://eiobajtihwxdlfxufmbg.supabase.co; base-uri 'self'; form-action 'self'; object-src 'none'"/>
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
@@ -530,7 +530,7 @@ textarea{min-height:64px}
 #pageWarehouse .warehouseBatchTools>button{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-width:0!important;max-width:100%!important;min-height:34px!important;height:auto!important;margin:0!important;padding:5px 3px!important;border-radius:8px!important;font-family:inherit!important;font-size:clamp(9px,2.45vw,11px)!important;font-weight:600!important;line-height:1.3!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal!important;box-sizing:border-box!important}
 @media(max-width:360px){#pageWarehouse .warehouseSection>.listTabs>button{font-size:11px!important;padding:5px 3px!important}#pageWarehouse .warehouseBatchTools{gap:4px!important;padding:4px!important}#pageWarehouse .warehouseBatchTools>button{font-size:9px!important;padding:4px 2px!important;min-height:34px!important}}
 </style>
-<meta name="saman-build" content="v274">
+<meta name="saman-build" content="v275">
 
 <style id="v213-fund-transfer-split">
 .fundActOverlay,.fundPickerOverlay{position:fixed;inset:0;z-index:100520;display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;background:rgba(15,28,45,.48);backdrop-filter:blur(2px)}
@@ -5937,15 +5937,14 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
   sec.classList.remove('hidden');sec.hidden=false;
   box.innerHTML=arr.map(function(r){
    var bought=(r.items||[]).map(function(it,index){return {it:it,index:index}}).filter(function(x){return x.it&&x.it.status==='bought'});
-   var head='<div class="procReturnHead"><div class="procReturnHeadMain"><span class="procReturnBadge">برگشتی</span><b>درخواست #'+esc(r.id)+'</b></div><span class="procReturnMeta">'+fa(bought.length)+' قلم خریداری‌شده</span></div>'
-    +'<div class="procReturnSub">برگشت کل درخواست توسط '+esc((r.procReturn&&r.procReturn.by)||'—')+' در '+esc((r.procReturn&&r.procReturn.date)||'')+'</div>'
+   var head='<div class="procReturnHead"><div class="procReturnHeadMain"><span class="procReturnBadge">برگشتی</span><b>درخواست #'+esc(r.id)+'</b><span class="procReturnMeta">'+fa(bought.length)+' قلم</span></div><span class="procReturnMeta procReturnBy">برگشت توسط '+esc((r.procReturn&&r.procReturn.by)||'—')+(r.procReturn&&r.procReturn.date?' · '+esc(r.procReturn.date):'')+'</span></div>'
     +((r.procReturn&&r.procReturn.reason)?'<div class="procReturnReason">دلیل: '+esc(r.procReturn.reason)+'</div>':'');
    var rows=bought.length?bought.map(function(o){
     var it=o.it,index=o.index;
     var cur=Number((it.boughtQty!=null?it.boughtQty:it.qty)||0);
     var amount=v249ItemShareAmount(r,index);
     var key=esc(String(r.id))+'|'+index;
-    return '<div class="procReturnRow"><div class="procReturnRowInfo"><b>'+esc(it.name||'کالا')+'</b><small>تعداد فعلی: <b>'+fa(cur)+'</b> '+esc(it.unit||'')+(amount>0?' · سهم مبلغ: '+money(amount)+' '+currencyUnit():'')+'</small></div><div class="procReturnRowActions"><input class="finput" inputmode="decimal" value="'+esc(String(cur))+'" data-v249-qty="'+key+'" aria-label="تعداد جدید"><button class="v274CheckBtn" type="button" data-v249-qty-save="'+key+'" title="ثبت تعداد اصلاح‌شده" aria-label="ثبت تعداد اصلاح‌شده"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4 10-11"/></svg></button><button class="outline v274NotBuyBtn" type="button" data-v249-notbuy="'+key+'">ثبت عدم خرید</button></div></div>';
+    return '<div class="procReturnRow"><div class="procReturnRowInfo"><b>'+esc(it.name||'کالا')+'</b><span class="procReturnRowMeta">· تعداد فعلی <b>'+fa(cur)+'</b> '+esc(it.unit||'')+(amount>0?' · سهم '+money(amount)+' '+currencyUnit():'')+'</span></div><div class="procReturnRowActions"><input class="finput" inputmode="decimal" value="'+esc(String(cur))+'" data-v249-qty="'+key+'" aria-label="تعداد جدید"><button class="v274CheckBtn" type="button" data-v249-qty-save="'+key+'" title="ثبت تعداد اصلاح‌شده" aria-label="ثبت تعداد اصلاح‌شده"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4 10-11"/></svg></button><button class="outline v274NotBuyBtn" type="button" data-v249-notbuy="'+key+'">ثبت عدم خرید</button></div></div>';
    }).join(''):'<div class="procReturnEmpty">قلم خریداری‌شده‌ای باقی نمانده است؛ برای ارسال به انبار تأیید کن.</div>';
    return '<div class="procReturnCard">'+head+rows+'<div class="procReturnFooter"><button class="primary" type="button" data-v250-resolve="'+esc(String(r.id))+'">تأیید نهایی و ارسال کل درخواست به انبار</button></div></div>';
   }).join('');
@@ -5957,30 +5956,31 @@ editTx=function(id){v253EditPoolUsed=0;const r=_v253OrigEditTx.apply(this,argume
   st.textContent=[
    '#withdrawMixed{grid-template-columns:repeat(2,minmax(0,1fr))}',
    '#withdrawBasketFields{margin-top:8px}',
-   '.procReturnCard{display:flex;flex-direction:column;gap:8px;border:1px solid #ecd9b8;border-radius:14px;padding:11px 12px 11px;background:linear-gradient(180deg,#fffdf7,#fff8ec)}',
-   '.procReturnHead{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}',
-   '.procReturnHeadMain{display:flex;align-items:center;gap:7px;min-width:0}',
-   '.procReturnHeadMain b{font-size:12.5px}',
-   '.procReturnBadge{display:inline-flex;align-items:center;border-radius:999px;padding:2px 8px;font-size:9px;font-weight:900;background:#fff1d6;color:#a97915;border:1px solid #f0dcae}',
-   '.procReturnMeta{font-size:9.5px;color:var(--muted);white-space:nowrap}',
-   '.procReturnSub{font-size:9.5px;color:var(--muted);line-height:1.7}',
-   '.procReturnReason{font-size:10px;color:#8a6320;background:#fff7e6;border:1px dashed #ead9b6;border-radius:8px;padding:5px 8px;line-height:1.7}',
-   '.procReturnRow{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;border-top:1px dashed #eee2cb;padding-top:8px}',
+   '.procReturnCard{display:flex;flex-direction:column;gap:6px;border:1px solid #ecd9b8;border-radius:13px;padding:9px 10px;background:linear-gradient(180deg,#fffdf7,#fff8ec)}',
+   '.procReturnHead{display:flex;align-items:center;justify-content:space-between;gap:2px 8px;flex-wrap:wrap}',
+   '.procReturnHeadMain{display:flex;align-items:center;gap:6px;min-width:0}',
+   '.procReturnHeadMain b{font-size:11.5px}',
+   '.procReturnBadge{display:inline-flex;align-items:center;border-radius:999px;padding:1px 7px;font-size:8.5px;font-weight:900;background:#fff1d6;color:#a97915;border:1px solid #f0dcae}',
+   '.procReturnMeta{font-size:8.5px;color:var(--muted);white-space:nowrap}',
+   '.procReturnBy{white-space:normal;line-height:1.5;text-align:left}',
+   '.procReturnReason{font-size:9px;color:#8a6320;background:#fff7e6;border:1px dashed #ead9b6;border-radius:7px;padding:4px 7px;line-height:1.6}',
+   '.procReturnRow{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;border-top:1px dashed #eee2cb;padding-top:6px}',
    '.procReturnRow:first-child{border-top:0;padding-top:0}',
-   '.procReturnRowInfo{min-width:0;flex:1 1 170px}',
-   '.procReturnRowInfo b{font-size:11.5px;display:block}',
-   '.procReturnRowInfo small{color:var(--muted);font-size:9.5px;line-height:1.7}',
-   '.procReturnRowActions{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}',
-   '.procReturnRowActions input{width:62px;height:36px;text-align:center;padding:0 6px}',
-   '.procReturnRowActions button{height:36px;padding:0 11px;font-size:10.5px;border-radius:10px;white-space:nowrap}',
-   '.procReturnRowActions .v274CheckBtn{width:36px;padding:0;border:1px solid #cfe0d4;background:#fff;color:#237344;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:background .25s,border-color .25s,color .25s,transform .15s,box-shadow .25s}',
-   '.procReturnRowActions .v274CheckBtn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}',
+   '.procReturnRowInfo{min-width:0;flex:1 1 210px;display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 6px}',
+   '.procReturnRowInfo b{font-size:11px}',
+   '.procReturnRowMeta{color:var(--muted);font-size:9px;line-height:1.45}',
+   '.procReturnRowMeta b{font-size:9px;color:#4b5a66}',
+   '.procReturnRowActions{display:flex;align-items:center;gap:5px;flex-wrap:nowrap}',
+   '.procReturnRowActions input{width:56px;height:32px;text-align:center;padding:0 5px}',
+   '.procReturnRowActions button{height:32px;padding:0 10px;font-size:10px;border-radius:9px;white-space:nowrap}',
+   '.procReturnRowActions .v274CheckBtn{width:32px;padding:0;border:1px solid #cfe0d4;background:#fff;color:#237344;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:background .25s,border-color .25s,color .25s,transform .15s,box-shadow .25s}',
+   '.procReturnRowActions .v274CheckBtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}',
    '.procReturnRowActions .v274CheckBtn:active{transform:scale(.94)}',
    '.procReturnRowActions .v274CheckBtn.v274CheckOk{background:#1f9d55;border-color:#1f9d55;color:#fff;box-shadow:0 3px 10px rgba(31,157,85,.35);animation:v274CheckPop .42s ease}',
    '.procReturnRowActions .v274NotBuyBtn{transition:background .28s,border-color .28s,color .28s,transform .15s,box-shadow .28s}',
    '.procReturnRowActions .v274NotBuyBtn.v274NotBuyRed{background:#d9534f;border-color:#d9534f;color:#fff;box-shadow:0 3px 10px rgba(217,83,79,.35);animation:v274NotBuyPop .4s ease}',
    '.procReturnEmpty{font-size:10px;color:var(--muted);line-height:1.7}',
-   '.procReturnFooter{margin-top:1px}',
+   '.procReturnFooter{margin-top:0}',
    '.procReturnFooter button{width:100%;height:48px;border-radius:13px;font-size:13px;font-weight:700}',
    '@keyframes v274CheckPop{0%{transform:scale(1)}45%{transform:scale(1.16)}100%{transform:scale(1)}}',
    '@keyframes v274NotBuyPop{0%{transform:scale(1)}45%{transform:scale(1.06)}100%{transform:scale(1)}}',
@@ -7355,7 +7355,7 @@ select.driverLockedField{-webkit-appearance:none;appearance:none;background-imag
 
 /* v274 - دکمهٔ ثبت در فرم‌های overlay هم‌قد دکمه‌های اصلی اپ */
 #pageAdd .form .save{height:48px!important;border-radius:12px!important}
-#pageAdd.regOpen .form .save{height:48px!important;border-radius:14px!important;font-size:14px!important}
+#pageAdd.regOpen .form .save{height:48px!important;min-height:48px!important;flex:0 0 auto!important;border-radius:14px!important;font-size:14px!important}
 
 /* v274 - هم‌خوانی متن «ماندهٔ قابل استفادهٔ کارت رانندگان» در ثبت برداشت */
 #withdrawDriverHint{font-size:11px!important;color:#59636b!important;font-weight:600!important;line-height:1.6!important}
